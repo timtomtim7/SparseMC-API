@@ -1,0 +1,20 @@
+buildscript {
+    ext.kotlin_version = '1.2.41'
+	ext.coroutines_version = '0.22.5'
+
+    repositories {
+        mavenCentral()
+		jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+group 'blue.sparse'
+version '1.0-SNAPSHOT'
+
+task copyJars(type: Copy) {
+	from subprojects.collect { it.tasks.withType(Jar) }
+	into "$buildDir/allJars"
+}

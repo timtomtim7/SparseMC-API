@@ -1,0 +1,5 @@
+name: SparseMC-API
+version: 1
+author: Tom
+main: blue.sparse.minecraft.SparseMCPlugin
+load: STARTUP
