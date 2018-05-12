@@ -6,9 +6,9 @@ class Compound: DataMap<String> {
 
 	private val backingMap = LinkedHashMap<String, NBTValue<*>>()
 
-	override fun keys(): MutableSet<String> {
-		return backingMap.keys
-	}
+//	override fun keys(): MutableSet<String> {
+//		return backingMap.keys
+//	}
 
 	override fun byte(key: String): Byte {
 		return (backingMap[key] as NBTValue.NBTByte).value
