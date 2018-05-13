@@ -4,6 +4,6 @@ group 'blue.sparse'
 version '0.0'
 
 dependencies {
-	compileOnly project(':core')
+	compileOnly project(':modules/core')
 }
 

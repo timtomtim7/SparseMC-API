@@ -6,9 +6,13 @@ class Compound: DataMap<String> {
 
 	private val backingMap = LinkedHashMap<String, NBTValue<*>>()
 
-//	override fun keys(): MutableSet<String> {
-//		return backingMap.keys
-//	}
+	fun keys(): MutableSet<String> {
+		return backingMap.keys
+	}
+
+	fun values(): MutableCollection<NBTValue<*>> {
+		return backingMap.values
+	}
 
 	override fun byte(key: String): Byte {
 		return (backingMap[key] as NBTValue.NBTByte).value
@@ -52,6 +56,10 @@ class Compound: DataMap<String> {
 
 	override fun longArray(key: String): LongArray {
 		return (backingMap[key] as NBTValue.NBTLongArray).value
+	}
+
+	fun compound(key: String): Compound {
+		return (backingMap[key] as NBTValue.NBTCompound).value
 	}
 
 
@@ -102,4 +110,7 @@ class Compound: DataMap<String> {
 		backingMap[key] = NBTValue.NBTLongArray(value)
 	}
 
+	fun compound(key: String, value: Compound) {
+		backingMap[key] = NBTValue.NBTCompound(value)
+	}
 }
