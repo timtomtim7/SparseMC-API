@@ -18,3 +18,12 @@ task copyJars(type: Copy) {
 	from subprojects.collect { it.tasks.withType(Jar) }
 	into "$buildDir/allJars"
 }
+
+task copyToPlugins(type: Copy) {
+	into("testServer/plugins")
+	from subprojects.find { it.name == "core" }.tasks.withType(Jar)
+
+	into("SparseMC-API/modules/") {
+		from subprojects.findAll { it.name != "core" }.collect { it.tasks.withType(Jar) }
+	}
+}
