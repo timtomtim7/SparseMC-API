@@ -13,11 +13,10 @@ import java.util.logging.Logger
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.jvmName
 
-abstract class KotlinPlugin : PluginBase() {
+abstract class SparsePlugin : PluginBase() {
 
 	private val description: PluginDescriptionFile
 
-	//	private val _logger by lazy { PluginLogger(this) }
 	private val _logger: Logger by lazy { Logger.getLogger(name) }
 
 	private var _enabled = false
@@ -25,8 +24,8 @@ abstract class KotlinPlugin : PluginBase() {
 
 	private lateinit var _server: Server
 	private lateinit var _dataFolder: File
-//	private lateinit var _pluginLoader: KotlinPluginLoader
-//	private lateinit var _classLoader: KotlinPluginClassLoader
+	private lateinit var _pluginLoader: SparsePluginLoader
+	private lateinit var classLoader: SparsePluginClassLoader
 
 	protected var enabled: Boolean
 		get() = _enabled
@@ -41,7 +40,7 @@ abstract class KotlinPlugin : PluginBase() {
 	init {
 		val clazz = this::class
 		val annotation = clazz.findAnnotation<PluginDescription>()
-				?: throw IllegalStateException("KotlinPlugin must have the PluginDescription annotation.")
+				?: throw IllegalStateException("SparsePlugin must have the PluginDescription annotation.")
 
 		description = PluginDescriptionFile(annotation.name, annotation.version, clazz.jvmName)
 		val descClazz = description.javaClass
@@ -79,12 +78,11 @@ abstract class KotlinPlugin : PluginBase() {
 	final override fun onTabComplete(p0: CommandSender?, p1: Command?, p2: String?, p3: Array<out String>?) = null
 
 	final override fun getResource(name: String): InputStream? {
-//		return _classLoader.getResource(name)?.let {
-//			val conn = it.openConnection()
-//			conn.useCaches = true
-//			conn.getInputStream()
-//		}
-		TODO("not implemented")
+		return classLoader.getResource(name)?.let {
+			val conn = it.openConnection()
+			conn.useCaches = true
+			conn.getInputStream()
+		}
 	}
 
 	final override fun saveResource(name: String, replace: Boolean) {
@@ -119,12 +117,12 @@ abstract class KotlinPlugin : PluginBase() {
 
 	final override fun getServer() = _server
 
-//	internal fun init(dataFolder: File, pluginLoader: KotlinPluginLoader, classLoader: KotlinPluginClassLoader, server: Server) {
-//		_dataFolder = dataFolder
-//		_pluginLoader = pluginLoader
-//		_classLoader = classLoader
-//		_server = server
-//	}
+	internal fun init(dataFolder: File, pluginLoader: SparsePluginLoader, classLoader: SparsePluginClassLoader, server: Server) {
+		_dataFolder = dataFolder
+		_pluginLoader = pluginLoader
+		this.classLoader = classLoader
+		_server = server
+	}
 
 	internal fun setEnabled(value: Boolean) {
 		enabled = value
@@ -132,9 +130,9 @@ abstract class KotlinPlugin : PluginBase() {
 
 	companion object {
 
-//		fun getProvidingPlugin(clazz: Class<*>): KotlinPlugin? {
-//			return (clazz.classLoader as? KotlinPluginClassLoader ?: return null).plugin
-//		}
+		fun getProvidingPlugin(clazz: Class<*>): SparsePlugin? {
+			return (clazz.classLoader as? SparsePluginClassLoader ?: return null).plugin
+		}
 
 	}
 }

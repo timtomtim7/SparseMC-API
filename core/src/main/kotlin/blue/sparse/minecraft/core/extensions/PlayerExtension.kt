@@ -8,18 +8,14 @@ fun Player.getPluginLocale(plugin: Plugin): PluginLocale {
 	return PluginLocale[plugin, player.locale]
 }
 
-fun Player.send(plugin: Plugin, key: String, placeholders: Map<String, Any>) {
+fun Player.sendMessage(plugin: Plugin, key: String, placeholders: Map<String, Any>) {
 	sendMessage(getPluginLocale(plugin)[key, placeholders])
 }
 
-fun Player.send(plugin: Plugin, key: String, vararg placeholders: Pair<String, Any>) {
-	send(plugin, key, placeholders.toMap())
+fun Player.sendMessage(plugin: Plugin, key: String, vararg placeholders: Pair<String, Any>) {
+	sendMessage(plugin, key, placeholders.toMap())
 }
 
-fun Player.send(raw: String) {
-	sendMessage(raw)
-}
-
-fun Player.sendColored(raw: String) {
+fun Player.sendColoredMessage(raw: String) {
 	sendMessage(raw.colored)
 }

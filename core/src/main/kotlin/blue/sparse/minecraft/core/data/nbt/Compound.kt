@@ -6,12 +6,34 @@ class Compound: DataMap<String> {
 
 	private val backingMap = LinkedHashMap<String, NBTValue<*>>()
 
+	constructor(map: Map<String, Any>) {
+		for ((k, v) in map) {
+			backingMap[k] = NBTValue.toNBTValue(v)
+		}
+	}
+
+	constructor(vararg pairs: Pair<String, Any>) {
+		for ((k, v) in pairs) {
+			backingMap[k] = NBTValue.toNBTValue(v)
+		}
+	}
+
+	constructor(pairs: Collection<Pair<String, Any>>) {
+		for ((k, v) in pairs) {
+			backingMap[k] = NBTValue.toNBTValue(v)
+		}
+	}
+
 	fun keys(): MutableSet<String> {
 		return backingMap.keys
 	}
 
-	fun values(): MutableCollection<NBTValue<*>> {
-		return backingMap.values
+	internal fun raw(key: String): NBTValue<*> {
+		return backingMap[key]!!
+	}
+
+	operator fun get(key: String): Any {
+		return backingMap[key]!!.value
 	}
 
 	override fun byte(key: String): Byte {
@@ -62,7 +84,9 @@ class Compound: DataMap<String> {
 		return (backingMap[key] as NBTValue.NBTCompound).value
 	}
 
-
+	fun collection(key: String): Collection<Any> {
+		return (backingMap[key] as NBTValue.NBTList<*>).value.map { it.value }
+	}
 
 
 
@@ -112,5 +136,15 @@ class Compound: DataMap<String> {
 
 	fun compound(key: String, value: Compound) {
 		backingMap[key] = NBTValue.NBTCompound(value)
+	}
+
+	fun collection(key: String, collection: Collection<Any>) {
+		if(collection.isNotEmpty()) {
+			val first = collection.first()
+			if (collection.any { it.javaClass != first.javaClass })
+				throw IllegalStateException("All items in NBT collection must have the same type.")
+		}
+
+		backingMap[key] = NBTValue.NBTList(collection.map { NBTValue.toNBTValue(it) })
 	}
 }

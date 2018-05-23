@@ -1,6 +1,6 @@
 package blue.sparse.minecraft.core.data.nbt
 
-sealed class NBTValue<T: Any>(val id: Int) {
+internal sealed class NBTValue<T: Any>(val id: Int) {
 	abstract val value: T
 
 	data class NBTByte			(override val value: Byte)							 : NBTValue<Byte>(1)

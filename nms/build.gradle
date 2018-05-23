@@ -3,7 +3,21 @@ apply from: "../common.gradle"
 group 'blue.sparse'
 version '0.0'
 
+repositories {
+    flatDir { dirs "libs" }
+}
+
 dependencies {
     compileOnly project(':core')
+    compileOnly name: "spigot-1.12.2"
+    compileOnly name: "spigot-1.11.2"
+    compileOnly name: "spigot-1.10.2"
+    compileOnly name: "spigot-1.9.4"
+    compileOnly name: "spigot-1.9.2"
+    compileOnly name: "spigot-1.8.8"
+    compileOnly name: "spigot-1.8.3"
+    compileOnly name: "spigot-1.8"
+
+    testCompileOnly name: "spigot-1.12.2"
 }
 

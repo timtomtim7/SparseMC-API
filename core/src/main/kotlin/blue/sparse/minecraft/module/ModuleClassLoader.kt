@@ -1,5 +1,6 @@
 package blue.sparse.minecraft.module
 
+import jdk.internal.org.objectweb.asm.util.ASMifier
 import java.io.File
 import java.net.URLClassLoader
 import java.util.jar.JarFile

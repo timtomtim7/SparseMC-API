@@ -47,3 +47,5 @@ out/
 hs_err_pid*
 
 testServer
+
+nms/libs
