@@ -11,8 +11,38 @@ buildscript {
     }
 }
 
-group 'blue.sparse'
+group 'blue.sparse.minecraft'
 version '1.0-SNAPSHOT'
+
+allprojects {
+	apply plugin: 'maven-publish'
+}
+
+subprojects { p ->
+	configure(p) {
+		publishing {
+			publications {
+				j(MavenPublication) {
+					groupId project.group
+					artifactId project.name
+					version project.version
+					from components.java
+				}
+
+//				mavenJava(MavenPublication) {
+//					artifact tasks.getByName("jar")
+//				}
+			}
+			repositories {
+				maven {
+					name = "sparse"
+					url "F:\\maven"
+				}
+			}
+		}
+	}
+}
+
 
 task copyJars(type: Copy) {
 	from subprojects.collect { it.tasks.withType(Jar) }

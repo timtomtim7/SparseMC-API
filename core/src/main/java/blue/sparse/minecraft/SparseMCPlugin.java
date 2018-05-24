@@ -1,6 +1,8 @@
 package blue.sparse.minecraft;
 
 import blue.sparse.minecraft.module.ModuleManager;
+import blue.sparse.minecraft.plugin.SparsePluginLoader;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;

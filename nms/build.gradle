@@ -1,6 +1,6 @@
 apply from: "../common.gradle"
 
-group 'blue.sparse'
+group 'blue.sparse.minecraft'
 version '0.0'
 
 repositories {

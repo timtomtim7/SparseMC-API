@@ -11,8 +11,8 @@ dependencies {
 	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 	compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 	compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
-	compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
-	testCompileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+	compile 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+	testCompile 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
 }
 
 compileKotlin {

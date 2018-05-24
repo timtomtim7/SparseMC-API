@@ -1,5 +1,7 @@
 package blue.sparse.minecraft.plugin
 
+import blue.sparse.minecraft.util.castDeclaredField
+import org.bukkit.Server
 import org.bukkit.event.*
 import org.bukkit.plugin.*
 import java.io.File
@@ -7,11 +9,28 @@ import java.util.regex.Pattern
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.jvmErasure
 
-internal class SparsePluginLoader : PluginLoader {
+internal class SparsePluginLoader(val server: Server) : PluginLoader {
 
 	private val loadedPlugins = HashMap<File, SparsePlugin>()
 
-	override fun loadPlugin(file: File): Plugin {
+	init {
+		instance = this
+	}
+
+	fun reloadPlugin(plugin: SparsePlugin): SparsePlugin {
+		val file = (plugin.javaClass.classLoader as SparsePluginClassLoader).file
+		val pluginManager = server.pluginManager
+
+		pluginManager.disablePlugin(plugin)
+		unloadPlugin(plugin)
+
+		val newPlugin = pluginManager.loadPlugin(file)
+		pluginManager.enablePlugin(newPlugin)
+
+		return newPlugin as SparsePlugin
+	}
+
+	override fun loadPlugin(file: File): SparsePlugin {
 		if (file.extension != "spl")
 			throw IllegalArgumentException("Invalid file extension for SparsePluginLoader")
 
@@ -22,6 +41,21 @@ internal class SparsePluginLoader : PluginLoader {
 		loadedPlugins[file] = plugin
 
 		return plugin
+	}
+
+	fun unloadPlugin(plugin: SparsePlugin) {
+		plugin.logger.info("Unloading ${plugin.name} v${plugin.description.version}")
+		server.pluginManager.castDeclaredField<MutableList<Plugin>>("plugins").remove(plugin)
+		server.pluginManager.castDeclaredField<MutableMap<String, Plugin>>("lookupNames").values.remove(plugin)
+		loadedPlugins.values.remove(plugin)
+	}
+
+	fun unloadAll() {
+		loadedPlugins.values.toTypedArray().forEach(this::unloadPlugin)
+	}
+
+	fun disableAll() {
+		loadedPlugins.values.forEach(this::disablePlugin)
 	}
 
 	override fun enablePlugin(plugin: Plugin) {
@@ -60,6 +94,12 @@ internal class SparsePluginLoader : PluginLoader {
 		}
 
 		TODO("Not implemented")
+	}
+
+	companion object {
+		var instance: SparsePluginLoader? = null
+			private set
+
 	}
 
 }

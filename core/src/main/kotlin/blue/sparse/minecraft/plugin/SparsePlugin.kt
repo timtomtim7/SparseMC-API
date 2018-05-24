@@ -5,8 +5,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.generator.ChunkGenerator
-import org.bukkit.plugin.PluginBase
-import org.bukkit.plugin.PluginDescriptionFile
+import org.bukkit.plugin.*
 import java.io.File
 import java.io.InputStream
 import java.util.logging.Logger
@@ -17,8 +16,8 @@ abstract class SparsePlugin : PluginBase() {
 
 	private val description: PluginDescriptionFile
 
-	private val _logger: Logger by lazy { Logger.getLogger(name) }
 
+	private val _logger: Logger by lazy { Logger.getLogger(name) }
 	private var _enabled = false
 	private var _naggable = true
 
@@ -105,7 +104,7 @@ abstract class SparsePlugin : PluginBase() {
 		TODO("not implemented")
 	}
 
-	final override fun getPluginLoader() = TODO("not implemented")
+	final override fun getPluginLoader(): PluginLoader = _pluginLoader
 
 	final override fun isNaggable() = _naggable
 
