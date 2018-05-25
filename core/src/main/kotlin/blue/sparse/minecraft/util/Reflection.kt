@@ -17,16 +17,23 @@ class Reflection(val value: Any) {
 		val declaredField: Field? by lazy { tryOrNull { origin.valueClass.getDeclaredField(name) } }
 
 		var fieldValue: Any?
-			get() {
-				val f = this.field!!
-				f.isAccessible = true
-				return f.get(origin.value)
-			}
-			set(value) {
-				val f = this.field!!
-				f.isAccessible = true
-				f.set(origin.value, value)
-			}
+			get() = getFieldValue(this.field!!)
+			set(value) = setFieldValue(this.field!!, value)
+
+		var declaredFieldValue: Any?
+			get() = getFieldValue(this.declaredField!!)
+			set(value) = setFieldValue(this.declaredField!!, value)
+
+		private fun getFieldValue(field: Field): Any? {
+			field.isAccessible = true
+			return field[origin.value]
+		}
+
+		private fun setFieldValue(field: Field, value: Any?) {
+			field.isAccessible = true
+			field.set(origin.value, value)
+
+		}
 
 		fun method(name: String, vararg params: Class<*>): Method? {
 			return tryOrNull { origin.valueClass.getMethod(name, *params) }
@@ -42,5 +49,12 @@ inline fun <T> tryOrNull(body: () -> T): T? {
 		null
 	}
 }
+
+//inline fun ignore(vararg exceptions: Class<out Throwable>, body: () -> Unit) {
+//	try {
+//		body()
+//	} catch (t: Throwable) {
+//	}
+//}
 
 val Any.reflection get() = Reflection(this)

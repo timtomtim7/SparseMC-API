@@ -4,7 +4,9 @@ import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.module.Module
 import blue.sparse.minecraft.module.ModuleDefinition
 import blue.sparse.minecraft.plugin.SparsePluginLoader
+import blue.sparse.minecraft.util.castDeclaredField
 import blue.sparse.minecraft.util.reflection
+import org.bukkit.plugin.PluginLoader
 import java.io.File
 
 @ModuleDefinition
@@ -12,11 +14,11 @@ object CoreModule : Module {
 
 	override fun onEnable() {
 		registerPluginLoader()
-		loadPlugins()
+		loadAndEnablePlugins()
 	}
 
 	override fun onDisable() {
-		unloadPlugins()
+		disableAndUnloadPlugins()
 		unregisterPluginLoader()
 	}
 
@@ -26,11 +28,12 @@ object CoreModule : Module {
 
 	private fun unregisterPluginLoader() {
 		val pm = server.pluginManager
-		val fileAssoc = pm.reflection["fileAssociations"].fieldValue as MutableMap<*, *>
+//		val fileAssociations = pm.castDeclaredField<MutableMap<*, PluginLoader>>("fileAssociations")
+		val fileAssoc = pm.reflection["fileAssociations"].declaredFieldValue as MutableMap<*, *>
 		fileAssoc.values.removeAll { it?.javaClass == SparsePluginLoader::class.java }
 	}
 
-	private fun loadPlugins() {
+	private fun loadAndEnablePlugins() {
 		val pluginsFolder = File("plugins")
 		if (pluginsFolder.exists()) {
 			val files = pluginsFolder.listFiles { f -> f.extension == "spl" }
@@ -44,15 +47,15 @@ object CoreModule : Module {
 				}
 			}
 
-			//TODO: Sort by dependencies,
-			// download and load maven dependencies,
-			// download plugin dependencies (if available)
+			//TODO: download plugin dependencies (if available)
+			//TODO: sort by dependencies
+			//TODO: download maven dependencies
 
 			plugins.forEach(server.pluginManager::enablePlugin)
 		}
 	}
 
-	private fun unloadPlugins() {
+	private fun disableAndUnloadPlugins() {
 		SparsePluginLoader.instance?.let {
 			it.disableAll()
 			it.unloadAll()
