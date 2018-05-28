@@ -1,13 +1,12 @@
 package blue.sparse.minecraft.plugin
 
+import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.util.castDeclaredField
 import org.bukkit.Server
 import org.bukkit.event.*
 import org.bukkit.plugin.*
 import java.io.File
 import java.util.regex.Pattern
-import kotlin.reflect.full.*
-import kotlin.reflect.jvm.jvmErasure
 
 internal class SparsePluginLoader(val server: Server) : PluginLoader {
 
@@ -85,15 +84,17 @@ internal class SparsePluginLoader(val server: Server) : PluginLoader {
 	}
 
 	override fun createRegisteredListeners(listener: Listener, plugin: Plugin): MutableMap<Class<out Event>, MutableSet<RegisteredListener>> {
-		val result = HashMap<Class<out Event>, MutableSet<RegisteredListener>>()
+//		val result = HashMap<Class<out Event>, MutableSet<RegisteredListener>>()
+//
+//		val eventFunctions = listener.javaClass.kotlin.functions.filter {
+//			(it.parameters.size == 1 && it.parameters.first().type.jvmErasure.isSubclassOf(Event::class))
+//		}.mapNotNull {
+//			it to (it.findAnnotation<EventHandler>() ?: return@mapNotNull null)
+//		}
 
-		val eventFunctions = listener.javaClass.kotlin.functions.filter {
-			(it.parameters.size == 1 && it.parameters.first().type.jvmErasure.isSubclassOf(Event::class))
-		}.mapNotNull {
-			it to (it.findAnnotation<EventHandler>() ?: return@mapNotNull null)
-		}
+		return SparseMCAPIPlugin.getPlugin().pluginLoader.createRegisteredListeners(listener, plugin)
 
-		TODO("Not implemented")
+//		TODO("Not implemented")
 	}
 
 	companion object {

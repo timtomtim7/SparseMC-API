@@ -1,6 +1,6 @@
 package blue.sparse.minecraft.nms.v1_12_R1
 
-import blue.sparse.minecraft.SparseMCPlugin
+import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.nms.api.PlaceholdersNMS
 import io.netty.channel.*
@@ -16,7 +16,7 @@ import java.lang.reflect.ParameterizedType
 class PlaceholderImpl : PlaceholdersNMS, Listener {
 
 	override fun onEnable() {
-		server.pluginManager.registerEvents(this, SparseMCPlugin.getPlugin())
+		server.pluginManager.registerEvents(this, SparseMCAPIPlugin.getPlugin())
 		server.onlinePlayers.forEach { onPlayerJoin(PlayerJoinEvent(it, null)) }
 
 //		PacketPlayOutSetSlot
@@ -39,6 +39,7 @@ class PlaceholderImpl : PlaceholdersNMS, Listener {
 	fun onPlayerQuit(e: PlayerQuitEvent) {
 		val channel = getChannel(e.player)
 		channel.eventLoop().submit { channel.pipeline().remove("sparsemc-${e.player.name}") }
+//		channel.pipeline().remove("sparsemc-${e.player.name}")
 	}
 
 	private fun getChannel(player: Player): Channel {

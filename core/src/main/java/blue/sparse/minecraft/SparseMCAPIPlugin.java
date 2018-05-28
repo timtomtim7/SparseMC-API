@@ -1,8 +1,6 @@
 package blue.sparse.minecraft;
 
 import blue.sparse.minecraft.module.ModuleManager;
-import blue.sparse.minecraft.plugin.SparsePluginLoader;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -12,15 +10,15 @@ import java.util.List;
 /**
  * Plugin class for the SparseMC API
  */
-public final class SparseMCPlugin extends JavaPlugin {
+public final class SparseMCAPIPlugin extends JavaPlugin {
 	
-	private static SparseMCPlugin plugin;
-	private static List<Runnable> disableHooks = new ArrayList<>();
+	private static SparseMCAPIPlugin plugin;
+	private static List<Runnable>    disableHooks = new ArrayList<>();
 	
 	/**
-	 * @return the instance of SparseMCPlugin
+	 * @return the instance of SparseMCAPIPlugin
 	 */
-	public static SparseMCPlugin getPlugin() {
+	public static SparseMCAPIPlugin getPlugin() {
 		return plugin;
 	}
 	
@@ -36,6 +34,7 @@ public final class SparseMCPlugin extends JavaPlugin {
 	public void onDisable() {
 		ModuleManager.INSTANCE.onPluginDisable();
 		disableHooks.forEach(Runnable::run);
+		System.gc();
 	}
 	
 	public void onEnable() {

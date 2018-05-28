@@ -1,6 +1,8 @@
 package blue.sparse.minecraft.commands
 
-import blue.sparse.minecraft.SparseMCPlugin
+import blue.sparse.minecraft.SparseMCAPIPlugin
+import blue.sparse.minecraft.commands.parsing.Parser
+import blue.sparse.minecraft.commands.parsing.impl.*
 import blue.sparse.minecraft.commands.test.TestCommands
 import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.module.Module
@@ -22,12 +24,38 @@ object CommandsModule : Module, Listener {
 	private val pluginCommands = HashMap<Plugin, MutableSet<Command>>()
 
 	override fun onEnable() {
-		server.pluginManager.registerEvents(this, SparseMCPlugin.getPlugin())
-		registerCommands(SparseMCPlugin.getPlugin(), TestCommands)
+		server.pluginManager.registerEvents(this, SparseMCAPIPlugin.getPlugin())
+		registerDefaultParsers()
+		registerCommands(SparseMCAPIPlugin.getPlugin(), TestCommands)
 	}
 
 	override fun onDisable() {
 
+	}
+
+	private fun registerDefaultParsers() {
+		val plugin = SparseMCAPIPlugin.getPlugin()
+
+		Parser.registerAll(
+				plugin,
+				doubleParser,
+				floatParser,
+				longParser,
+				intParser,
+				shortParser,
+				byteParser,
+				bigIntegerParser,
+				bigDecimalParser,
+				EnumParser,
+				uuidParser,
+				stringParser,
+				ListParser,
+				spacedStringParser,
+				QuotedStringParser,
+				EitherParser,
+				playerParser
+//				offlinePlayerParser
+		)
 	}
 
 	@EventHandler

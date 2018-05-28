@@ -42,8 +42,8 @@ class PluginLocale private constructor(
 		this.storage = storage
 	}
 
-	operator fun get(key: String, placeholders: Map<String, Any>): String {
-		val localized = storage[key] as? String ?: return "MISSING_LOCALE_KEY[$key]"
+	operator fun get(key: String, placeholders: Map<String, Any>): String? {
+		val localized = storage[key] as? String ?: return null//"MISSING_LOCALE_KEY[$key]"
 
 		val result = StringBuilder()
 

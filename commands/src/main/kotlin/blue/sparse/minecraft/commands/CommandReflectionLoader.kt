@@ -1,10 +1,15 @@
 package blue.sparse.minecraft.commands
 
+import blue.sparse.minecraft.commands.parsing.CharIterator
+import blue.sparse.minecraft.commands.parsing.Parser
+import blue.sparse.minecraft.util.*
+import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.jvmErasure
+import kotlin.system.measureTimeMillis
 
 object CommandReflectionLoader {
 
@@ -17,7 +22,7 @@ object CommandReflectionLoader {
 		}
 
 		val tabCompleteFunctions = functions.filter {
-			it.extensionReceiverParameter?.type?.jvmErasure == Execute::class &&
+			it.extensionReceiverParameter?.type?.jvmErasure == TabComplete::class &&
 					it.returnType.jvmErasure.isSubclassOf(Collection::class)
 		}
 
@@ -50,8 +55,27 @@ object CommandReflectionLoader {
 				data.aliases
 		) {
 			override fun execute(sender: CommandSender, commandLabel: String, args: Array<out String>): Boolean {
-				val context = Execute(data, sender)
-				exe.call(holder, context)
+				val ms = measureTimeMillis {
+					val context = Execute(data, sender)
+
+					val parsedArgs = parseCommandArguments(exe.valueParameters, args.joinToString(" "))
+
+					if (parsedArgs is Right) {
+						val param = parsedArgs.right
+						sendErrorMessage(context, exe.valueParameters, param)
+					} else {
+						val params = parsedArgs.left
+						params[exe.instanceParameter!!] = holder
+						params[exe.extensionReceiverParameter!!] = context
+
+						try {
+							exe.callBy(params)
+						}catch (t: ContextEscape) {}
+//						ignore<ContextEscape> { exe.callBy(params) }
+					}
+				}
+				println("Command $name took ${ms}ms")
+
 				return true
 			}
 
@@ -63,6 +87,99 @@ object CommandReflectionLoader {
 				return (tab.call(holder, context) as Collection<*>).mapTo(ArrayList(), Any?::toString)
 			}
 		}
+	}
+
+	private fun typeToString(type: KType?): String {
+		if (type == null)
+			return "*"
+
+		val result = StringBuilder()
+		result.append(type.jvmErasure.simpleName)
+
+		val arguments = type.arguments
+		if (arguments.isNotEmpty()) {
+			result.append('<')
+			result.append(arguments.joinToString { typeToString(it.type) })
+			result.append('>')
+		}
+
+		return result.toString()
+	}
+
+	private fun sendErrorMessage(context: Execute, params: List<KParameter>, failedAt: KParameter) {
+		val message = context.locale["error.command.${context.command.name}.${failedAt.name}", emptyMap()]
+		if (message != null) {
+			context.replyRaw(message)
+			return
+		}
+
+		val args = StringBuilder()
+
+		for (param in params) {
+			if (param == failedAt) {
+				args.append(ChatColor.RED.toString())
+			} else {
+				args.append(ChatColor.LIGHT_PURPLE.toString())
+			}
+
+			val optional = param.isOptional || param.type.isMarkedNullable || param.isVararg
+			if (optional) args.append('[') else args.append('<')
+			args.append(param.name)
+			if (param.isVararg)
+				args.append("...")
+			if (optional) args.append(']') else args.append('>')
+
+			args.append(' ')
+		}
+
+		context.replyRaw(ChatColor.GRAY, ChatColor.BOLD, "Usage: ", ChatColor.LIGHT_PURPLE, '/', context.command.name, ' ', args)
+		context.replyRaw(ChatColor.GRAY, ChatColor.BOLD, "Expected: ", ChatColor.RED, failedAt.name!!)
+	}
+
+	private fun parseCommandArguments(goal: List<KParameter>, input: String): Either<MutableMap<KParameter, Any?>, KParameter> {
+		val iterator = CharIterator(input)
+
+		val result = HashMap<KParameter, Any?>()
+
+		for (param in goal) {
+			if (param.isVararg) {
+				val type = param.type.arguments.first().type!!
+				var parsed = Parser.parse(type, iterator)
+
+				val vararg = ArrayList<Any>()
+				while (parsed != null) {
+					vararg.add(parsed)
+					iterator.takeWhile(Char::isWhitespace)
+					parsed = Parser.parse(type, iterator)
+				}
+
+				val array = java.lang.reflect.Array.newInstance(type.jvmErasure.java, vararg.size)
+				for ((i, value) in vararg.withIndex()) {
+					java.lang.reflect.Array.set(array, i, value)
+				}
+
+				result[param] = array
+//				result[param] = vararg.toArray()
+			} else {
+				val parsed = Parser.parse(param.type, iterator)
+				if (parsed == null) {
+					if (param.isOptional)
+						continue
+					if (!param.type.isMarkedNullable)
+						return Right(param)
+				}
+
+				result[param] = parsed
+			}
+
+			iterator.takeWhile(Char::isWhitespace)
+		}
+
+		if (iterator.hasNext()) {
+			println("Command arguments \"${iterator.source}\" had trailing (unused): \"${iterator.takeWhile { true }}\"")
+		}
+
+		return Left(result)
 	}
 
 	private fun getAnnotationData(plugin: Plugin, originalName: String, element: KAnnotatedElement): Command {
@@ -80,13 +197,5 @@ object CommandReflectionLoader {
 		return Command(plugin, name, aliases, description, usage)
 
 	}
-
-//	data class CommandData(
-//			val name: String,
-//			val aliases: List<String>,
-//			val description: String,
-//			val usage: String,
-//			val default: Boolean
-//	)
 
 }

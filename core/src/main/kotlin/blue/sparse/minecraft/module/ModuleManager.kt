@@ -1,13 +1,13 @@
 package blue.sparse.minecraft.module
 
-import blue.sparse.minecraft.SparseMCPlugin
+import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.CoreModule
 import java.io.File
 import java.io.FileFilter
 
 object ModuleManager {
 
-	private val logger = SparseMCPlugin.getPlugin().logger
+	private val logger = SparseMCAPIPlugin.getPlugin().logger
 
 	private val modules = LinkedHashSet<Module>()
 
@@ -25,7 +25,7 @@ object ModuleManager {
 	}
 
 	private fun loadModules() {
-		val folder = File(SparseMCPlugin.getPlugin().dataFolder, "modules")
+		val folder = File(SparseMCAPIPlugin.getPlugin().dataFolder, "modules")
 		if (!folder.exists() || !folder.isDirectory)
 			return
 

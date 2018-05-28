@@ -1,1 +1,2 @@
-test=This is a {RED}test{RESET}.
+privateMessageReceived = {GRAY}{sender}{DARK_GRAY} ➤ {GREEN}{BOLD}You{DARK_GRAY}: {RESET}{message}
+privateMessageSent = {GREEN}{BOLD}You{DARK_GRAY} ➤ {GRAY}{receivers}{DARK_GRAY}: {RESET}{message}

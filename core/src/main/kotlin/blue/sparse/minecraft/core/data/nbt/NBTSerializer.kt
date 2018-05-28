@@ -3,6 +3,7 @@ package blue.sparse.minecraft.core.data.nbt
 import java.io.DataOutputStream
 import java.io.OutputStream
 import blue.sparse.minecraft.core.data.nbt.NBTValue.*
+import blue.sparse.minecraft.core.data.nbt.NBTValue.Companion.toNBTValue
 
 internal object NBTSerializer {
 
@@ -34,10 +35,10 @@ internal object NBTSerializer {
 			}
 			is NBTString -> target.writeUTF(value.value)
 			is NBTList<*> -> {
-				val type = value.value.firstOrNull()?.id ?: 0
+				val type = value.value.firstOrNull()?.let(::toNBTValue)?.id ?: 0
 				target.write(type)
 				target.writeInt(value.value.size)
-				value.value.forEach { write(it, target) }
+				value.value.forEach { write(toNBTValue(it), target) }
 			}
 			is NBTCompound -> {
 				for (key in value.value.keys()) {

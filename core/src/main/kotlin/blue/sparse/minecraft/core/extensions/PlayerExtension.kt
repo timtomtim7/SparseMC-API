@@ -8,8 +8,8 @@ fun Player.getPluginLocale(plugin: Plugin): PluginLocale {
 	return PluginLocale[plugin, player.locale]
 }
 
-fun Player.sendMessage(plugin: Plugin, key: String, placeholders: Map<String, Any>) {
-	sendMessage(getPluginLocale(plugin)[key, placeholders])
+fun Player.sendMessage(plugin: Plugin, key: String, placeholders: Map<String, Any>, default: String = "MISSING_LOCALE_KEY[$key]") {
+	sendMessage(getPluginLocale(plugin)[key, placeholders] ?: default)
 }
 
 fun Player.sendMessage(plugin: Plugin, key: String, vararg placeholders: Pair<String, Any>) {

@@ -21,10 +21,11 @@ internal object NBTUtil {
 		is NBTTagCompound -> Compound(base.c().mapNotNull m@{ Pair(it ?: return@m null, nbtBaseValue(base[it])) })
 		is NBTTagIntArray -> base.d()
 		is NBTTagLongArray -> base.getDeclaredFieldValue("b")
-		else -> throw IllegalArgumentException("Invalid NBTBase object")
+		else -> throw IllegalArgumentException("Invalid NBTBase object ${base.javaClass.name}")
 	}
 
 	internal fun valueToNBTBase(value: Any): NBTBase {
+//		println("Converting $value (${value.javaClass.name})")
 		return when (value) {
 			is Byte -> NBTTagByte(value)
 			is Short -> NBTTagShort(value)
@@ -38,7 +39,7 @@ internal object NBTUtil {
 			is Compound -> NBTTagCompound().apply { value.keys().forEach { this.set(it, valueToNBTBase(value[it])) } }
 			is IntArray -> NBTTagIntArray(value)
 			is LongArray -> NBTTagLongArray(value)
-			else -> throw IllegalArgumentException("Cannot convert type to NBT")
+			else -> throw IllegalArgumentException("Cannot convert type to NBT ${value.javaClass.name}")
 		}
 	}
 

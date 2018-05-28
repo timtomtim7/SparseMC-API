@@ -11,7 +11,7 @@ internal sealed class NBTValue<T: Any>(val id: Int) {
 	data class NBTDouble		(override val value: Double)						 : NBTValue<Double>(6)
 	class NBTByteArray			(override val value: ByteArray)						 : NBTValue<ByteArray>(7)
 	data class NBTString		(override val value: String)						 : NBTValue<String>(8)
-	data class NBTList<T: Any>	(override val value: Collection<NBTValue<out T>>)	 : NBTValue<Collection<NBTValue<out T>>>(9)
+	data class NBTList<T: Any>	(override val value: Collection<T>)					 : NBTValue<Collection<T>>(9)
 	data class NBTCompound		(override val value: Compound)						 : NBTValue<Compound>(10)
 	class NBTIntArray			(override val value: IntArray)						 : NBTValue<IntArray>(11)
 	class NBTLongArray			(override val value: LongArray)						 : NBTValue<LongArray>(12)

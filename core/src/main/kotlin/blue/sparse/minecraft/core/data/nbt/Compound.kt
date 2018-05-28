@@ -85,7 +85,7 @@ class Compound: DataMap<String> {
 	}
 
 	fun collection(key: String): Collection<Any> {
-		return (backingMap[key] as NBTValue.NBTList<*>).value.map { it.value }
+		return (backingMap[key] as NBTValue.NBTList<*>).value
 	}
 
 
@@ -143,8 +143,9 @@ class Compound: DataMap<String> {
 			val first = collection.first()
 			if (collection.any { it.javaClass != first.javaClass })
 				throw IllegalStateException("All items in NBT collection must have the same type.")
+			NBTValue.toNBTValue(first)
 		}
 
-		backingMap[key] = NBTValue.NBTList(collection.map { NBTValue.toNBTValue(it) })
+		backingMap[key] = NBTValue.NBTList(collection)
 	}
 }

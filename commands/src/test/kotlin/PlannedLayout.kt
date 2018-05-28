@@ -1,5 +1,8 @@
+import blue.sparse.minecraft.commands.parsing.util.QuotedString
+import blue.sparse.minecraft.commands.parsing.util.SpacedString
 import blue.sparse.minecraft.core.extensions.getPluginLocale
 import blue.sparse.minecraft.core.i18n.PluginLocale
+import blue.sparse.minecraft.util.Either
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
@@ -20,12 +23,21 @@ object TestCommands {
 		}
 
 		// No annotation required, this can be executed with `/test hello <string>`
-		fun Execute.hello(name: String) {
+		fun Execute.hello(@Quoted name: String) {
 			reply("greeting", "name" to name)
 		}
 
+		fun Execute.hello(name: QuotedString) {
+			reply("greeting", "name" to name)
+		}
+
+		fun Execute.msg(targets: Either<Player, List<Player>>, message: SpacedString) {
+
+		}
 	}
 }
+
+annotation class Quoted
 
 interface CommandGroup
 

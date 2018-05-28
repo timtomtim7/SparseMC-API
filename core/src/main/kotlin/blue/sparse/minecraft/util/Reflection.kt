@@ -35,7 +35,7 @@ class Reflection(val value: Any) {
 
 		}
 
-		fun method(name: String, vararg params: Class<*>): Method? {
+		fun method(vararg params: Class<*>): Method? {
 			return tryOrNull { origin.valueClass.getMethod(name, *params) }
 		}
 
@@ -47,6 +47,15 @@ inline fun <T> tryOrNull(body: () -> T): T? {
 		body()
 	} catch (t: Throwable) {
 		null
+	}
+}
+
+inline fun <reified T: Throwable> ignore(body: () -> Unit) {
+	try {
+		body()
+	} catch(t: Throwable) {
+		if(t !is T)
+			throw t
 	}
 }
 
