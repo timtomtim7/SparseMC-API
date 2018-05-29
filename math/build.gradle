@@ -3,7 +3,12 @@ apply from: "../common.gradle"
 group 'blue.sparse.minecraft'
 version '0.0'
 
+repositories {
+	mavenLocal() //TODO: Put math library on Sparse repo
+}
+
 dependencies {
 	compileOnly project(':core')
+	compile "blue.sparse:sparse-math:+"
 }
 

@@ -35,7 +35,7 @@ internal object NBTUtil {
 			is Double -> NBTTagDouble(value)
 			is ByteArray -> NBTTagByteArray(value)
 			is String -> NBTTagString(value)
-			is List<*> -> NBTTagList().apply { value.filterNotNull().map { valueToNBTBase(it) }.forEach(this::add) }
+			is List<*> -> NBTTagList().apply { value.filterNotNull().map(::valueToNBTBase).forEach(this::add) }
 			is Compound -> NBTTagCompound().apply { value.keys().forEach { this.set(it, valueToNBTBase(value[it])) } }
 			is IntArray -> NBTTagIntArray(value)
 			is LongArray -> NBTTagLongArray(value)

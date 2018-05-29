@@ -1,0 +1,41 @@
+Core:
+	Fix NBT lists
+	Make NBT reader
+	Test/Finish NBT writer
+	Compound functional constructor
+	Easier/more direct listener registration
+	Text capitalization utilities (Title Case, etc.)
+
+Scheduler:
+	Suspend and callback functions for events and delayed tasks
+	Coroutines
+	Consider command support?
+	
+Math:
+	Add Bukkit/Spigot math extensions
+	Finish external math library:
+		2D, 3D, 4D Vectors
+		Byte, Short, Int, Long, Float, Double Vectors
+		2x2, 3x3, 4x4 Matrices
+		Quaternions
+		Perlin, Simplex, Voronoi noise
+		Multi-octave noise support
+
+Commands:
+	Easier/more direct command registration
+	Sub-commands/Command groups
+	Consider `suspend` support with scheduler module?
+	
+Inventory:
+	Inventory (non-menu) API
+	Inventory menu API
+	ItemStack#editMeta
+	Crafting handler API
+	Custom item API
+	
+NMS:
+	Block entity (tile entity) NBT
+	Particle API
+	NPCs API
+	Version-safe: secondary hand, titles, etc.
+	Item/chat packet editing
