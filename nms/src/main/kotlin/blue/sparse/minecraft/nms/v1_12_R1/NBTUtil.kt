@@ -25,7 +25,6 @@ internal object NBTUtil {
 	}
 
 	internal fun valueToNBTBase(value: Any): NBTBase {
-//		println("Converting $value (${value.javaClass.name})")
 		return when (value) {
 			is Byte -> NBTTagByte(value)
 			is Short -> NBTTagShort(value)

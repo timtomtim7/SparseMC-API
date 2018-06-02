@@ -1,27 +1,50 @@
 package blue.sparse.minecraft.commands.test
 
-import blue.sparse.minecraft.commands.Command
 import blue.sparse.minecraft.commands.Execute
-import blue.sparse.minecraft.commands.parsing.util.SpacedString
-import blue.sparse.minecraft.core.extensions.sendMessage
-import blue.sparse.minecraft.util.Either
-import blue.sparse.minecraft.util.fold
-import org.bukkit.*
-import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
+import blue.sparse.minecraft.core.extensions.server
+import blue.sparse.minecraft.plugin.*
+import org.bukkit.ChatColor
 
 object TestCommands {
 
-	@Command.Description("Message another player or players.")
-	fun Execute.msg(target: Either<Player, List<Player>>, message: SpacedString) {
-		val targets = target.fold(::listOf, { it })
+	fun Execute.sparseReload(pluginName: String) {
+		if (!sender.hasPermission("sparsemcapi.reload.plugin"))
+			errorRaw(ChatColor.RED, "No permission to reload.")
 
-		targets.forEach {
-			it.sendMessage(plugin, "privateMessageReceived", "sender" to sender.name, "message" to message)
-		}
+		val pluginManager = server.pluginManager
+		var plugin = pluginManager.getPlugin(pluginName)
 
-		reply("privateMessageSent", "receivers" to targets.joinToString { it.name }, "message" to message)
+		if (plugin == null)
+			errorRaw(ChatColor.RED, "Plugin either doesn't exist or isn't loaded")
+
+		if (plugin !is SparsePlugin)
+			errorRaw(ChatColor.RED, "That plugin was not loaded by SparseMC-API")
+
+		val file = (plugin.javaClass.classLoader as SparsePluginClassLoader).file
+
+		val loader = SparsePluginLoader.instance!!
+		loader.disablePlugin(plugin)
+		loader.unloadPlugin(plugin)
+
+		plugin = null
+		System.gc()
+
+		plugin = pluginManager.loadPlugin(file)
+		pluginManager.enablePlugin(plugin)
+
+		replyRaw(ChatColor.GRAY, "Plugin ", ChatColor.GREEN, plugin.name, ChatColor.GRAY, " reloaded.")
 	}
+
+//	@Command.Description("Message another player or players.")
+//	fun Execute.msg(target: Either<Player, List<Player>>, message: SpacedString) {
+//		val targets = target.fold(::listOf, { it })
+//
+//		targets.forEach {
+//			it.sendMessage(plugin, "privateMessageReceived", "sender" to sender.name, "message" to message)
+//		}
+//
+//		reply("privateMessageSent", "receivers" to targets.joinToString { it.name }, "message" to message)
+//	}
 
 //	@Command.Aliases("i", "item")
 //	fun Execute.give(target: Player? = sender as? Player, itemType: Material, amount: Int = 1) {

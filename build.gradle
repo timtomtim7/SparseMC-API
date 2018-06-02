@@ -22,7 +22,7 @@ subprojects { p ->
 	configure(p) {
 		publishing {
 			publications {
-				j(MavenPublication) {
+				mavenJava(MavenPublication) {
 					groupId project.group
 					artifactId project.name
 					version project.version

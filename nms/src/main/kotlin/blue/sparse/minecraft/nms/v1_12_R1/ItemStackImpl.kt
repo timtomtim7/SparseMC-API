@@ -46,6 +46,8 @@ class ItemStackImpl : ItemStackNMS {
 			val craft = asCraftItemStack(this)
 			val handleField = craft.javaClass.getDeclaredField("handle")
 			handleField.isAccessible = true
-			return handleField.get(craft) as net.minecraft.server.v1_12_R1.ItemStack
+
+			val handleValue = handleField.get(craft) as net.minecraft.server.v1_12_R1.ItemStack?
+			return handleValue ?: CraftItemStack.asNMSCopy(this)
 		}
 }

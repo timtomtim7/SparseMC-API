@@ -24,7 +24,7 @@ class Compound: DataMap<String> {
 		}
 	}
 
-	fun keys(): MutableSet<String> {
+	override fun keys(): MutableSet<String> {
 		return backingMap.keys
 	}
 
@@ -34,6 +34,14 @@ class Compound: DataMap<String> {
 
 	operator fun get(key: String): Any {
 		return backingMap[key]!!.value
+	}
+
+	fun getOptional(key: String): Any? {
+		return backingMap[key]?.value
+	}
+
+	operator fun set(key: String, value: Any) {
+		backingMap[key] = NBTValue.toNBTValue(value)
 	}
 
 	override fun byte(key: String): Byte {
@@ -89,6 +97,61 @@ class Compound: DataMap<String> {
 	}
 
 
+	fun optionalByte(key: String): Byte? {
+		return getOptional(key) as? Byte
+	}
+
+	fun optionalShort(key: String): Short? {
+		return getOptional(key) as? Short
+	}
+
+	fun optionalInt(key: String): Int? {
+		return getOptional(key) as? Int
+	}
+
+	fun optionalLong(key: String): Long? {
+		return getOptional(key) as? Long
+	}
+
+
+	fun optionalFloat(key: String): Float? {
+		return getOptional(key) as? Float
+	}
+
+	fun optionalDouble(key: String): Double? {
+		return getOptional(key) as? Double
+	}
+
+
+	fun optionalString(key: String): String? {
+		return getOptional(key) as? String
+	}
+
+
+	fun optionalByteArray(key: String): ByteArray? {
+		return getOptional(key) as? ByteArray
+	}
+
+	fun optionalShortArray(key: String): ShortArray? {
+		return getOptional(key) as? ShortArray
+	}
+
+	fun optionalIntArray(key: String): IntArray? {
+		return getOptional(key) as? IntArray
+	}
+
+	fun optionalLongArray(key: String): LongArray? {
+		return getOptional(key) as? LongArray
+	}
+
+	fun optionalCompound(key: String): Compound? {
+		return getOptional(key) as? Compound
+	}
+
+	fun optionalCollection(key: String): Collection<Any>? {
+		return (backingMap[key] as? NBTValue.NBTList<*>)?.value
+	}
+
 
 	override fun byte(key: String, value: Byte) {
 		backingMap[key] = NBTValue.NBTByte(value)
@@ -138,6 +201,10 @@ class Compound: DataMap<String> {
 		backingMap[key] = NBTValue.NBTCompound(value)
 	}
 
+	inline fun compound(key: String, body: Compound.() -> Unit) {
+		compound(key, Compound(body))
+	}
+
 	fun collection(key: String, collection: Collection<Any>) {
 		if(collection.isNotEmpty()) {
 			val first = collection.first()
@@ -147,5 +214,13 @@ class Compound: DataMap<String> {
 		}
 
 		backingMap[key] = NBTValue.NBTList(collection)
+	}
+
+	companion object {
+
+		inline operator fun invoke(body: Compound.() -> Unit): Compound {
+			return Compound().apply(body)
+		}
+
 	}
 }

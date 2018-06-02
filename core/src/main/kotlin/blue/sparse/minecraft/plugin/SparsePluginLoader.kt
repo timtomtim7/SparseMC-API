@@ -8,7 +8,7 @@ import org.bukkit.plugin.*
 import java.io.File
 import java.util.regex.Pattern
 
-internal class SparsePluginLoader(val server: Server) : PluginLoader {
+class SparsePluginLoader(val server: Server) : PluginLoader {
 
 	private val loadedPlugins = HashMap<File, SparsePlugin>()
 

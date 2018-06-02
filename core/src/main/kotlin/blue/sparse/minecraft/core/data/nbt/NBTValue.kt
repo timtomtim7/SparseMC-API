@@ -28,13 +28,16 @@ internal sealed class NBTValue<T: Any>(val id: Int) {
 			is String -> NBTString(value)
 			is Collection<*> -> {
 				if(value.isEmpty())
-					NBTList<Any>(emptyList())
+					NBTList(emptyList())
 
 				val nonNull = value.filterNotNull()
 				if(nonNull.size != value.size)
 					throw IllegalArgumentException("NBTList may not contain nulls")
+				val first = nonNull.first().javaClass
+				if(nonNull.any { it.javaClass != first })
+					throw IllegalArgumentException("All items in NBTList must be of the same type.")
 
-				NBTList(nonNull.map(this::toNBTValue))
+				NBTList(nonNull)
 			}
 			is Compound -> NBTCompound(value)
 			is IntArray -> NBTIntArray(value)

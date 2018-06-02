@@ -12,3 +12,9 @@ dependencies {
 	compile "blue.sparse:sparse-math:+"
 }
 
+jar {
+	from {
+		configurations.compile.filter { it.name.contains("sparse-math") }.collect { it.isDirectory() ? it : zipTree(it) }
+//		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+}

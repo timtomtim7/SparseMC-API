@@ -6,6 +6,7 @@ import blue.sparse.minecraft.util.*
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.jvmErasure
@@ -28,7 +29,7 @@ object CommandReflectionLoader {
 
 		val matched = executeFunctions.map { exe ->
 			exe to tabCompleteFunctions.find { tab ->
-				exe.name == tab.name && exe.valueParameters == tab.valueParameters
+				exe.name == tab.name /*&& exe.valueParameters == tab.valueParameters*/
 			}
 		}.toMap()
 
@@ -70,7 +71,12 @@ object CommandReflectionLoader {
 
 						try {
 							exe.callBy(params)
-						}catch (t: ContextEscape) {}
+						} catch (t: ContextEscape) {
+						} catch (t: InvocationTargetException) {
+							if (t.targetException !is ContextEscape)
+								throw t
+						}
+
 //						ignore<ContextEscape> { exe.callBy(params) }
 					}
 				}

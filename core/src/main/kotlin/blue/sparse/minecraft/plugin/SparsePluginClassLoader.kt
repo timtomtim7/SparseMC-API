@@ -8,7 +8,7 @@ import java.util.jar.JarFile
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubclassOf
 
-internal class SparsePluginClassLoader(
+class SparsePluginClassLoader(
 		val pluginLoader: SparsePluginLoader,
 		parent: ClassLoader,
 		val file: File

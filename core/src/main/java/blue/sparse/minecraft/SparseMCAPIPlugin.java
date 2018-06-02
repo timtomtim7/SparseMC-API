@@ -12,8 +12,8 @@ import java.util.List;
  */
 public final class SparseMCAPIPlugin extends JavaPlugin {
 	
-	private static SparseMCAPIPlugin plugin;
-	private static List<Runnable>    disableHooks = new ArrayList<>();
+	private static final List<Runnable>    disableHooks = new ArrayList<>();
+	private static       SparseMCAPIPlugin plugin;
 	
 	/**
 	 * @return the instance of SparseMCAPIPlugin

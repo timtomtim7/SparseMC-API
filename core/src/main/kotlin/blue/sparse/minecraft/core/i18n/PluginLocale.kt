@@ -20,7 +20,7 @@ class PluginLocale private constructor(
 		val file = File(plugin.dataFolder, resourcePath)
 		val default = plugin.getResource(resourcePath)
 
-		if (!file.exists())
+		if (!file.exists() && plugin.getResource(resourcePath) != null)
 			plugin.saveResource(resourcePath, false)
 
 		val sources = ArrayList<InputStream>()
@@ -66,6 +66,10 @@ class PluginLocale private constructor(
 		}
 
 		return result.toString()
+	}
+
+	operator fun get(key: String, vararg placeholders: Pair<String, Any>): String? {
+		return get(key, placeholders.toMap())
 	}
 
 	private fun getPlaceholderValue(key: String, placeholders: Map<String, Any>): String {

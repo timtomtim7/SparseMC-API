@@ -1,9 +1,9 @@
 Core:
-	Fix NBT lists
+	(Done) Fix NBT lists
 	Make NBT reader
 	Test/Finish NBT writer
-	Compound functional constructor
-	Easier/more direct listener registration
+	(Done) Compound functional constructor
+	(Done) Easier/more direct listener registration
 	Text capitalization utilities (Title Case, etc.)
 
 Scheduler:
@@ -12,8 +12,8 @@ Scheduler:
 	Consider command support?
 	
 Math:
-	Add Bukkit/Spigot math extensions
-	Finish external math library:
+	(Partial) Add Bukkit/Spigot math extensions
+	(Partial) Finish external math library:
 		2D, 3D, 4D Vectors
 		Byte, Short, Int, Long, Float, Double Vectors
 		2x2, 3x3, 4x4 Matrices
@@ -22,18 +22,19 @@ Math:
 		Multi-octave noise support
 
 Commands:
-	Easier/more direct command registration
+	(Done) Easier/more direct command registration
 	Sub-commands/Command groups
 	Consider `suspend` support with scheduler module?
 	
 Inventory:
 	Inventory (non-menu) API
 	Inventory menu API
-	ItemStack#editMeta
+	(Done) ItemStack#editMeta
 	Crafting handler API
 	Custom item API
 	
 NMS:
+	(Done) ItemStack#editNBT
 	Block entity (tile entity) NBT
 	Particle API
 	NPCs API

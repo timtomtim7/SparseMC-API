@@ -10,6 +10,8 @@ import kotlin.reflect.KClass
 val uuidParser = Parser.of({ it.isLetterOrDigit() || it == '-' }, UUID::fromString)
 val stringParser = Parser.of({ !it.isWhitespace() }, { it })
 
+val booleanParser = Parser.of({ it.isLetterOrDigit() }, { it.toBoolean() })
+
 val spacedStringParser = Parser.of({ true }, { SpacedString(it.takeIf(String::isNotBlank)!!) })
 
 object QuotedStringParser : Parser {

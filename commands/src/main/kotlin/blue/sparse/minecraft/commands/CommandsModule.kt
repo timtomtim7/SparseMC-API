@@ -47,6 +47,7 @@ object CommandsModule : Module, Listener {
 				bigIntegerParser,
 				bigDecimalParser,
 				EnumParser,
+				booleanParser,
 				uuidParser,
 				stringParser,
 				ListParser,

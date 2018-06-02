@@ -1,11 +1,10 @@
 package blue.sparse.minecraft.plugin
 
-import blue.sparse.minecraft.util.tryOrNull
+import blue.sparse.minecraft.core.PluginProvided
 import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.FileConfiguration
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.generator.ChunkGenerator
 import org.bukkit.plugin.*
 import java.io.File
@@ -16,10 +15,9 @@ import java.util.logging.Logger
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.jvmName
 
-abstract class SparsePlugin : PluginBase() {
+abstract class SparsePlugin : PluginBase(), PluginProvided<SparsePlugin> {
 
 	private val description: PluginDescriptionFile
-
 
 	private val _logger: Logger by lazy { Logger.getLogger(name) }
 	private var _enabled = false
@@ -39,6 +37,8 @@ abstract class SparsePlugin : PluginBase() {
 			if (value) onEnable()
 			else onDisable()
 		}
+
+	override val plugin get() = this
 
 	init {
 		val clazz = this::class
@@ -91,11 +91,11 @@ abstract class SparsePlugin : PluginBase() {
 	final override fun saveResource(name: String, replace: Boolean) {
 		val resource = getResource(name) ?: throw IllegalArgumentException("Plugin resource not found \"$name\"")
 
-		if(replace)
-			Files.copy(resource, File(dataFolder, name).toPath(), StandardCopyOption.REPLACE_EXISTING)
-		else try {
-			Files.copy(resource, File(dataFolder, name).toPath())
-		} catch(e: FileAlreadyExistsException) {}
+		val file = File(dataFolder, name)
+		file.parentFile.mkdirs()
+
+		if (replace || !file.exists())
+			Files.copy(resource, file.toPath(), StandardCopyOption.REPLACE_EXISTING)
 	}
 
 	final override fun getConfig(): FileConfiguration {

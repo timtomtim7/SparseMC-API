@@ -2,6 +2,8 @@ package blue.sparse.minecraft.core.data
 
 interface DataMapReadable<K> {
 
+	fun keys(): Set<K>
+
 	fun byte(key: K): Byte
 	fun short(key: K): Short
 	fun int(key: K): Int
@@ -16,5 +18,9 @@ interface DataMapReadable<K> {
 	fun shortArray(key: K): ShortArray
 	fun intArray(key: K): IntArray
 	fun longArray(key: K): LongArray
+
+	operator fun contains(key: K): Boolean {
+		return key in keys()
+	}
 
 }
