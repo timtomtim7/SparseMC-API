@@ -1,5 +1,7 @@
 package blue.sparse.minecraft.math.extensions
 
+import blue.sparse.math.quaternion.floats.quatf
+import blue.sparse.math.toRadians
 import blue.sparse.math.vector.floats.Vector3f
 import blue.sparse.math.vector.floats.vec3f
 import org.bukkit.Location
@@ -9,6 +11,8 @@ fun Location.toVector3f() = vec3f(x.toFloat(), y.toFloat(), z.toFloat())
 
 fun Location.copy(x: Double, y: Double, z: Double) = Location(world, x, y, z)
 fun Location.copy(x: Float, y: Float, z: Float) = copy(x.toDouble(), y.toDouble(), z.toDouble())
+
+val Location.rotation get() = quatf(0f, -toRadians(yaw), toRadians(pitch))
 
 operator fun Location.plus(other: Vector3f) = copy(x + other.x, y + other.y, z + other.z)
 operator fun Location.minus(other: Vector3f) = copy(x - other.x, y - other.y, z - other.z)

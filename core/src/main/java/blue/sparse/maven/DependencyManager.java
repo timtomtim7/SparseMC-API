@@ -12,12 +12,12 @@ public final class DependencyManager {
 	
 	private DependencyManager() {}
 	
-	public static Map<MavenProject, File> downloadDependencies(Collection<MavenProject> projects, File folder) {
+	public static Map<MavenArtifact, File> downloadDependencies(Collection<MavenArtifact> projects, File folder) {
 		folder.mkdirs();
 		
-		final Map<MavenProject, File> result = new HashMap<>();
+		final Map<MavenArtifact, File> result = new HashMap<>();
 		
-		for(MavenProject project : projects) {
+		for(MavenArtifact project : projects) {
 			final File[] files = folder.listFiles((dir, name) -> name.contains(project.toString()));
 			if(files == null) {
 				try {
@@ -49,11 +49,15 @@ public final class DependencyManager {
 		return result;
 	}
 	
-	public static void updateAndLoadDependencies(Collection<MavenProject> projects, File folder) {
+	public static void updateAndLoadDependencies(Collection<MavenArtifact> projects, File folder) {
+		updateAndLoadDependencies(projects, folder, getClassLoader());
+	}
+	
+	public static void updateAndLoadDependencies(Collection<MavenArtifact> projects, File folder, URLClassLoader classLoader) {
 		final Collection<File> dependencies = downloadDependencies(projects, folder).values();
 		for(File dependency : dependencies) {
 			try {
-				load(dependency);
+				load(classLoader, dependency);
 			}catch(MalformedURLException | ReflectiveOperationException e) {
 				e.printStackTrace();
 			}
@@ -61,7 +65,11 @@ public final class DependencyManager {
 	}
 	
 	public static void load(File jar) throws MalformedURLException, ReflectiveOperationException {
-		addURL(getClassLoader(), jar.toURI().toURL());
+		load(getClassLoader(), jar);
+	}
+	
+	public static void load(URLClassLoader classLoader, File jar) throws MalformedURLException, ReflectiveOperationException {
+		addURL(classLoader, jar.toURI().toURL());
 	}
 	
 	private static void addURL(URLClassLoader loader, URL url) throws ReflectiveOperationException {

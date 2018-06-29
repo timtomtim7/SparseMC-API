@@ -15,6 +15,18 @@ public final class SparseMCAPIPlugin extends JavaPlugin {
 	private static final List<Runnable>    disableHooks = new ArrayList<>();
 	private static       SparseMCAPIPlugin plugin;
 	
+	public static void addDisableHook(Runnable runnable) {
+		disableHooks.add(runnable);
+	}
+	
+	public static File getDependenciesFolder() {
+		return new File(getPlugin().getDataFolder(), "dependencies");
+	}
+	
+	public static File getModulesFolder() {
+		return new File(getPlugin().getDataFolder(), "modules");
+	}
+	
 	/**
 	 * @return the instance of SparseMCAPIPlugin
 	 */
@@ -22,13 +34,13 @@ public final class SparseMCAPIPlugin extends JavaPlugin {
 		return plugin;
 	}
 	
-	public static void addDisableHook(Runnable runnable) {
-		disableHooks.add(runnable);
-	}
-	
 	public void onLoad() {
 		plugin = this;
-		KotlinLoader.load(new File(getDataFolder(), "dependencies"));
+		KotlinLoader.load(getDependenciesFolder());
+	}
+	
+	public void onEnable() {
+		ModuleManager.INSTANCE.onPluginEnable();
 	}
 	
 	public void onDisable() {
@@ -37,8 +49,5 @@ public final class SparseMCAPIPlugin extends JavaPlugin {
 		System.gc();
 	}
 	
-	public void onEnable() {
-		ModuleManager.INSTANCE.onPluginEnable();
-	}
 	
 }

@@ -1,10 +1,11 @@
 package blue.sparse.minecraft.math
 
-import blue.sparse.minecraft.module.Module
-import blue.sparse.minecraft.module.ModuleDefinition
+import blue.sparse.minecraft.module.*
 
 @ModuleDefinition
 object MathModule: Module {
+	override val type = ModuleType.MATH
+
 	override fun onEnable() {
 
 	}

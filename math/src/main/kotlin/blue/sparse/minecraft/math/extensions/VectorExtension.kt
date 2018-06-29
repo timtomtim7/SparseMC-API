@@ -3,12 +3,19 @@ package blue.sparse.minecraft.math.extensions
 import blue.sparse.math.vector.floats.Vector3f
 import blue.sparse.math.vector.floats.vec3f
 import org.bukkit.Location
+import org.bukkit.block.BlockFace
 import org.bukkit.util.Vector
 
 fun Vector.toVector3f() = vec3f(x.toFloat(), y.toFloat(), z.toFloat())
 
 fun Vector.copy(x: Double, y: Double, z: Double) = Vector(x, y, z)
 fun Vector.copy(x: Float, y: Float, z: Float) = copy(x.toDouble(), y.toDouble(), z.toDouble())
+
+fun Vector.toBlockFace(): BlockFace {
+	return BlockFace.values().first {
+		it.modX == blockX && it.modY == blockY && it.modZ == blockZ
+	}
+}
 
 operator fun Vector.plus(other: Vector3f) = copy(x + other.x, y + other.y, z + other.z)
 operator fun Vector.minus(other: Vector3f) = copy(x - other.x, y - other.y, z - other.z)

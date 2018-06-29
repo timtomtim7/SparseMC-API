@@ -1,6 +1,7 @@
 package blue.sparse.minecraft.core.data.nbt
 
 import blue.sparse.minecraft.core.data.*
+import java.io.File
 
 class Compound: DataMap<String> {
 
@@ -216,7 +217,15 @@ class Compound: DataMap<String> {
 		backingMap[key] = NBTValue.NBTList(collection)
 	}
 
+	fun write(file: File) {
+		NBTSerializer.write(NBTValue.NBTCompound(this), file.outputStream().buffered())
+	}
+
 	companion object {
+
+		fun read(file: File): Compound {
+			return (NBTSerializer.read(file.inputStream().buffered()) as NBTValue.NBTCompound).value
+		}
 
 		inline operator fun invoke(body: Compound.() -> Unit): Compound {
 			return Compound().apply(body)

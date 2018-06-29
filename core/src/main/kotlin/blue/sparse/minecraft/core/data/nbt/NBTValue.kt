@@ -18,6 +18,7 @@ internal sealed class NBTValue<T: Any>(val id: Int) {
 
 	companion object {
 		fun toNBTValue(value: Any): NBTValue<out Any> = when (value) {
+			is NBTValue<*> -> value
 			is Byte -> NBTByte(value)
 			is Short -> NBTShort(value)
 			is Int -> NBTInt(value)

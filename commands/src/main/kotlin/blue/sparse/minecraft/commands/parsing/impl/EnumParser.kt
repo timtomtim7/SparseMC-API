@@ -47,11 +47,11 @@ object EnumParser : Parser {
 		return result as Enum<*>
 	}
 
-	private fun findEnumValue(enumClass: Class<*>, name: String): Any? {
-		println("Tried finding enum value for \"$name\"")
-		return null
-//		return tryOrNull { java.lang.Enum.valueOf(enumClass as Class<FakeEnum>, name) }
-	}
+//	private fun findEnumValue(enumClass: Class<*>, name: String): Any? {
+//		println("Tried finding enum value for \"$name\"")
+//		return null
+////		return tryOrNull { java.lang.Enum.valueOf(enumClass as Class<FakeEnum>, name) }
+//	}
 
 	private enum class FakeEnum
 

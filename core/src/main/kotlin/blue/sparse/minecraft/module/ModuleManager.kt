@@ -7,6 +7,11 @@ import java.io.FileFilter
 
 object ModuleManager {
 
+	const val MODULE_MAVEN_REPO = "https://sparse.blue/maven/"
+	const val MODULE_MAVEN_GROUP = "blue.sparse.minecraft"
+
+	val modulesFolder = File(SparseMCAPIPlugin.getPlugin().dataFolder, "modules")
+
 	private val logger = SparseMCAPIPlugin.getPlugin().logger
 
 	private val modules = LinkedHashSet<Module>()
@@ -14,9 +19,7 @@ object ModuleManager {
 	@JvmName("onPluginEnable")
 	internal fun onPluginEnable() {
 		modules.add(CoreModule)
-		loadModules()
-
-		modules.forEach(Module::onEnable)
+		CoreModule.onEnable()
 	}
 
 	@JvmName("onPluginDisable")
@@ -24,20 +27,31 @@ object ModuleManager {
 		modules.forEach(Module::onDisable)
 	}
 
-	private fun loadModules() {
-		val folder = File(SparseMCAPIPlugin.getPlugin().dataFolder, "modules")
-		if (!folder.exists() || !folder.isDirectory)
-			return
+//	private fun loadModules() {
+//		val folder = modulesFolder
+//		if (!folder.exists() || !folder.isDirectory)
+//			return
+//
+//		folder.listFiles(FileFilter { it.extension == "jar" }).forEach { file ->
+//			val type = ModuleType.values().find {
+//				file.nameWithoutExtension.startsWith(it.name, true)
+//			}
+//			if(type != null)
+//				loadModule(type, file)
+//		}
+//	}
 
-		folder.listFiles(FileFilter { it.extension == "jar" }).forEach {
-			val module = loadModule(it)
-			modules.add(module)
-			logger.info("Module loaded: ${module.name}")
-		}
-	}
+	internal fun loadModule(type: ModuleType, file: File): Module {
+		modules.find { it.type == type }?.let { return it }
+		logger.info("Loading module: ${type.name.toLowerCase()}")
 
-	private fun loadModule(file: File): Module {
-		return ModuleClassLoader(file, javaClass.classLoader).module
+		val module = ModuleClassLoader(file, javaClass.classLoader).module
+		modules.add(module)
+		logger.info("Module loaded: ${type.name.toLowerCase()}")
+
+		module.onEnable()
+
+		return module
 	}
 
 

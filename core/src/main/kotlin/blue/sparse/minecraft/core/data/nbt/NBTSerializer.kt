@@ -1,9 +1,8 @@
 package blue.sparse.minecraft.core.data.nbt
 
-import java.io.DataOutputStream
-import java.io.OutputStream
 import blue.sparse.minecraft.core.data.nbt.NBTValue.*
 import blue.sparse.minecraft.core.data.nbt.NBTValue.Companion.toNBTValue
+import java.io.*
 
 internal object NBTSerializer {
 
@@ -55,6 +54,61 @@ internal object NBTSerializer {
 				target.writeInt(value.value.size)
 				value.value.forEach(target::writeLong)
 			}
+		}
+	}
+
+	fun read(input: InputStream): NBTValue<*> {
+		return read(DataInputStream(input))
+	}
+
+	fun read(input: DataInputStream, type: Int = input.read()): NBTValue<*> {
+		return when(type) {
+			1 -> NBTByte(input.readByte())
+			2 -> NBTShort(input.readShort())
+			3 -> NBTInt(input.readInt())
+			4 -> NBTLong(input.readLong())
+			5 -> NBTFloat(input.readFloat())
+			6 -> NBTDouble(input.readDouble())
+			7 -> {
+				val size = input.readInt()
+				val array = ByteArray(size)
+				input.read(array)
+				NBTByteArray(array)
+			}
+			8 -> NBTString(input.readUTF())
+			9 -> {
+				val listType = input.read()
+				val size = input.readInt()
+				val result = ArrayList<Any>()
+				for(i in 1..size)
+					result.add(read(input, listType).value)
+
+				NBTList(result)
+			}
+			10 -> {
+				val result = Compound()
+				while(true) {
+					val id = input.read()
+					if(id == 0)
+						break
+
+					val name = input.readUTF()
+					result[name] = read(input, id)
+				}
+
+				NBTCompound(result)
+			}
+			11 -> {
+				val size = input.readInt()
+				val array = IntArray(size) { input.readInt() }
+				NBTIntArray(array)
+			}
+			12 -> {
+				val size = input.readInt()
+				val array = LongArray(size) { input.readLong() }
+				NBTLongArray(array)
+			}
+			else -> throw IllegalArgumentException("Unexpected NBT ID")
 		}
 	}
 

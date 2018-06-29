@@ -9,6 +9,8 @@ interface Module {
 	val logger: Logger
 		get() = Logger.getLogger("SparseMC-$name")
 
+	val type: ModuleType
+
 	fun onEnable() {}
 	fun onDisable() {}
 }

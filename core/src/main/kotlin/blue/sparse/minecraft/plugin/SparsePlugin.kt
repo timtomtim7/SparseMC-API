@@ -1,6 +1,8 @@
 package blue.sparse.minecraft.plugin
 
 import blue.sparse.minecraft.core.PluginProvided
+import blue.sparse.minecraft.core.i18n.PluginLocale
+import blue.sparse.minecraft.module.ModuleType
 import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -27,6 +29,8 @@ abstract class SparsePlugin : PluginBase(), PluginProvided<SparsePlugin> {
 	private lateinit var _dataFolder: File
 	private lateinit var _pluginLoader: SparsePluginLoader
 	private lateinit var classLoader: SparsePluginClassLoader
+
+	val locale get() = PluginLocale.default(this)
 
 	protected var enabled: Boolean
 		get() = _enabled
@@ -66,7 +70,7 @@ abstract class SparsePlugin : PluginBase(), PluginProvided<SparsePlugin> {
 
 	override fun onDisable() {}
 
-	override fun getDefaultWorldGenerator(p0: String?, p1: String?): ChunkGenerator? = null
+	override fun getDefaultWorldGenerator(worldName: String, id: String?): ChunkGenerator? = null
 
 	final override fun isEnabled() = _enabled
 

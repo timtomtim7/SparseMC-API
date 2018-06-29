@@ -1,10 +1,11 @@
 package blue.sparse.minecraft.scheduler
 
-import blue.sparse.minecraft.module.Module
-import blue.sparse.minecraft.module.ModuleDefinition
+import blue.sparse.minecraft.module.*
 
 @ModuleDefinition
 object SchedulerModule: Module {
+	override val type = ModuleType.SCHEDULER
+
 	override fun onEnable() {
 
 	}

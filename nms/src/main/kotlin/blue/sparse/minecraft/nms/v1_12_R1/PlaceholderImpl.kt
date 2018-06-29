@@ -2,10 +2,9 @@ package blue.sparse.minecraft.nms.v1_12_R1
 
 import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.server
-import blue.sparse.minecraft.nms.api.PlaceholdersNMS
+import blue.sparse.minecraft.nms.api.PlaceholderNMS
 import blue.sparse.minecraft.nms.extensions.*
 import blue.sparse.minecraft.nms.placeholders.ItemReplacer
-import com.google.common.collect.Ordering.compound
 import io.netty.channel.*
 import net.minecraft.server.v1_12_R1.*
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
@@ -17,10 +16,9 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.server.PluginDisableEvent
 import org.bukkit.plugin.Plugin
-import sun.rmi.transport.TransportConstants.Return
 import java.lang.reflect.ParameterizedType
 
-class PlaceholderImpl : PlaceholdersNMS, Listener {
+class PlaceholderImpl : PlaceholderNMS, Listener {
 
 	private val pluginItemReplacers = HashMap<Plugin, MutableSet<ItemReplacer>>()
 	private val itemReplacers = HashSet<ItemReplacer>()
@@ -28,10 +26,10 @@ class PlaceholderImpl : PlaceholdersNMS, Listener {
 	override fun registerItemReplacer(plugin: Plugin, replacer: ItemReplacer): Boolean {
 		val pluginSet = pluginItemReplacers.getOrPut(plugin, ::HashSet)
 
-		if(!pluginSet.add(replacer))
+		if (!pluginSet.add(replacer))
 			return false
 
-		if(!itemReplacers.add(replacer)) {
+		if (!itemReplacers.add(replacer)) {
 			pluginSet.remove(replacer)
 			return false
 		}
@@ -56,7 +54,9 @@ class PlaceholderImpl : PlaceholdersNMS, Listener {
 
 	@EventHandler
 	fun onPlayerJoin(e: PlayerJoinEvent) {
-		getChannel(e.player).pipeline().addBefore("packet_handler", "sparsemc-${e.player.name}", ItemPacketIntercept(e.player))
+		val pipeline = getChannel(e.player).pipeline()
+		if (pipeline["sparsemc-${e.player.name}"] == null)
+			pipeline.addBefore("packet_handler", "sparsemc-${e.player.name}", ItemPacketIntercept(e.player))
 	}
 
 	@EventHandler
@@ -87,7 +87,7 @@ class PlaceholderImpl : PlaceholdersNMS, Listener {
 					val replaced = replace(items)
 					setItems(packet, replaced)
 				}
-			}catch(t: Throwable) {
+			} catch (t: Throwable) {
 				t.printStackTrace()
 			}
 
@@ -101,7 +101,7 @@ class PlaceholderImpl : PlaceholdersNMS, Listener {
 					val reverted = revert(items)
 					setItems(packet, reverted)
 				}
-			}catch (t: Throwable) {
+			} catch (t: Throwable) {
 				t.printStackTrace()
 			}
 
@@ -113,7 +113,7 @@ class PlaceholderImpl : PlaceholdersNMS, Listener {
 
 			for ((name, items) in fieldMap) {
 				result[name] = items.map {
-					if(it == null || it.isEmpty)
+					if (it == null || it.isEmpty)
 						return@map it
 
 					val bukkit: org.bukkit.inventory.ItemStack = CraftItemStack.asBukkitCopy(it)
@@ -124,7 +124,7 @@ class PlaceholderImpl : PlaceholdersNMS, Listener {
 						replacer.replace(player, item) ?: item
 					}
 
-					if(hash != replaced.hashCode()) {
+					if (hash != replaced.hashCode()) {
 						replaced.editNBT { compound("__original", original) }
 						CraftItemStack.asNMSCopy(replaced)
 					} else {
@@ -141,12 +141,12 @@ class PlaceholderImpl : PlaceholdersNMS, Listener {
 
 			for ((name, items) in fieldMap) {
 				result[name] = items.map {
-					if(it == null || it.isEmpty)
+					if (it == null || it.isEmpty)
 						return@map it
 
 					val bukkit: org.bukkit.inventory.ItemStack = CraftItemStack.asBukkitCopy(it)
 					val nbt = bukkit.nbt
-					if("__original" in nbt)
+					if ("__original" in nbt)
 						CraftItemStack.asNMSCopy(nbt.compound("__original").toItemStack())
 					else
 						it
@@ -193,7 +193,7 @@ class PlaceholderImpl : PlaceholdersNMS, Listener {
 					continue
 				}
 
-				if(List::class.java.isAssignableFrom(field.type)) {
+				if (List::class.java.isAssignableFrom(field.type)) {
 					field.isAccessible = true
 					field.set(value, items as? List ?: items.toList())
 					continue

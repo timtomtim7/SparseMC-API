@@ -15,7 +15,7 @@ interface ItemReplacer {
 		}
 
 		inline fun register(plugin: Plugin, crossinline replacer: (ItemStack) -> ItemStack?): Boolean {
-			return register(plugin) { p, i -> replacer(i) }
+			return register(plugin) { _, i -> replacer(i) }
 		}
 
 		inline fun register(plugin: Plugin, crossinline replacer: (Player, ItemStack) -> ItemStack?): Boolean {

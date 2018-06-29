@@ -1,16 +1,24 @@
 package blue.sparse.maven;
 
+import blue.sparse.minecraft.SparseMCAPIPlugin;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-public class MavenProject {
+public class MavenArtifact {
+	private final String repo;
 	private final String group;
 	private final String artifact;
 	
-	public MavenProject(String group, String artifact) {
+	public MavenArtifact(String repo, String group, String artifact) {
+		this.repo = repo;
 		this.group = group;
 		this.artifact = artifact;
+	}
+	
+	public MavenArtifact(String group, String artifact) {
+		this(MavenDownloader.MAVEN_CENTRAL, group, artifact);
 	}
 	
 	public String getGroup() {
@@ -43,11 +51,12 @@ public class MavenProject {
 	}
 	
 	public void downloadLatest(File target) throws IOException {
-		MavenDownloader.downloadLatestJar(group, artifact, target);
+		SparseMCAPIPlugin.getPlugin().getLogger().info("Downloading dependency -> "+group+":"+artifact);
+		MavenDownloader.downloadLatestJar(repo, group, artifact, target);
 	}
 	
 	public String getLatestVersion() throws IOException {
-		return MavenDownloader.getLatestVersion(group, artifact);
+		return MavenDownloader.getLatestVersion(repo, group, artifact);
 	}
 	
 	public int hashCode() {
@@ -56,8 +65,8 @@ public class MavenProject {
 	
 	public boolean equals(Object o) {
 		if(this == o) return true;
-		if(!(o instanceof MavenProject)) return false;
-		MavenProject that = (MavenProject) o;
+		if(!(o instanceof MavenArtifact)) return false;
+		MavenArtifact that = (MavenArtifact) o;
 		return Objects.equals(group, that.group) &&
 				Objects.equals(artifact, that.artifact);
 	}

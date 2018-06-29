@@ -5,8 +5,7 @@ import blue.sparse.minecraft.commands.parsing.Parser
 import blue.sparse.minecraft.commands.parsing.impl.*
 import blue.sparse.minecraft.commands.test.TestCommands
 import blue.sparse.minecraft.core.extensions.server
-import blue.sparse.minecraft.module.Module
-import blue.sparse.minecraft.module.ModuleDefinition
+import blue.sparse.minecraft.module.*
 import blue.sparse.minecraft.util.castDeclaredField
 import org.bukkit.command.Command
 import org.bukkit.command.SimpleCommandMap
@@ -18,6 +17,8 @@ import kotlin.reflect.KClass
 
 @ModuleDefinition
 object CommandsModule : Module, Listener {
+
+	override val type = ModuleType.COMMANDS
 
 	private val commandMap: SimpleCommandMap = server.castDeclaredField("commandMap")
 	private val knownCommands: MutableMap<String, Command> = commandMap.castDeclaredField("knownCommands")
@@ -54,7 +55,8 @@ object CommandsModule : Module, Listener {
 				spacedStringParser,
 				QuotedStringParser,
 				EitherParser,
-				playerParser
+				playerParser,
+				worldParser
 //				offlinePlayerParser
 		)
 	}

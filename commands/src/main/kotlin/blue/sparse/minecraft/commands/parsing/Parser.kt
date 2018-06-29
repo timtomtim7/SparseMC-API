@@ -64,15 +64,15 @@ interface Parser {
 		}
 
 		fun parse(goal: KType, input: CharIterator): Any? {
-			var result: Any? = null
+//			val result: Any?
 			val parser = findParser(goal) ?: return null
-			val ms = measureTimeMillis {
+//			val ms = measureTimeMillis {
 				val index = input.index
 
-				result = tryOrNull { parser.parse(goal, input) }
+				val result = tryOrNull { parser.parse(goal, input) }
 				if(result == null)
 					input.index = index
-			}
+//			}
 
 //			println("Parser $parser took ${ms}ms")
 

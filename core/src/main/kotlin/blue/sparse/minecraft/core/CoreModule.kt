@@ -1,16 +1,15 @@
 package blue.sparse.minecraft.core
 
 import blue.sparse.minecraft.core.extensions.server
-import blue.sparse.minecraft.module.Module
-import blue.sparse.minecraft.module.ModuleDefinition
+import blue.sparse.minecraft.module.*
 import blue.sparse.minecraft.plugin.SparsePluginLoader
-import blue.sparse.minecraft.util.castDeclaredField
 import blue.sparse.minecraft.util.reflection
-import org.bukkit.plugin.PluginLoader
 import java.io.File
 
 @ModuleDefinition
 object CoreModule : Module {
+
+	override val type = ModuleType.CORE
 
 	override fun onEnable() {
 		registerPluginLoader()

@@ -7,33 +7,33 @@ import org.bukkit.ChatColor
 
 object TestCommands {
 
-	fun Execute.sparseReload(pluginName: String) {
-		if (!sender.hasPermission("sparsemcapi.reload.plugin"))
-			errorRaw(ChatColor.RED, "No permission to reload.")
-
-		val pluginManager = server.pluginManager
-		var plugin = pluginManager.getPlugin(pluginName)
-
-		if (plugin == null)
-			errorRaw(ChatColor.RED, "Plugin either doesn't exist or isn't loaded")
-
-		if (plugin !is SparsePlugin)
-			errorRaw(ChatColor.RED, "That plugin was not loaded by SparseMC-API")
-
-		val file = (plugin.javaClass.classLoader as SparsePluginClassLoader).file
-
-		val loader = SparsePluginLoader.instance!!
-		loader.disablePlugin(plugin)
-		loader.unloadPlugin(plugin)
-
-		plugin = null
-		System.gc()
-
-		plugin = pluginManager.loadPlugin(file)
-		pluginManager.enablePlugin(plugin)
-
-		replyRaw(ChatColor.GRAY, "Plugin ", ChatColor.GREEN, plugin.name, ChatColor.GRAY, " reloaded.")
-	}
+//	fun Execute.sparseReload(pluginName: String) {
+//		if (!sender.hasPermission("sparsemcapi.reload.plugin"))
+//			errorRaw(ChatColor.RED, "No permission to reload.")
+//
+//		val pluginManager = server.pluginManager
+//		var plugin = pluginManager.getPlugin(pluginName)
+//
+//		if (plugin == null)
+//			errorRaw(ChatColor.RED, "Plugin either doesn't exist or isn't loaded")
+//
+//		if (plugin !is SparsePlugin)
+//			errorRaw(ChatColor.RED, "That plugin was not loaded by SparseMC-API")
+//
+//		val file = (plugin.javaClass.classLoader as SparsePluginClassLoader).file
+//
+//		val loader = SparsePluginLoader.instance!!
+//		loader.disablePlugin(plugin)
+//		loader.unloadPlugin(plugin)
+//
+//		plugin = null
+//		System.gc()
+//
+//		plugin = pluginManager.loadPlugin(file)
+//		pluginManager.enablePlugin(plugin)
+//
+//		replyRaw(ChatColor.GRAY, "Plugin ", ChatColor.GREEN, plugin.name, ChatColor.GRAY, " reloaded.")
+//	}
 
 //	@Command.Description("Message another player or players.")
 //	fun Execute.msg(target: Either<Player, List<Player>>, message: SpacedString) {

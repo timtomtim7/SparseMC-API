@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 
 fun Player.getPluginLocale(plugin: Plugin): PluginLocale {
-	return PluginLocale[plugin, player.locale]
+	return PluginLocale[plugin, player.spigot().locale]
 }
 
 fun Player.sendMessage(plugin: Plugin, key: String, placeholders: Map<String, Any>, default: String = "MISSING_LOCALE_KEY[$key]") {
