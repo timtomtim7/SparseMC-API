@@ -14,7 +14,7 @@ internal object NBTUtil {
 		is NBTTagDouble -> base.g()
 		is NBTTagByteArray -> base.c()
 		is NBTTagString -> base.a_()
-		is NBTTagList -> (0 until base.size()).mapNotNull { nbtBaseValue(base.get(it)) }
+		is NBTTagList -> (0 until base.size()).mapNotNull { nbtBaseValue(base.g(it)) }
 		is NBTTagCompound -> Compound(base.c()
 				.filterIsInstance<String?>()
 				.mapNotNull m@{ Pair(it ?: return@m null, nbtBaseValue(base[it])) })

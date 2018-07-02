@@ -4,7 +4,6 @@ import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.event.cancel
 import blue.sparse.minecraft.core.extensions.sendColoredMessage
 import blue.sparse.minecraft.core.extensions.server
-import blue.sparse.minecraft.scripting.kotlin.BlankScriptTemplate
 import blue.sparse.minecraft.scripting.kotlin.KotlinScriptManager
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
@@ -28,10 +27,6 @@ object ChatScriptListener: Listener {
 
 	private val dependencyJars = SparseMCAPIPlugin.getDependenciesFolder()
 			.listFiles().filter { it.extension == "jar" }
-
-//	private val classPath = SparseMCAPIPlugin.getPlugin().dataFolder.let {
-//		(it.parentFile.listFiles() + it.listFiles()).filter { it.extension == "jar" }
-//	}
 
 	val manager = KotlinScriptManager(ChatScriptTemplate::class, classpath = pluginJars + moduleJars + dependencyJars)
 

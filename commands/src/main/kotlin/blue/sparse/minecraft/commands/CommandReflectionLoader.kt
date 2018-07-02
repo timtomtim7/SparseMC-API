@@ -2,6 +2,7 @@ package blue.sparse.minecraft.commands
 
 import blue.sparse.minecraft.commands.parsing.CharIterator
 import blue.sparse.minecraft.commands.parsing.Parser
+import blue.sparse.minecraft.core.extensions.color
 import blue.sparse.minecraft.util.*
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -10,7 +11,6 @@ import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.jvmErasure
-import kotlin.system.measureTimeMillis
 
 object CommandReflectionLoader {
 
@@ -56,31 +56,34 @@ object CommandReflectionLoader {
 				data.aliases
 		) {
 			override fun execute(sender: CommandSender, commandLabel: String, args: Array<out String>): Boolean {
-				val ms = measureTimeMillis {
-					val context = Execute(data, sender)
+				val context = Execute(data, sender, args)
 
-					val parsedArgs = parseCommandArguments(exe.valueParameters, args.joinToString(" "))
-
-					if (parsedArgs is Right) {
-						val param = parsedArgs.right
-						sendErrorMessage(context, exe.valueParameters, param)
-					} else {
-						val params = parsedArgs.left
-						params[exe.instanceParameter!!] = holder
-						params[exe.extensionReceiverParameter!!] = context
-
-						try {
-							exe.callBy(params)
-						} catch (t: ContextEscape) {
-						} catch (t: InvocationTargetException) {
-							if (t.targetException !is ContextEscape)
-								throw t
-						}
-
-//						ignore<ContextEscape> { exe.callBy(params) }
-					}
+				val permission = data.permission
+				if(permission != null && !sender.hasPermission(permission)) {
+					val message = context.locale["error.command.${data.name}.noPermission"] ?: color("&cYou do not have permission.")
+					sender.sendMessage(message)
+					return true
 				}
-				println("Command $name took ${ms}ms")
+
+				val parsedArgs = parseCommandArguments(exe.valueParameters, args.joinToString(" "))
+
+				if (parsedArgs is Right) {
+					val param = parsedArgs.right
+					sendErrorMessage(context, exe.valueParameters, param)
+				} else {
+					val params = parsedArgs.left
+					params[exe.instanceParameter!!] = holder
+					params[exe.extensionReceiverParameter!!] = context
+
+					try {
+						exe.callBy(params)
+					} catch (t: ContextEscape) {
+					} catch (t: InvocationTargetException) {
+						if (t.targetException !is ContextEscape)
+							throw t
+					}
+
+				}
 
 				return true
 			}
@@ -88,7 +91,7 @@ object CommandReflectionLoader {
 			override fun tabComplete(sender: CommandSender, alias: String, args: Array<out String>): MutableList<String> {
 				if (tab == null)
 					return ArrayList()
-				val context = TabComplete(data, sender)
+				val context = TabComplete(data, sender, args)
 				//TODO: Make more efficient?
 				return (tab.call(holder, context) as Collection<*>).mapTo(ArrayList(), Any?::toString)
 			}
@@ -198,9 +201,11 @@ object CommandReflectionLoader {
 
 		val usage = element.findAnnotation<Command.Usage>()?.usage ?: "/$name"
 
+		val permission = element.findAnnotation<Command.Permission>()?.permission
+
 //		val default = element.findAnnotation<Command.Default>() != null
 
-		return Command(plugin, name, aliases, description, usage)
+		return Command(plugin, name, aliases, description, usage, permission)
 
 	}
 

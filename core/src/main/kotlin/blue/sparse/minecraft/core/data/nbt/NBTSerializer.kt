@@ -100,6 +100,7 @@ internal object NBTSerializer {
 			}
 			11 -> {
 				val size = input.readInt()
+//				println("Reading $size int array")
 				val array = IntArray(size) { input.readInt() }
 				NBTIntArray(array)
 			}

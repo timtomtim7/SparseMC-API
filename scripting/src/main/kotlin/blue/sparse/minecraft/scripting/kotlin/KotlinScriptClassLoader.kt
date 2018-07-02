@@ -7,7 +7,7 @@ import jdk.internal.org.objectweb.asm.tree.ClassNode
 import org.jetbrains.kotlin.cli.common.repl.KotlinJsr223JvmScriptEngineBase
 import java.io.File
 
-class KotlinScriptClassLoader : ClassLoader(KotlinScriptClassLoader::class.java.classLoader) {
+class KotlinScriptClassLoader(parent: ClassLoader = KotlinScriptClassLoader::class.java.classLoader) : ClassLoader(parent) {
 	private var classCount: Int = 0
 
 	private fun generateNextClassName() = "Script${classCount++}"

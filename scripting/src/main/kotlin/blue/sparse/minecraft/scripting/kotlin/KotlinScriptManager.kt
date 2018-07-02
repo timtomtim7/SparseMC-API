@@ -9,12 +9,13 @@ class KotlinScriptManager<T : Any>(
 		val template: KClass<T>,
 		val maxCacheSize: Int = Int.MAX_VALUE,
 		classpath: List<File> = emptyList(),
-		appendCurrentClasspath: Boolean = true
+		appendCurrentClasspath: Boolean = true,
+		parentClassLoader: ClassLoader = KotlinScriptClassLoader::class.java.classLoader
 ) {
 //	private val classDirectory = Files.createTempDirectory("kotlin-scripts").toFile()
 
 	private val engine = KotlinScriptEngineFactory(template.java.name, classpath/* + classDirectory*/, appendCurrentClasspath).scriptEngine
-	private var classLoader = KotlinScriptClassLoader()
+	private var classLoader = KotlinScriptClassLoader(parentClassLoader)
 
 	private var cache = HashMap<CacheKey, CompiledScript<T>>()
 
