@@ -6,7 +6,5 @@ import blue.sparse.minecraft.module.*
 object SchedulerModule: Module {
 	override val type = ModuleType.SCHEDULER
 
-	override fun onEnable() {
-
-	}
+	override fun onEnable() {}
 }

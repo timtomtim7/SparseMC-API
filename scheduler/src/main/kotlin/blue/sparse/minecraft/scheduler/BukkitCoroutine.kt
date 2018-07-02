@@ -111,7 +111,7 @@ class BukkitCoroutine internal constructor(val plugin: Plugin) {
 		val task = server.scheduler.delayed(plugin, ticks, async) { cont.resume(Unit) }
 
 		override val isRunning: Boolean
-			get() = !task.isCancelled && server.scheduler.isCurrentlyRunning(task.taskId)
+			get() = server.scheduler.isCurrentlyRunning(task.taskId)
 
 		override fun cancel() = task.cancel()
 

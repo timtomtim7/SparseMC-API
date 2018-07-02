@@ -10,6 +10,7 @@ import org.bukkit.plugin.Plugin
 import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.*
 import kotlin.reflect.full.*
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
 object CommandReflectionLoader {
@@ -76,6 +77,7 @@ object CommandReflectionLoader {
 					params[exe.extensionReceiverParameter!!] = context
 
 					try {
+						exe.isAccessible = true
 						exe.callBy(params)
 					} catch (t: ContextEscape) {
 					} catch (t: InvocationTargetException) {
