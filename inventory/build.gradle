@@ -7,4 +7,3 @@ dependencies {
     compileOnly project(':core')
     compileOnly project(':nms')
 }
-

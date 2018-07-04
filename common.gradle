@@ -17,6 +17,10 @@ dependencies {
 	testCompileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
 }
 
+jar {
+	archiveName = "${archivesBaseName}.jar"
+}
+
 compileKotlin {
 	kotlinOptions.jvmTarget = "1.8"
 }
