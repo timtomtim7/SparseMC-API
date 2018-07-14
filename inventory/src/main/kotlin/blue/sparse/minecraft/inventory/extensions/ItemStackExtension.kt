@@ -1,8 +1,12 @@
 package blue.sparse.minecraft.inventory.extensions
 
+import blue.sparse.minecraft.inventory.item.CustomItemType
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
+
+val ItemStack.customItemType: CustomItemType?
+	get() = CustomItemType.getType(this)
 
 fun ItemStack?.notEmptyOrNull(): ItemStack? {
 	return if (this == null || this.type == Material.AIR) null else this

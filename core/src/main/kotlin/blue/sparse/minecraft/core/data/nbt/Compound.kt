@@ -34,6 +34,10 @@ class Compound: DataMap<String> {
 		return backingMap[key]!!
 	}
 
+	fun remove(key: String): Boolean {
+		return backingMap.remove(key) != null
+	}
+
 	operator fun get(key: String): Any {
 		return backingMap[key]!!.value
 	}

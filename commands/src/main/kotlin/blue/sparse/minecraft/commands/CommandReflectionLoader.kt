@@ -34,20 +34,27 @@ object CommandReflectionLoader {
 			}
 		}.toMap()
 
-		val result = HashSet<org.bukkit.command.Command>()
+		if(holder is CommandGroup) {
 
-		for ((exe, tab) in matched) {
-			val data = getAnnotationData(plugin, exe.name, exe)
+		}else{
+			val result = HashSet<org.bukkit.command.Command>()
 
-			result.add(createBukkitCommand(holder, data, exe, tab))
+			for ((exe, tab) in matched) {
+				val data = getAnnotationData(plugin, exe.name, exe)
+
+				result.add(createBukkitCommand(holder, data, exe, tab))
+			}
+
+			return result
 		}
 
-//		val groupClasses = clazz.nestedClasses.filter {
-//			it.objectInstance != null && it.isSubclassOf(CommandGroup::class)
-//		}
+		val groupClasses = clazz.nestedClasses.filter {
+			it.objectInstance != null && it.isSubclassOf(CommandGroup::class)
+		}
 
-		return result
+		return groupClasses.flatMapTo(HashSet()) { scan(plugin, it) }
 	}
+
 
 	private fun createBukkitCommand(holder: Any, data: Command, exe: KFunction<*>, tab: KFunction<*>?): org.bukkit.command.Command {
 		return object : org.bukkit.command.Command(

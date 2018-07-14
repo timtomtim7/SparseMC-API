@@ -6,12 +6,12 @@ version '0.1'
 archivesBaseName = "SparseMC-API"
 
 dependencies {
-	compile "blue.sparse:sparse-config:1.0-SNAPSHOT"
+	compile "blue.sparse:sparse-data:1.0-SNAPSHOT"
 }
 
-//jar {
-//	from {
-//		configurations.compile.filter { it.name.contains("sparse-config") }.collect { it.isDirectory() ? it : zipTree(it) }
-////		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-//	}
-//}
+jar {
+	from {
+		configurations.compile.filter { it.name.contains("sparse-data") }.collect { it.isDirectory() ? it : zipTree(it) }
+//		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+}

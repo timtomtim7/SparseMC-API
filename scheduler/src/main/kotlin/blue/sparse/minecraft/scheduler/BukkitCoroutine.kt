@@ -13,8 +13,8 @@ class BukkitCoroutine internal constructor(val plugin: Plugin) {
 		set(value) {
 			if (field == Cancelled)
 				return
-			if (field.isRunning)
-				plugin.logger.warning("Coroutine changed state while previous state was active. ${field.javaClass.simpleName} -> ${value.javaClass.name}")
+//			if (field.isRunning)
+//				plugin.logger.warning("Coroutine changed state while previous state was active. ${field.javaClass.simpleName} -> ${value.javaClass.name}")
 			field = value
 		}
 

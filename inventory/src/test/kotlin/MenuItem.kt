@@ -1,5 +1,3 @@
-package blue.sparse.minecraft.inventory.inventory
-
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
