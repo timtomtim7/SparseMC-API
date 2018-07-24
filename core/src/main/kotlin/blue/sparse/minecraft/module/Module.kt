@@ -19,3 +19,5 @@ interface Module: PluginProvided<SparseMCAPIPlugin> {
 	fun onEnable() {}
 	fun onDisable() {}
 }
+
+abstract class AbstractModule(override val type: ModuleType): Module

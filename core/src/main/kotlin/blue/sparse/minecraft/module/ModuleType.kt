@@ -5,6 +5,7 @@ import java.io.File
 
 enum class ModuleType {
 	CORE,
+	COMPATIBILITY,
 	COMMANDS,
 	CONFIGURATION,
 	INVENTORY,
