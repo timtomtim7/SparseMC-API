@@ -12,7 +12,7 @@ import org.bukkit.util.Vector
 
 class ParticleImpl : ParticleNMS {
 	override fun isAvailable(particle: ParticleType<*>): Boolean {
-		return EnumParticle.a(particle.id) != null
+		return EnumParticle.a(particle.numericID) != null
 	}
 
 	override fun spawn(particle: ParticleType<*>, location: Location, data: ParticleData) {
@@ -31,7 +31,7 @@ class ParticleImpl : ParticleNMS {
 	) {
 		val connection = (player as CraftPlayer).handle.playerConnection
 		connection.sendPacket(PacketPlayOutWorldParticles(
-				EnumParticle.a(particle.id),
+				EnumParticle.a(particle.numericID),
 				true,
 				position.x.toFloat(),
 				position.y.toFloat(),

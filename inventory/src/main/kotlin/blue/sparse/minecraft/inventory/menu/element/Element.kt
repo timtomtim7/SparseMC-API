@@ -1,6 +1,6 @@
 package blue.sparse.minecraft.inventory.menu.element
 
-import blue.sparse.minecraft.inventory.menu.InventorySection
+import blue.sparse.minecraft.inventory.menu.ElementContainer
 import blue.sparse.minecraft.inventory.menu.Vector2i
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -8,13 +8,15 @@ import org.bukkit.event.inventory.InventoryClickEvent
 abstract class Element(
 		val position: Vector2i,
 		val size: Vector2i,
-		val parentSection: InventorySection
+		val parent: ElementContainer
 ) {
+
+	val visible get() = parent.isVisible(this)
 
 	val min = position
 	val max = position + size
 
-	val section = parentSection.subsection(min, size)
+	val section = parent.section.subsection(min, size)
 
 	operator fun contains(point: Vector2i): Boolean {
 		return point.x >= min.x
@@ -32,6 +34,6 @@ abstract class Element(
 	abstract fun setup()
 
 	interface Type<E : Element> {
-		fun create(position: Vector2i, size: Vector2i, parentSection: InventorySection): E
+		fun create(position: Vector2i, size: Vector2i, parent: ElementContainer): E
 	}
 }

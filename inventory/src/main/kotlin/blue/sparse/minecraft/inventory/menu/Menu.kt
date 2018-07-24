@@ -1,18 +1,24 @@
 package blue.sparse.minecraft.inventory.menu
 
+import blue.sparse.minecraft.core.extensions.getPluginLocale
 import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.core.i18n.LocalizedString
+import blue.sparse.minecraft.core.i18n.PluginLocale
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.plugin.Plugin
 
-class Menu(val plugin: Plugin, val player: Player, rows: Int) : ElementContainer(Vector2i(9, rows)), InventoryHolder {
+class Menu(val plugin: Plugin, val player: Player, rows: Int)
+	: ElementContainer(Vector2i(9, rows), PluginLocale.default(plugin)), InventoryHolder {
 	private var _inventory = createInventory()
 	private var closeCallback: () -> Unit = {}
 
 	override val section: InventorySection
 		get() = InventorySection(_inventory, Vector2i(0, 0), contentSize)
+
+	override val locale: PluginLocale
+		get() = player.getPluginLocale(plugin)
 
 	var title: LocalizedString? = null
 		set(value) {

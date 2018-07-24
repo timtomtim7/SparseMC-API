@@ -81,8 +81,9 @@ class PlaceholderImpl : PlaceholderNMS, Listener {
 		}
 
 		override fun write(context: ChannelHandlerContext, packet: Any, promise: ChannelPromise) {
+//			println("IN: "+packet.javaClass.simpleName)
 			try {
-				if (packet is PacketPlayOutSetSlot || packet is PacketPlayOutWindowItems) {
+				if (packet is PacketPlayOutSetSlot || packet is PacketPlayOutWindowItems || packet is PacketPlayOutEntityEquipment) {
 					val items = getItems(packet)
 					val replaced = replace(items)
 					setItems(packet, replaced)
@@ -95,6 +96,7 @@ class PlaceholderImpl : PlaceholderNMS, Listener {
 		}
 
 		override fun channelRead(context: ChannelHandlerContext, packet: Any) {
+//			println("OUT: "+packet.javaClass.simpleName)
 			try {
 				if (packet is PacketPlayInSetCreativeSlot || packet is PacketPlayInWindowClick) {
 					val items = getItems(packet)

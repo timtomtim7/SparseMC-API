@@ -1,0 +1,14 @@
+Representation = Compound System
+Storage = Plugin's Data Folder
+
+Types {
+	Plugin,
+	Player,
+	World,
+	Chunk,
+	Block
+}
+
+Syntax {
+	Type#persistent[Plugin] -> Returns a compound.
+}

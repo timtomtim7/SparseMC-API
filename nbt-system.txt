@@ -1,0 +1,17 @@
+Representation = Compound System
+
+Storage {
+	TileEntities/BlockEntities
+	ItemStacks
+	Entities
+}
+
+Syntax {
+	Type#nbt = returns a compound representing this type's current NBT.
+	Type#editNBT {} = modifies the current NBT based on the block.
+}
+
+Note {
+	ItemStacks can have completely custom NBT values.
+	Entities and TileEntities can not have completely custom, but can edit existing NBT values.
+}

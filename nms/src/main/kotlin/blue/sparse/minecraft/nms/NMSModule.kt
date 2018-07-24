@@ -1,7 +1,9 @@
 package blue.sparse.minecraft.nms
 
+import blue.sparse.minecraft.core.data.nbt.converter.NBTConverter
 import blue.sparse.minecraft.module.*
 import blue.sparse.minecraft.nms.api.*
+import blue.sparse.minecraft.nms.util.ItemStackConverter
 
 @ModuleDefinition
 object NMSModule : Module {
@@ -17,6 +19,7 @@ object NMSModule : Module {
 	override fun onEnable() {
 		println("NMSModule enabled with ${nmsHandlers.size} NMS handlers.")
 		nmsHandlers.forEach(NMSHandler::onEnable)
+		NBTConverter.register(ItemStackConverter)
 	}
 
 	override fun onDisable() {

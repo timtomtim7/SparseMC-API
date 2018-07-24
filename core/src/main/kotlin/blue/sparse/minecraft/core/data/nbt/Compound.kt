@@ -1,6 +1,7 @@
 package blue.sparse.minecraft.core.data.nbt
 
 import blue.sparse.minecraft.core.data.DataMap
+import blue.sparse.minecraft.core.data.nbt.converter.NBTConverter
 import java.io.DataInputStream
 import java.io.File
 
@@ -102,6 +103,14 @@ class Compound: DataMap<String> {
 		return (backingMap[key] as NBTValue.NBTList<*>).value
 	}
 
+	fun convert(key: String): Any {
+		return optionalConvert(key)!!
+	}
+
+	inline fun <reified T: Any> convertTyped(key: String): T {
+		return optionalConvertTyped(key)!!
+	}
+
 
 	fun optionalByte(key: String): Byte? {
 		return getOptional(key) as? Byte
@@ -156,6 +165,14 @@ class Compound: DataMap<String> {
 
 	fun optionalCollection(key: String): Collection<Any>? {
 		return (backingMap[key] as? NBTValue.NBTList<*>)?.value
+	}
+
+	fun optionalConvert(key: String): Any? {
+		return NBTConverter.getValue(this, key)
+	}
+
+	inline fun <reified T: Any> optionalConvertTyped(key: String): T? {
+		return optionalConvert(key) as? T
 	}
 
 
@@ -222,10 +239,18 @@ class Compound: DataMap<String> {
 		backingMap[key] = NBTValue.NBTList(collection)
 	}
 
+	fun convert(key: String, value: Any) {
+		NBTConverter.setValue(this, key, value)
+	}
+
 	fun write(file: File) {
 		file.outputStream().buffered().use {
 			NBTSerializer.writeNamed("", NBTValue.NBTCompound(this), it)
 		}
+	}
+
+	override fun toString(): String {
+		return backingMap.toString()
 	}
 
 	companion object {

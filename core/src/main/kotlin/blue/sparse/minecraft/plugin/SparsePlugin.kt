@@ -2,7 +2,6 @@ package blue.sparse.minecraft.plugin
 
 import blue.sparse.minecraft.core.PluginProvided
 import blue.sparse.minecraft.core.i18n.PluginLocale
-import blue.sparse.minecraft.module.ModuleType
 import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -47,21 +46,24 @@ abstract class SparsePlugin : PluginBase(), PluginProvided<SparsePlugin> {
 	init {
 		val clazz = this::class
 		val annotation = clazz.findAnnotation<PluginDescription>()
-				?: throw IllegalStateException("SparsePlugin must have the PluginDescription annotation.")
+//				?: throw IllegalStateException("SparsePlugin must have the PluginDescription annotation.")
+		if(annotation != null) {
+			description = PluginDescriptionFile(annotation.name, annotation.version, clazz.jvmName)
+			val descClazz = description.javaClass
+			val dependField = descClazz.getDeclaredField("depend")
+			val softDependField = descClazz.getDeclaredField("softDepend")
+			val loadBeforeField = descClazz.getDeclaredField("loadBefore")
 
-		description = PluginDescriptionFile(annotation.name, annotation.version, clazz.jvmName)
-		val descClazz = description.javaClass
-		val dependField = descClazz.getDeclaredField("depend")
-		val softDependField = descClazz.getDeclaredField("softDepend")
-		val loadBeforeField = descClazz.getDeclaredField("loadBefore")
+			dependField.isAccessible = true
+			softDependField.isAccessible = true
+			loadBeforeField.isAccessible = true
 
-		dependField.isAccessible = true
-		softDependField.isAccessible = true
-		loadBeforeField.isAccessible = true
-
-		dependField.set(description, annotation.depend.toList())
-		softDependField.set(description, annotation.softDepend.toList())
-		loadBeforeField.set(description, annotation.loadBefore.toList())
+			dependField.set(description, annotation.depend.toList())
+			softDependField.set(description, annotation.softDepend.toList())
+			loadBeforeField.set(description, annotation.loadBefore.toList())
+		}else{
+			description = PluginDescriptionFile(clazz.simpleName!!.removeSuffix("Plugin"), "1.0", clazz.jvmName)
+		}
 	}
 
 	override fun onEnable() {}

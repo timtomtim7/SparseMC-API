@@ -35,6 +35,13 @@ fun Block.adjacent(): Set<Block> {
 	return BlockFace.values().take(6).mapTo(HashSet(), this::getRelative)
 }
 
+val Block.north get() = getRelative(BlockFace.NORTH)
+val Block.south get() = getRelative(BlockFace.SOUTH)
+val Block.east get() = getRelative(BlockFace.EAST)
+val Block.west get() = getRelative(BlockFace.WEST)
+val Block.up get() = getRelative(BlockFace.UP)
+val Block.down get() = getRelative(BlockFace.DOWN)
+
 operator fun Block.plus(other: Block) = world.getBlockAt(x + other.x, y + other.y, z + other.z)
 operator fun Block.minus(other: Block) = world.getBlockAt(x - other.x, y - other.y, z - other.z)
 operator fun Block.times(other: Block) = world.getBlockAt(x * other.x, y * other.y, z * other.z)

@@ -12,6 +12,7 @@ object CoreModule : Module {
 	override val type = ModuleType.CORE
 
 	override fun onEnable() {
+		ModuleType.values().forEach { it.downloadAndLoad() }
 		registerPluginLoader()
 		loadAndEnablePlugins()
 	}

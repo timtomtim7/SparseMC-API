@@ -1,0 +1,31 @@
+Storage = ItemStacks
+Representation = Wrapping ItemStack System
+
+Syntax {
+	
+	val apple = Item(ItemType.Apple) = Would create an item that represents one apple.
+	apple.editNBT {}
+	apple.displayName = colored("&cApple")
+	apple.lore = coloredListOf("&fI'm a big ole red apple.")
+	
+	val dirt = Item(BlockType.Dirt, variation = BlockType.Dirt.Coarse) {
+		displayName = colored("&b&lFancy Dirt")
+		lore = coloredListOf("&fI'm the fanciest dirt in town.")
+		editNBT {
+			int("hello", 5)
+		}
+	}
+	
+	val redWool = Item(BlockType.Wool, variation = BlockColor.Red) {
+		displayName = "Tom1024"
+		lore = listOf("lol")
+	}
+	
+	val diamondSword = Item(ItemType.Sword, variation = ToolMaterial.Diamond) {
+		durability = .5 // Sets the durability to 50%.
+		
+		enchant(Enchantment.SHARPNESS, 45)
+		safeEnchant(Enchantment.UNBREAKING, 4555) // Would error. Definitely.
+		itemFlag(ItemFlag.HIDE_ENCHANTS)
+	}
+}

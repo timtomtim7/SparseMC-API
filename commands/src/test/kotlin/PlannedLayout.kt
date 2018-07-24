@@ -3,6 +3,7 @@ import blue.sparse.minecraft.commands.parsing.util.SpacedString
 import blue.sparse.minecraft.core.extensions.getPluginLocale
 import blue.sparse.minecraft.core.i18n.PluginLocale
 import blue.sparse.minecraft.util.Either
+import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
@@ -13,18 +14,42 @@ object TestCommands {
 		sender.sendMessage("This is a test!")
 	}
 
+	fun Execute.player(player: OfflinePlayer) {}
+
+	fun Execute.player(value: Int) {}
+
+	fun TabComplete.player(): List<String> {
+		return emptyList()
+	}
+
+
+	@Command.Aliases("f")
+	object Factions: CommandGroup {
+		fun Execute.who(player: OfflinePlayer) {
+
+		}
+
+		fun Execute.map() {
+
+		}
+
+		fun Execute.help() {
+
+		}
+
+		@Command.Default
+		fun Execute.default() {
+
+		}
+	}
+
 	@Command.Name("test")
-	object TestCommandGroup: CommandGroup {
+	object Test: CommandGroup {
 
 		// The annotation marks this command as the default, so executing `/test` would run this.
 		@Command.Default
 		fun Execute.default() {
 			reply("testMessage")
-		}
-
-		// No annotation required, this can be executed with `/test hello <string>`
-		fun Execute.hello(@Quoted name: String) {
-			reply("greeting", "name" to name)
 		}
 
 		fun Execute.hello(name: QuotedString) {

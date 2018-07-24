@@ -82,7 +82,7 @@ class PlaceholderImpl : PlaceholderNMS, Listener {
 
 		override fun write(context: ChannelHandlerContext, packet: Any, promise: ChannelPromise) {
 			try {
-				if (packet is PacketPlayOutSetSlot || packet is PacketPlayOutWindowItems) {
+				if (packet is PacketPlayOutSetSlot || packet is PacketPlayOutWindowItems || packet is PacketPlayOutEntityEquipment) {
 					val items = getItems(packet)
 					val replaced = replace(items)
 					setItems(packet, replaced)

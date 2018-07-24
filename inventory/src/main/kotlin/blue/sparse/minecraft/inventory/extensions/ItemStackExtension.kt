@@ -31,7 +31,7 @@ inline fun item(
 		type: Material = Material.AIR,
 		amount: Int = 1,
 		damage: Short = 0,
-		body: ItemStack.() -> Unit
+		body: ItemStack.() -> Unit = {}
 ): ItemStack {
 	return ItemStack(type, amount, damage).apply(body)
 }

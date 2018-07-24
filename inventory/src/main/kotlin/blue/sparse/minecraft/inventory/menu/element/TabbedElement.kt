@@ -1,6 +1,7 @@
 package blue.sparse.minecraft.inventory.menu.element
 
 import blue.sparse.minecraft.core.extensions.event.cancel
+import blue.sparse.minecraft.core.i18n.PluginLocale
 import blue.sparse.minecraft.inventory.menu.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -10,22 +11,28 @@ import org.bukkit.inventory.ItemStack
 class TabbedElement(
 		position: Vector2i,
 		size: Vector2i,
-		parentSection: InventorySection
-) : Element(position, size, parentSection) {
+		parent: ElementContainer
+) : Element(position, size, parent) {
 
 	private val tabs = LinkedHashSet<Tab>()
 
 	var tabsSide = Side.TOP
-	var dividers: Array<out ItemStack>? = null
+	var dividers: Array<out ItemStack>? = arrayOf(ItemStack(Material.GLASS_PANE))
+	var selectedDivider: ItemStack? = ItemStack(Material.GLASS)
 	val hasDividers get() = dividers != null
 
+	private var currentTabIndex = 0
 	var currentTab: Tab? = null
 		private set
 
 	val tabContentSection get() = section.subsection(tabOrigin, tabSize)
 
+	fun noDivider() {
+		dividers = null
+	}
+
 	inline fun divider(
-			base: ItemStack = ItemStack(Material.STAINED_GLASS_PANE),
+			base: ItemStack = ItemStack(Material.GLASS_PANE),
 			body: ItemStack.() -> Unit = {}
 	) {
 		dividers = arrayOf(base.apply(body))
@@ -45,13 +52,14 @@ class TabbedElement(
 		currentTab?.save()
 		val tab = Tab(tabSize, tabContentSection)
 		currentTab = tab
+		currentTabIndex = tabs.size
 		tabs.add(tab)
 		return tab
 	}
 
 	override fun onClick(event: InventoryClickEvent, player: Player, position: Vector2i) {
-		val slot = section.getSlot(position)
-		val tabPosition = tabContentSection.getPosition(slot)
+		val slot = section.getAbsoluteSlot(position)
+		val tabPosition = tabContentSection.getPositionByAbsoluteSlot(slot)
 		if (tabPosition in tabContentSection) {
 			val currentTab = currentTab ?: return event.cancel()
 
@@ -59,14 +67,23 @@ class TabbedElement(
 		} else {
 			event.cancel()
 
-			val newTab = tabs.withIndex()
-					.find { getTabIconPosition(it.index) == position }
-					?.value ?: return
+			val (index, newTab) = tabs.withIndex()
+					.find { getTabIconPosition(it.index) == position } ?: return
+
+			val dividers = dividers
+			if (dividers != null) {
+				val oldDividerPos = getTabIconPosition(currentTabIndex, 1)
+				section[oldDividerPos] = dividers[currentTabIndex % dividers.size]
+
+				val newDividerPos = getTabIconPosition(index, 1)
+				section[newDividerPos] = selectedDivider ?: dividers[index % dividers.size]
+			}
 
 			currentTab?.save()
 			currentTab = newTab
 			newTab.load()
 			newTab.selectedCallback()
+			currentTabIndex = index
 		}
 	}
 
@@ -75,11 +92,16 @@ class TabbedElement(
 		if (div != null) {
 			var i = 0
 			while (true) {
-				val pos = getTabIconPosition(i++, 1)
+				val pos = getTabIconPosition(i, 1)
 				if (pos !in this)
 					break
 
-				section[pos] = div[i % div.size]
+				if (i == currentTabIndex) {
+					section[pos] = selectedDivider ?: div[i % div.size]
+				} else {
+					section[pos] = div[i % div.size]
+				}
+				i++
 			}
 		}
 
@@ -90,17 +112,20 @@ class TabbedElement(
 	}
 
 	companion object : Element.Type<TabbedElement> {
-		override fun create(position: Vector2i, size: Vector2i, parentSection: InventorySection): TabbedElement {
-			return TabbedElement(position, size, parentSection)
+		override fun create(position: Vector2i, size: Vector2i, parent: ElementContainer): TabbedElement {
+			return TabbedElement(position, size, parent)
 		}
 	}
 
 	inner class Tab internal constructor(
 			contentSize: Vector2i,
 			override val section: InventorySection
-	) : ElementContainer(contentSize) {
+	) : ElementContainer(contentSize, parent.locale) {
 
 		private var saved: Map<Vector2i, ItemStack?>? = null
+
+		override val locale: PluginLocale
+			get() = parent.locale
 
 		var icon = ItemStack(Material.STONE)
 		var selectedCallback = {}
@@ -171,7 +196,7 @@ class TabbedElement(
 	}
 
 
-//	enum class Side(val getPosition: (tab: Int, offset: Int, size: Vector2i) -> Vector2i) {
+//	enum class Side(val getPositionByAbsoluteSlot: (tab: Int, offset: Int, size: Vector2i) -> Vector2i) {
 //		TOP({ tab, offset, _ -> Vector2i(tab, offset) }),
 //		LEFT({ tab, offset, _ -> Vector2i(offset, tab) }),
 //		BOTTOM({ tab, offset, size -> Vector2i(tab, (size.y - 1) - offset) }),

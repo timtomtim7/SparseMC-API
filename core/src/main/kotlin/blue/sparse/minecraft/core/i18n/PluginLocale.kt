@@ -1,8 +1,7 @@
 package blue.sparse.minecraft.core.i18n
 
+import blue.sparse.minecraft.core.extensions.colored
 import org.bukkit.ChatColor
-import org.bukkit.configuration.Configuration
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.Plugin
 import java.io.*
 import java.util.Properties
@@ -65,7 +64,8 @@ class PluginLocale private constructor(
 			i++
 		}
 
-		return result.toString()
+		//TODO: Should this stay `colored`?
+		return result.toString().colored
 	}
 
 	operator fun get(key: String, vararg placeholders: Pair<String, Any>): String? {

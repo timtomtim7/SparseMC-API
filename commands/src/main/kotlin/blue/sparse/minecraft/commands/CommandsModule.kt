@@ -7,6 +7,7 @@ import blue.sparse.minecraft.commands.test.TestCommands
 import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.module.*
 import blue.sparse.minecraft.util.castDeclaredField
+import blue.sparse.minecraft.util.castField
 import org.bukkit.command.Command
 import org.bukkit.command.SimpleCommandMap
 import org.bukkit.event.EventHandler
@@ -21,7 +22,7 @@ object CommandsModule : Module, Listener {
 	override val type = ModuleType.COMMANDS
 
 	private val commandMap: SimpleCommandMap = server.castDeclaredField("commandMap")
-	private val knownCommands: MutableMap<String, Command> = commandMap.castDeclaredField("knownCommands")
+	private val knownCommands: MutableMap<String, Command> = commandMap.castField("knownCommands")
 	private val pluginCommands = HashMap<Plugin, MutableSet<Command>>()
 
 	override fun onEnable() {
@@ -71,7 +72,7 @@ object CommandsModule : Module, Listener {
 	}
 
 	fun registerCommands(plugin: Plugin, clazz: KClass<*>) {
-		CommandReflectionLoader.scan(plugin, clazz).forEach {
+		OldCommandReflectionLoader.scan(plugin, clazz).forEach {
 			registerCommand(plugin, it)
 		}
 	}

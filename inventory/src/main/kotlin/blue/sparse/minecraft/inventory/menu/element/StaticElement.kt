@@ -1,14 +1,14 @@
 package blue.sparse.minecraft.inventory.menu.element
 
 import blue.sparse.minecraft.core.extensions.event.cancel
-import blue.sparse.minecraft.inventory.menu.InventorySection
+import blue.sparse.minecraft.inventory.menu.ElementContainer
 import blue.sparse.minecraft.inventory.menu.Vector2i
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 
-class StaticElement(position: Vector2i, size: Vector2i, parentSection: InventorySection) : Element(position, size, parentSection) {
+class StaticElement(position: Vector2i, size: Vector2i, parent: ElementContainer) : Element(position, size, parent) {
 
 	var icon = ItemStack(Material.STONE)
 	var clickCallback: (position: Vector2i) -> Unit = {}
@@ -33,8 +33,8 @@ class StaticElement(position: Vector2i, size: Vector2i, parentSection: Inventory
 	}
 
 	companion object : Element.Type<StaticElement> {
-		override fun create(position: Vector2i, size: Vector2i, parentSection: InventorySection): StaticElement {
-			return StaticElement(position, size, parentSection)
+		override fun create(position: Vector2i, size: Vector2i, parent: ElementContainer): StaticElement {
+			return StaticElement(position, size, parent)
 		}
 	}
 

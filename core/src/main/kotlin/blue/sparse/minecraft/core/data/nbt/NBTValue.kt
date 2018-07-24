@@ -17,34 +17,42 @@ internal sealed class NBTValue<T: Any>(val id: Int) {
 	class NBTLongArray			(override val value: LongArray)						 : NBTValue<LongArray>(12)
 
 	companion object {
-		fun toNBTValue(value: Any): NBTValue<out Any> = when (value) {
-			is NBTValue<*> -> value
-			is Byte -> NBTByte(value)
-			is Short -> NBTShort(value)
-			is Int -> NBTInt(value)
-			is Long -> NBTLong(value)
-			is Float -> NBTFloat(value)
-			is Double -> NBTDouble(value)
-			is ByteArray -> NBTByteArray(value)
-			is String -> NBTString(value)
-			is Collection<*> -> {
-				if(value.isEmpty())
-					NBTList(emptyList())
-
-				val nonNull = value.filterNotNull()
-				if(nonNull.size != value.size)
-					throw IllegalArgumentException("NBTList may not contain nulls")
-				val first = nonNull.first().javaClass
-				if(nonNull.any { it.javaClass != first })
-					throw IllegalArgumentException("All items in NBTList must be of the same type.")
-
-				NBTList(nonNull)
-			}
-			is Compound -> NBTCompound(value)
-			is IntArray -> NBTIntArray(value)
-			is LongArray -> NBTLongArray(value)
-
-			else -> throw IllegalArgumentException("Unsupported value for NBT: ${value.javaClass}")
+		fun toNBTValue(value: Any): NBTValue<out Any> {
+			return toNBTValueOrNull(value) ?: throw IllegalArgumentException("Unsupported value for NBT: ${value.javaClass}")
 		}
+
+		fun toNBTValueOrNull(value: Any): NBTValue<out Any>? {
+			return when (value) {
+				is NBTValue<*> -> value
+				is Byte -> NBTByte(value)
+				is Short -> NBTShort(value)
+				is Int -> NBTInt(value)
+				is Long -> NBTLong(value)
+				is Float -> NBTFloat(value)
+				is Double -> NBTDouble(value)
+				is ByteArray -> NBTByteArray(value)
+				is String -> NBTString(value)
+				is Collection<*> -> {
+					if(value.isEmpty())
+						NBTList(emptyList())
+
+					val nonNull = value.filterNotNull()
+					if(nonNull.size != value.size)
+						return null
+					val first = nonNull.first().javaClass
+					if(nonNull.any { it.javaClass != first })
+						return null
+					//TODO: I think there is a bug here (if the list contains non-NBT primitive types)
+
+					NBTList(nonNull)
+				}
+				is Compound -> NBTCompound(value)
+				is IntArray -> NBTIntArray(value)
+				is LongArray -> NBTLongArray(value)
+
+				else -> null
+			}
+		}
+
 	}
 }

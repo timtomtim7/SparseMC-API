@@ -1,0 +1,25 @@
+Representation = NBT
+
+Storage {
+	File System
+	ItemStack
+	Persistent Data
+	BlockEntites/TileEntities
+}
+
+Syntax {
+	
+	Get Section
+	Compound#int("key") = would return an int. Similar functions for short, long, byte, collections, et cetera.
+	Compound#optionalInt("key") = would return an optional int. Same as before, but nullable if it's not there.
+	Compound#defaultInt("key", 0) = would default it if it's not there.
+	
+	Set Section
+	Compound#int("key", 0) = would set "key" to 0. Same types as getting.
+	
+	Compound#compound("key") {} = Overwrites "key" compound with whatever is in the block.
+	Compound#editCompound("key") {} = Edits "key" compound.
+	Compound#defaultCompound("key") = Defaults "key" to blank.
+	Compound#defaultCompound("key") {} = Defaults "key" to whatever is in the block. If the compound exists, the block won't get called. If it doesn't exist, it'll create the compound off the block.
+}
+

@@ -1,12 +1,10 @@
 package blue.sparse.minecraft.plugin
 
 import blue.sparse.minecraft.core.extensions.server
-import blue.sparse.minecraft.module.ModuleType
 import org.bukkit.plugin.InvalidPluginException
 import java.io.File
 import java.net.URLClassLoader
 import java.util.jar.JarFile
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubclassOf
 
 class SparsePluginClassLoader(
@@ -26,8 +24,8 @@ class SparsePluginClassLoader(
 			if (!clazz.isSubclassOf(SparsePlugin::class))
 				continue
 
-			val annotation = clazz.findAnnotation<PluginDescription>() ?: continue
-			annotation.modules.forEach(ModuleType::downloadAndLoad)
+//			val annotation = clazz.findAnnotation<PluginDescription>() ?: continue
+//			annotation.modules.forEach(ModuleType::downloadAndLoad)
 
 			instance = clazz.objectInstance as SparsePlugin
 			break

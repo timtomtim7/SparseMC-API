@@ -10,6 +10,8 @@ dependencies {
 }
 
 jar {
+	archivesBaseName = "SparseMC-API"
+	archiveName = "${archivesBaseName}.jar"
 	from {
 		configurations.compile.filter { it.name.contains("sparse-data") }.collect { it.isDirectory() ? it : zipTree(it) }
 //		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
