@@ -5,12 +5,12 @@ import java.io.File
 
 enum class ModuleType {
 	CORE,
+	NMS,
 	COMPATIBILITY,
 	COMMANDS,
 	CONFIGURATION,
 	INVENTORY,
 	MATH,
-	NMS,
 	PERSISTENT,
 	SCHEDULER,
 	SCRIPTING;
