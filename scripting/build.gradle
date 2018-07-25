@@ -1,7 +1,7 @@
+ext.baseVer = '0.1'
 apply from: "../common.gradle"
 
 group 'blue.sparse.minecraft'
-version '0.1'
 
 dependencies {
     compileOnly project(':core')

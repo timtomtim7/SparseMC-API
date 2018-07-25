@@ -53,6 +53,7 @@ task copyToPlugins(type: Copy) {
 	into("testServer/plugins")
 	from subprojects.find { it.name == "core" }.tasks.withType(Jar)
 
+	file("testServer/plugins/SparseMC-API/modules").deleteDir()
 	into("SparseMC-API/modules/") {
 		from subprojects.findAll { it.name != "core" }.collect { it.tasks.withType(Jar) }
 	}

@@ -36,12 +36,21 @@ public class MavenArtifact {
 		if(name.length() < artifact.length() + 2)
 			throw new IllegalArgumentException("File name did not contain version.");
 		
-		final String latestFileName = getLatestFileName();
-		if(name.equals(latestFileName))
+		String currentVersionString = name.substring(name.lastIndexOf('-') + 1);
+		currentVersionString = currentVersionString.substring(0, currentVersionString.lastIndexOf('.'));
+		
+		Version currentVersion = Version.fromString(currentVersionString);
+		Version latestVersion = Version.fromString(getLatestVersion());
+		
+		if(currentVersion.compareTo(latestVersion) >= 0)
 			return original;
 		
+//		final String latestFileName = getLatestFileName();
+//		if(name.equals(latestFileName))
+//			return original;
+		
 		original.delete();
-		final File latestFile = new File(original.getParentFile(), latestFileName);
+		final File latestFile = new File(original.getParentFile(), getLatestFileName());
 		downloadLatest(latestFile);
 		return latestFile;
 	}

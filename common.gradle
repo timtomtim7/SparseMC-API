@@ -1,6 +1,21 @@
 apply plugin: 'kotlin'
 apply plugin: 'idea'
 
+int getAndIncrementVersion() {
+	def file = new File(project.name, "ver.txt")
+	def value
+	try {
+		value = file.text.toInteger() + 1
+	}catch(Throwable ignored) {
+		file.text = "1"
+		return 1
+	}
+	file.text = value.toString()
+	return value
+}
+
+version = "${ext.baseVer}.${getAndIncrementVersion()}".toString()
+
 repositories {
 	mavenLocal()
 	mavenCentral()
@@ -18,7 +33,7 @@ dependencies {
 }
 
 jar {
-	archiveName = "${archivesBaseName}.jar"
+	archiveName = "${project.parent.group}-${project.name}-${project.version}.jar"
 }
 
 compileKotlin {

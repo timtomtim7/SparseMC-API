@@ -8,8 +8,18 @@ import kotlin.reflect.jvm.jvmErasure
 
 object CommandReflectionLoader {
 
-	fun loadBukkitCommands(plugin: Plugin, clazz: KClass<*>): Set<BukkitCommand> {
+	fun loadBukkitCommands(
+			plugin: Plugin,
+			clazz: KClass<*>,
+			instance: Any? = clazz.objectInstance
+	): Set<BukkitCommand> {
 		return emptySet()
+	}
+
+	private fun generateIntermediateSingles(plugin: Plugin, parent: Any?, clazz: KClass<*>): Set<IntermediateSingleCommand> {
+		return clazz.declaredMemberExtensionFunctions.mapNotNullTo(HashSet()) {
+			generateIntermediate(plugin, parent, it) }
+
 	}
 
 	private fun generateIntermediate(plugin: Plugin, parent: Any?, function: KFunction<*>): IntermediateSingleCommand? {

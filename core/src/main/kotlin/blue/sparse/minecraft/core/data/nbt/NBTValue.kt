@@ -39,6 +39,9 @@ internal sealed class NBTValue<T: Any>(val id: Int) {
 					val nonNull = value.filterNotNull()
 					if(nonNull.size != value.size)
 						return null
+					if(nonNull.isEmpty())
+						return NBTList(nonNull)
+
 					val first = nonNull.first().javaClass
 					if(nonNull.any { it.javaClass != first })
 						return null
