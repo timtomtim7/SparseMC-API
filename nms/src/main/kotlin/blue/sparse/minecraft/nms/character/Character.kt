@@ -4,6 +4,5 @@ import org.bukkit.Location
 
 interface Character {
 	var location: Location
-
-
+	var name: String?
 }

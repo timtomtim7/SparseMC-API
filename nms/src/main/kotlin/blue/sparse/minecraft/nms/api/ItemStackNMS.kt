@@ -11,7 +11,6 @@ interface ItemStackNMS : NMSHandler {
 
 	fun setNBT(item: ItemStack, compound: Compound)
 
-
 	fun toNBT(item: ItemStack): Compound
 
 	fun fromNBT(compound: Compound): ItemStack
