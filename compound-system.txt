@@ -4,7 +4,7 @@ Storage {
 	File System
 	ItemStack
 	Persistent Data
-	BlockEntites/TileEntities
+	BlockEntities/TileEntities
 }
 
 Syntax {
