@@ -1,14 +1,16 @@
+ext.baseVer = "0.0"
 apply from: "../common.gradle"
 
 group 'blue.sparse.minecraft'
-version '0.0'
 
 repositories {
+//    maven { url 'https://jitpack.io' }
     flatDir { dirs "plugins" }
 }
 
 dependencies {
     compile project(':core')
+//    implementation 'com.github.drtshock:FactionsUUID:-SNAPSHOT'
     file("plugins").listFiles().each {
         compile name: it.name.replace(".jar", "")
     }
