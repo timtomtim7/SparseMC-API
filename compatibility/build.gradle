@@ -1,0 +1,15 @@
+apply from: "../common.gradle"
+
+group 'blue.sparse.minecraft'
+version '0.0'
+
+repositories {
+    flatDir { dirs "plugins" }
+}
+
+dependencies {
+    compile project(':core')
+    file("plugins").listFiles().each {
+        compile name: it.name.replace(".jar", "")
+    }
+}
