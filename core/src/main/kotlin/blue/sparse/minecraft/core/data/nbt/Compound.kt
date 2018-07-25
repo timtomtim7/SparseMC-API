@@ -166,6 +166,8 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 
 	fun convert(key: String, value: Any) { NBTConverter.setValue(this, key, value) }
 
+	operator fun contains(key: String) = key in backingMap
+
 	fun write(file: File) {
 		file.outputStream().buffered().use {
 			NBTSerializer.writeNamed("", NBTValue.NBTCompound(this), it)
