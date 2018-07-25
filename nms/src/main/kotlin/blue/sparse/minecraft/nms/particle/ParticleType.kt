@@ -79,10 +79,3 @@ sealed class ParticleType<T : ParticleInfo.ParticleInfoPart>(
 		return spawn(location, createParts(ParticleInfo()).apply(body).info.toParticleData())
 	}
 }
-
-fun test() {
-	val location = Location(null, 0.0, 0.0, 0.0)
-	ParticleType.Redstone.spawn(location) {
-		color(0f, 0.333f, 1f)
-	}
-}

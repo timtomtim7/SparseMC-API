@@ -5,6 +5,8 @@ import blue.sparse.maven.MavenArtifact
 
 enum class ModuleType {
 	CORE,
+	NMS,
+	COMPATIBILITY,
 	COMMANDS,
 	NMS,
 	INVENTORY,

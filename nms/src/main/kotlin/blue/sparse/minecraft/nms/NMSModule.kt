@@ -15,6 +15,8 @@ object NMSModule : Module {
 	val itemNMS = create("ItemStackImpl") as ItemStackNMS
 	val placeholderNMS = create("PlaceholderImpl") as PlaceholderNMS
 	val particleNMS = create("ParticleImpl") as ParticleNMS
+	val blockNMS = create("BlockImpl") as BlockNMS
+	val entityNMS = create("EntityImpl") as EntityNMS
 
 	override fun onEnable() {
 		println("NMSModule enabled with ${nmsHandlers.size} NMS handlers.")

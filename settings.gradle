@@ -1,6 +1,7 @@
 rootProject.name = 'sparse-mc-api'
 include 'core'
 include 'math'
+include 'compatibility'
 include 'commands'
 include 'inventory'
 include 'persistent'

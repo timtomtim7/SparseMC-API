@@ -12,7 +12,6 @@ inline fun <R> ItemStack.editNBT(body: Compound.() -> R): R {
 	val nbt = nbt
 	val result = nbt.run(body)
 	this.nbt = nbt
-
 	return result
 }
 

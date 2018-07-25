@@ -1,0 +1,10 @@
+Idea {
+    Add built in compatibility for popular plugins. (Vault, FactionsUUID, et cetera)
+}
+
+Syntax {
+    Extension functions.
+    Player#balance would be from the vault compatibility.
+    Player#faction would be from the factions compatibility.
+    Player#balance += amount would be from the vault compatibility.
+}
