@@ -16,7 +16,9 @@ object MinecraftScriptDependencies: DependenciesResolver {
 						"org.bukkit.inventory.meta.*",
 						"blue.sparse.*",
 						"blue.sparse.minecraft.*",
-						"blue.sparse.minecraft.core.*"
+						"blue.sparse.minecraft.core.*",
+						"blue.sparse.minecraft.nms.*",
+						"blue.sparse.minecraft.nms.extensions.*"
 				)
 		).asSuccess()
 	}

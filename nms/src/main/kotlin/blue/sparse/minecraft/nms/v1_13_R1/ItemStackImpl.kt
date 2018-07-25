@@ -7,7 +7,7 @@ import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 
 class ItemStackImpl : ItemStackNMS {
-	private val craftMetaItemClass by lazy { Class.forName("org.bukkit.craftbukkit.v1_12_R1.inventory.CraftMetaItem") }
+	private val craftMetaItemClass by lazy { Class.forName("org.bukkit.craftbukkit.v1_13_R1.inventory.CraftMetaItem") }
 
 	override fun getNBT(item: ItemStack): Compound {
 		val method = craftMetaItemClass.getDeclaredMethod("applyToItem", NBTTagCompound::class.java)

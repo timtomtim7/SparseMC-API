@@ -13,7 +13,8 @@ var Entity.nbt
 	set(value) = nms.setNBT(this, value)
 
 inline fun <R> Entity.editNBT(body: Compound.() -> R): R {
-	val result = nbt.run(body)
-	this.nbt = nbt
+	val cachedNbt = nbt
+	val result = cachedNbt.run(body)
+	this.nbt = cachedNbt
 	return result
 }

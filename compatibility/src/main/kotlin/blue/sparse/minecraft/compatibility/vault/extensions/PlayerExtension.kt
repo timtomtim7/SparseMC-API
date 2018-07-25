@@ -8,17 +8,17 @@ import org.bukkit.entity.Player
 /**
  * Economy
  */
-val OfflinePlayer.balance get() = PlayerBalance(this)
+val OfflinePlayer.vaultBalance get() = PlayerBalance(this)
 
 /**
  * Permission
  */
-val Player.groups: Array<String>
+val Player.vaultGroups: Array<String>
 	get() {
 		return VaultCompat.permission.getPlayerGroups(this)
 	}
 
-val Player.primaryGroup: String
+val Player.vaultPrimaryGroup: String
 	get() {
 		return VaultCompat.permission.getPrimaryGroup(this)
 	}
@@ -26,7 +26,7 @@ val Player.primaryGroup: String
 /**
  * Chat
  */
-var Player.chatPrefix: String
+var Player.vaultChatPrefix: String
 	get() {
 		return VaultCompat.chat.getPlayerPrefix(this)
 	}

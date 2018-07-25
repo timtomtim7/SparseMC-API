@@ -10,13 +10,13 @@ class EntityImpl: EntityNMS {
 	override fun getNBT(entity: Entity): Compound {
 		val cEntity = entity as CraftEntity
 		val nmsCompound = NBTTagCompound()
-		cEntity.handle.c(nmsCompound)
+		cEntity.handle.save(nmsCompound)
 		return NBTUtil.nbtBaseValue(nmsCompound) as Compound
 	}
 
 	override fun setNBT(entity: Entity, compound: Compound) {
 		val cEntity = entity as CraftEntity
 		val base = NBTUtil.valueToNBTBase(compound)
-		cEntity.handle.save(base as NBTTagCompound)
+		cEntity.handle.f(base as NBTTagCompound)
 	}
 }

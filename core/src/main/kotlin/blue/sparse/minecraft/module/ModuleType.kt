@@ -8,7 +8,6 @@ enum class ModuleType {
 	NMS,
 	COMPATIBILITY,
 	COMMANDS,
-	NMS,
 	INVENTORY,
 	MATH,
 	PERSISTENT,

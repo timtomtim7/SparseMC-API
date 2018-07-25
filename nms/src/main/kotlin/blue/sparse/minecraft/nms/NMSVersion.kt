@@ -23,8 +23,7 @@ enum class NMSVersion {
 		val current = fromString(thisVersionString)
 		val latest = values().last()
 
-		fun fromString(name: String) = values().find { it.name == name } ?: UNKNOWN
-
+		private fun fromString(name: String) = values().find { it.name == name } ?: UNKNOWN
 	}
 
 }

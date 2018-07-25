@@ -2,6 +2,7 @@ package blue.sparse.minecraft.nms.extensions
 
 import blue.sparse.minecraft.core.data.nbt.Compound
 import blue.sparse.minecraft.nms.NMSModule
+import blue.sparse.minecraft.nms.block.BlockSnapshot
 import org.bukkit.block.Block
 
 //TODO: potentially a `toNBT`
@@ -20,3 +21,9 @@ inline fun <R> Block.editNBT(body: Compound.() -> R): R {
 }
 
 val Block.hasNBT get() = NMSModule.blockNMS.hasNBT(this)
+val Block.snapshot: BlockSnapshot
+	get() {
+		if (hasNBT)
+			return BlockSnapshot(type, nbt)
+		return BlockSnapshot(type)
+	}

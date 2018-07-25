@@ -12,13 +12,9 @@ object TestCommands {
 //			errorRaw(ChatColor.RED, "No permission to reload.")
 //
 //		val pluginManager = server.pluginManager
-//		var plugin = pluginManager.getPlugin(pluginName)
-//
-//		if (plugin == null)
-//			errorRaw(ChatColor.RED, "Plugin either doesn't exist or isn't loaded")
-//
-//		if (plugin !is SparsePlugin)
-//			errorRaw(ChatColor.RED, "That plugin was not loaded by SparseMC-API")
+//		var plugin: SparsePlugin = (pluginManager.getPlugin(pluginName)
+//				?: errorRaw(ChatColor.RED, "Plugin either doesn't exist or isn't loaded")) as? SparsePlugin
+//				?: errorRaw(ChatColor.RED, "That plugin was not loaded by SparseMC-API")
 //
 //		val file = (plugin.javaClass.classLoader as SparsePluginClassLoader).file
 //
@@ -26,10 +22,7 @@ object TestCommands {
 //		loader.disablePlugin(plugin)
 //		loader.unloadPlugin(plugin)
 //
-//		plugin = null
-//		System.gc()
-//
-//		plugin = pluginManager.loadPlugin(file)
+//		plugin = pluginManager.loadPlugin(file) as SparsePlugin
 //		pluginManager.enablePlugin(plugin)
 //
 //		replyRaw(ChatColor.GRAY, "Plugin ", ChatColor.GREEN, plugin.name, ChatColor.GRAY, " reloaded.")
