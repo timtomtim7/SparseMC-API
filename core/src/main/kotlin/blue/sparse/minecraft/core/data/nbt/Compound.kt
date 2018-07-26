@@ -1,8 +1,7 @@
 package blue.sparse.minecraft.core.data.nbt
 
 import blue.sparse.minecraft.core.data.nbt.converter.NBTConverter
-import java.io.DataInputStream
-import java.io.File
+import java.io.*
 
 @Suppress("UNCHECKED_CAST")
 class Compound/*: AbstractMutableMap<String, Any>*/ {
@@ -67,7 +66,7 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 
 	inline fun default(key: String, valueSupplier: () -> Any): Any {
 		val result = getOptional(key)
-		if(result != null)
+		if (result != null)
 			return result
 
 		val value = valueSupplier()
@@ -88,10 +87,10 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 	fun longArray(key: String): LongArray = (backingMap[key] as NBTValue.NBTLongArray).value
 	fun compound(key: String): Compound = (backingMap[key] as NBTValue.NBTCompound).value
 	fun collection(key: String): Collection<Any> = (backingMap[key] as NBTValue.NBTList<*>).value
-	fun <T: Any> collectionTyped(key: String): Collection<T> = (backingMap[key] as NBTValue.NBTList<T>).value
+	fun <T : Any> collectionTyped(key: String): Collection<T> = (backingMap[key] as NBTValue.NBTList<T>).value
 	fun convert(key: String): Any = optionalConvert(key)!!
 
-	inline fun <reified T: Any> convertTyped(key: String): T = optionalConvertTyped(key)!!
+	inline fun <reified T : Any> convertTyped(key: String): T = optionalConvertTyped(key)!!
 	fun optionalByte(key: String): Byte? = getOptional(key) as? Byte
 	fun optionalShort(key: String): Short? = getOptional(key) as? Short
 	fun optionalInt(key: String): Int? = getOptional(key) as? Int
@@ -105,23 +104,61 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 	fun optionalLongArray(key: String): LongArray? = getOptional(key) as? LongArray
 	fun optionalCompound(key: String): Compound? = getOptional(key) as? Compound
 	fun optionalCollection(key: String): Collection<Any>? = (backingMap[key] as? NBTValue.NBTList<*>)?.value
-	fun <T: Any> optionalCollectionTyped(key: String): Collection<T>? = (backingMap[key] as? NBTValue.NBTList<T>)?.value
+	fun <T : Any> optionalCollectionTyped(key: String): Collection<T>? = (backingMap[key] as? NBTValue.NBTList<T>)?.value
 	fun optionalConvert(key: String): Any? = NBTConverter.getValue(this, key)
-	inline fun <reified T: Any> optionalConvertTyped(key: String): T? = optionalConvert(key) as? T
+	inline fun <reified T : Any> optionalConvertTyped(key: String): T? = optionalConvert(key) as? T
 
-	fun byte(key: String, value: Byte) { backingMap[key] = NBTValue.NBTByte(value) }
-	fun short(key: String, value: Short) { backingMap[key] = NBTValue.NBTShort(value) }
-	fun int(key: String, value: Int) { backingMap[key] = NBTValue.NBTInt(value) }
-	fun long(key: String, value: Long) { backingMap[key] = NBTValue.NBTLong(value) }
-	fun float(key: String, value: Float) { backingMap[key] = NBTValue.NBTFloat(value) }
-	fun double(key: String, value: Double) { backingMap[key] = NBTValue.NBTDouble(value) }
-	fun string(key: String, value: String) { backingMap[key] = NBTValue.NBTString(value) }
-	fun byteArray(key: String, value: ByteArray) { backingMap[key] = NBTValue.NBTByteArray(value) }
-	fun shortArray(key: String, value: ShortArray) { backingMap[key] = NBTValue.NBTIntArray(value.map(Short::toInt).toIntArray()) }
-	fun intArray(key: String, value: IntArray) { backingMap[key] = NBTValue.NBTIntArray(value) }
-	fun longArray(key: String, value: LongArray) { backingMap[key] = NBTValue.NBTLongArray(value) }
-	fun compound(key: String, value: Compound) { backingMap[key] = NBTValue.NBTCompound(value) }
-	inline fun compound(key: String, body: Compound.() -> Unit) { compound(key, Compound(body)) }
+	fun byte(key: String, value: Byte) {
+		backingMap[key] = NBTValue.NBTByte(value)
+	}
+
+	fun short(key: String, value: Short) {
+		backingMap[key] = NBTValue.NBTShort(value)
+	}
+
+	fun int(key: String, value: Int) {
+		backingMap[key] = NBTValue.NBTInt(value)
+	}
+
+	fun long(key: String, value: Long) {
+		backingMap[key] = NBTValue.NBTLong(value)
+	}
+
+	fun float(key: String, value: Float) {
+		backingMap[key] = NBTValue.NBTFloat(value)
+	}
+
+	fun double(key: String, value: Double) {
+		backingMap[key] = NBTValue.NBTDouble(value)
+	}
+
+	fun string(key: String, value: String) {
+		backingMap[key] = NBTValue.NBTString(value)
+	}
+
+	fun byteArray(key: String, value: ByteArray) {
+		backingMap[key] = NBTValue.NBTByteArray(value)
+	}
+
+	fun shortArray(key: String, value: ShortArray) {
+		backingMap[key] = NBTValue.NBTIntArray(value.map(Short::toInt).toIntArray())
+	}
+
+	fun intArray(key: String, value: IntArray) {
+		backingMap[key] = NBTValue.NBTIntArray(value)
+	}
+
+	fun longArray(key: String, value: LongArray) {
+		backingMap[key] = NBTValue.NBTLongArray(value)
+	}
+
+	fun compound(key: String, value: Compound) {
+		backingMap[key] = NBTValue.NBTCompound(value)
+	}
+
+	inline fun compound(key: String, body: Compound.() -> Unit) {
+		compound(key, Compound(body))
+	}
 
 	fun defaultByte(key: String, value: Byte) = default(key, value) as Byte
 	fun defaultShort(key: String, value: Short) = default(key, value) as Short
@@ -146,7 +183,7 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 	inline fun defaultShortArray(key: String, supplier: () -> ShortArray) = default(key, supplier) as ShortArray
 	inline fun defaultIntArray(key: String, supplier: () -> IntArray) = default(key, supplier) as IntArray
 	inline fun defaultLongArray(key: String, supplier: () -> LongArray) = default(key, supplier) as LongArray
-//	inline fun defaultCompound(key: String, supplier: () -> Compound) = default(key, supplier) as Compound
+	//	inline fun defaultCompound(key: String, supplier: () -> Compound) = default(key, supplier) as Compound
 	inline fun defaultCompound(key: String, body: Compound.() -> Unit) = default(key) { Compound(body) } as Compound
 
 	inline fun editCompound(key: String, body: Compound.() -> Unit) {
@@ -154,7 +191,7 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 	}
 
 	fun collection(key: String, collection: Collection<Any>) {
-		if(collection.isNotEmpty()) {
+		if (collection.isNotEmpty()) {
 			val first = collection.first()
 			if (collection.any { it.javaClass != first.javaClass })
 				throw IllegalStateException("All items in NBT collection must have the same type.")
@@ -164,7 +201,9 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 		backingMap[key] = NBTValue.NBTList(collection)
 	}
 
-	fun convert(key: String, value: Any) { NBTConverter.setValue(this, key, value) }
+	fun convert(key: String, value: Any) {
+		NBTConverter.setValue(this, key, value)
+	}
 
 	operator fun contains(key: String) = key in backingMap
 
@@ -184,6 +223,14 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 			return file.inputStream().buffered().use {
 				it.read(ByteArray(3))
 				(NBTSerializer.read(DataInputStream(it), 10) as NBTValue.NBTCompound).value
+			}
+		}
+
+		fun readOrCreate(file: File): Compound {
+			return try {
+				read(file)
+			} catch (e: IOException) {
+				Compound()
 			}
 		}
 

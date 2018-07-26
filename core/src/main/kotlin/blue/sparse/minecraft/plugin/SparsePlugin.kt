@@ -61,6 +61,16 @@ abstract class SparsePlugin : PluginBase(), PluginProvided<SparsePlugin> {
 			dependField.set(description, annotation.depend.toList())
 			softDependField.set(description, annotation.softDepend.toList())
 			loadBeforeField.set(description, annotation.loadBefore.toList())
+
+			try {
+
+				val field = descClazz.getDeclaredField("apiVersion")
+				field.isAccessible = true
+				field.set(description, "1.13")
+
+			}catch(e: NoSuchFieldException) {
+
+			}
 		}else{
 			description = PluginDescriptionFile(clazz.simpleName!!.removeSuffix("Plugin"), "1.0", clazz.jvmName)
 		}

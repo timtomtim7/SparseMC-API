@@ -1,7 +1,22 @@
 package blue.sparse.minecraft.persistent.extensions
 
+import blue.sparse.minecraft.core.data.nbt.Compound
 import blue.sparse.minecraft.persistent.PersistentModule
 import org.bukkit.World
+import org.bukkit.plugin.Plugin
 
-val World.persistent
-	get() = PersistentModule.getWorldPersistent(this)
+fun World.persistent(plugin: Plugin): Compound {
+	return PersistentModule[plugin].worlds[this].compound
+}
+
+inline fun World.persistent(
+		plugin: Plugin,
+		save: Boolean = true,
+		body: Compound.() -> Unit
+) {
+	PersistentModule[plugin].worlds[this].apply {
+		compound.body()
+		if(save)
+			save()
+	}
+}

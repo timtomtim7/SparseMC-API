@@ -2,7 +2,7 @@ apply plugin: 'kotlin'
 apply plugin: 'idea'
 
 int getAndIncrementVersion() {
-	def file = new File(project.name, "ver.txt")
+	def file = new File(ideaModule.module.contentRoot, "ver.txt")
 	def value
 	try {
 		value = file.text.toInteger() + 1

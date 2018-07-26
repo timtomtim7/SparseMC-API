@@ -11,4 +11,6 @@ Types {
 
 Syntax {
 	Type#persistent[Plugin] -> Returns a compound.
+
+	plugin.persistent(differentPlugin)
 }
