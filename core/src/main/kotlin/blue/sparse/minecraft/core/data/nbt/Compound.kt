@@ -89,6 +89,7 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 	fun collection(key: String): Collection<Any> = (backingMap[key] as NBTValue.NBTList<*>).value
 	fun <T : Any> collectionTyped(key: String): Collection<T> = (backingMap[key] as NBTValue.NBTList<T>).value
 	fun convert(key: String): Any = optionalConvert(key)!!
+	fun boolean(key: String): Boolean = byte(key) == 1.toByte()
 
 	inline fun <reified T : Any> convertTyped(key: String): T = optionalConvertTyped(key)!!
 	fun optionalByte(key: String): Byte? = getOptional(key) as? Byte
@@ -107,6 +108,7 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 	fun <T : Any> optionalCollectionTyped(key: String): Collection<T>? = (backingMap[key] as? NBTValue.NBTList<T>)?.value
 	fun optionalConvert(key: String): Any? = NBTConverter.getValue(this, key)
 	inline fun <reified T : Any> optionalConvertTyped(key: String): T? = optionalConvert(key) as? T
+	fun optionalBoolean(key: String): Boolean? = optionalByte(key)?.let { it == 1.toByte() }
 
 	fun byte(key: String, value: Byte) {
 		backingMap[key] = NBTValue.NBTByte(value)
@@ -160,6 +162,10 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 		compound(key, Compound(body))
 	}
 
+	fun boolean(key: String, value: Boolean) {
+		byte(key, if(value) 1 else 0)
+	}
+
 	fun defaultByte(key: String, value: Byte) = default(key, value) as Byte
 	fun defaultShort(key: String, value: Short) = default(key, value) as Short
 	fun defaultInt(key: String, value: Int) = default(key, value) as Int
@@ -172,6 +178,8 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 	fun defaultIntArray(key: String, value: IntArray) = default(key, value) as IntArray
 	fun defaultLongArray(key: String, value: LongArray) = default(key, value) as LongArray
 	fun defaultCompound(key: String, value: Compound) = default(key, value) as Compound
+	fun defaultBoolean(key: String, value: Boolean) = (default(key, (if (value) 1 else 0).toByte()) as Byte) == 1.toByte()
+
 	inline fun defaultByte(key: String, supplier: () -> Long) = default(key, supplier) as Long
 	inline fun defaultShort(key: String, supplier: () -> Short) = default(key, supplier) as Short
 	inline fun defaultInt(key: String, supplier: () -> Int) = default(key, supplier) as Int
@@ -184,7 +192,8 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 	inline fun defaultIntArray(key: String, supplier: () -> IntArray) = default(key, supplier) as IntArray
 	inline fun defaultLongArray(key: String, supplier: () -> LongArray) = default(key, supplier) as LongArray
 	//	inline fun defaultCompound(key: String, supplier: () -> Compound) = default(key, supplier) as Compound
-	inline fun defaultCompound(key: String, body: Compound.() -> Unit) = default(key) { Compound(body) } as Compound
+//	inline fun defaultBoolean(key: String, supplier: () -> Boolean) = default(key, supplier)
+	inline fun defaultCompound(key: String, body: Compound.() -> Unit = {}) = default(key) { Compound(body) } as Compound
 
 	inline fun editCompound(key: String, body: Compound.() -> Unit) {
 		defaultCompound(key) {}.apply(body)

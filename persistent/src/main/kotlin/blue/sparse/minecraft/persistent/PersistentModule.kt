@@ -28,5 +28,7 @@ object PersistentModule : AbstractModule(ModuleType.PERSISTENT) {
 		}, 0, 5 * 60 * 20L)
 	}
 
-	override fun onDisable() {}
+	override fun onDisable() {
+		saveAll()
+	}
 }

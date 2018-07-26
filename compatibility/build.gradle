@@ -12,6 +12,6 @@ dependencies {
     compile project(':core')
 //    implementation 'com.github.drtshock:FactionsUUID:-SNAPSHOT'
     file("plugins").listFiles().each {
-        compile name: it.name.replace(".jar", "")
+        compileOnly name: it.name.replace(".jar", "")
     }
 }

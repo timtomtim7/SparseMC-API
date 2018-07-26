@@ -6,8 +6,6 @@ import blue.sparse.minecraft.nms.particle.ParticleType
 import net.minecraft.server.v1_13_R1.MinecraftKey
 import net.minecraft.server.v1_13_R1.Particle
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_13_R1.CraftParticle
-import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 
@@ -30,14 +28,20 @@ class ParticleImpl : ParticleNMS {
 			position: Vector,
 			data: ParticleData
 	) {
-		val bukkit = CraftParticle.toBukkit(Particle.REGISTRY.get(MinecraftKey(particle.stringID)))
+//		val param: ParticleParam? = when {
+//			particle === ParticleType.Redstone -> ParticleParamRedstone(data.offsetX, data.offsetY, data.offsetZ, 1f)
+//
+//			else -> null
+//		}
+
+//		val bukkit = CraftParticle.toBukkit(Particle.REGISTRY.get(MinecraftKey(particle.stringID)))
 //		player.spawnParticle(
 //				bukkit, position.toLocation(player.world),
 //				data.offsetX, data.offsetY, data.offsetZ,
 //				data.data, data.count, *data.extra
 //		)
 
-		val connection = (player as CraftPlayer).handle.playerConnection
+//		val connection = (player as CraftPlayer).handle.playerConnection
 //		connection.sendPacket(PacketPlayOutWorldParticles(
 ////				EnumParticle.a(particle.numericID),
 //				CraftParticle.toNMS(bukkit, null),

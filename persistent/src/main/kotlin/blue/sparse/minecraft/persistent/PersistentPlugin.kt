@@ -11,6 +11,8 @@ class PersistentPlugin internal constructor(val plugin: Plugin) {
 
 	val players = PlayerPersistent.Manager(this)
 	val plugins = PluginPersistent.Manager(this)
-	val worlds = WorldPersistent.Manager(this)
+	val worlds  = WorldPersistent.Manager(this)
+	val chunks  = ChunkPersistent.Manager(this)
+	val blocks  = BlockPersistent.Manager(this)
 
 }

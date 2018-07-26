@@ -63,11 +63,9 @@ abstract class SparsePlugin : PluginBase(), PluginProvided<SparsePlugin> {
 			loadBeforeField.set(description, annotation.loadBefore.toList())
 
 			try {
-
 				val field = descClazz.getDeclaredField("apiVersion")
 				field.isAccessible = true
 				field.set(description, "1.13")
-
 			}catch(e: NoSuchFieldException) {
 
 			}
