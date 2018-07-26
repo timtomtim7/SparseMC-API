@@ -43,7 +43,6 @@ subprojects { p ->
 	}
 }
 
-
 task copyJars(type: Copy) {
 	from subprojects.collect { it.tasks.withType(Jar) }
 	into "$buildDir/allJars"
