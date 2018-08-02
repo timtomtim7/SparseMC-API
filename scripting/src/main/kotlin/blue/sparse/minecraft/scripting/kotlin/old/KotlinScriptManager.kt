@@ -1,5 +1,7 @@
-package blue.sparse.minecraft.scripting.kotlin
+package blue.sparse.minecraft.scripting.kotlin.old
 
+import blue.sparse.minecraft.scripting.ScriptingModule
+import blue.sparse.minecraft.scripting.kotlin.JBCompiledScript
 import java.io.File
 import javax.script.ScriptContext
 import kotlin.reflect.KClass
@@ -35,9 +37,29 @@ class KotlinScriptManager<T : Any>(
 
 	@Suppress("UNCHECKED_CAST")
 	fun compile(source: String, cache: Boolean = true, className: String? = null): CompiledScript<T> {
+		val cacheFolder = getCacheFolder(source)
+		if(cache) {
+			if(cacheFolder.exists()) {
+				try {
+					val clazz = classLoader.loadCachedScript(cacheFolder).kotlin
+					val script = CompiledScript(clazz as KClass<T>)
+					if (cache)
+						cache(CacheKey.Source(source), script)
+
+					return script
+				}catch(t: Throwable) {
+					cacheFolder.deleteRecursively()
+				}
+			}
+		}
+
 		engine.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE)
 
-		val compiled = classLoader.compiledScriptToClass(engine.compile(source) as JBCompiledScript, className/*, classDirectory*/).kotlin
+		val compiled = classLoader.compiledScriptToClass(
+				engine.compile(source) as JBCompiledScript,
+				className,
+				cacheFolder
+		).kotlin
 
 		if (!template.isSuperclassOf(compiled))
 			throw IllegalStateException("Compiled class was not an instance of the template, this should not happen.")
@@ -50,9 +72,11 @@ class KotlinScriptManager<T : Any>(
 	}
 
 	fun compile(file: File, cache: Boolean = true, className: String? = null): CompiledScript<T> {
-		val script = compile(file.readText(), false, className)
-		if (cache)
-			cache(CacheKey.File(file), script)
+		//TODO: I changed `cache` from `false` to the actual variable
+		// This gets rid of the use of CacheKey.File, but it may not be desired
+		val script = compile(file.readText(), cache, className)
+//		if (cache)
+//			cache(CacheKey.File(file), script)
 
 		return script
 	}
@@ -63,6 +87,13 @@ class KotlinScriptManager<T : Any>(
 
 	fun run(source: String, className: String? = null, vararg args: Any?): CompiledScript<T>.Result {
 		return getOrCompile(source, className).invoke(*args)
+	}
+
+	private fun getCacheFolder(source: String): File {
+		val hash = hashSHA1(source)
+				.replace('/', '.')
+		val rootFolder = ScriptingModule.cacheFolder
+		return File(rootFolder, hash)
 	}
 
 	private fun cache(key: CacheKey, script: CompiledScript<T>) {

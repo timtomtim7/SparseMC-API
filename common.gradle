@@ -20,8 +20,9 @@ repositories {
 	mavenLocal()
 	mavenCentral()
 	maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
 	maven { url = "https://sparse.blue/maven/" }
+	maven { url = "http://dl.bintray.com/kotlin/kotlin-eap/" }
 }
 
 dependencies {
@@ -33,7 +34,7 @@ dependencies {
 }
 
 jar {
-	archiveName = "${project.parent.group}-${project.name}-${project.version}.jar"
+	archiveName = "${project.parent.group}-${project.name}\$${project.version}.jar"
 }
 
 compileKotlin {

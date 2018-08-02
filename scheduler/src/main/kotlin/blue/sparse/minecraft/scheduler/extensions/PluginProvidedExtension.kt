@@ -2,8 +2,7 @@ package blue.sparse.minecraft.scheduler.extensions
 
 import blue.sparse.minecraft.core.PluginProvided
 import blue.sparse.minecraft.scheduler.BukkitCoroutine
-import kotlinx.coroutines.experimental.*
-import org.bukkit.plugin.Plugin
+import kotlinx.coroutines.*
 
 fun PluginProvided<*>.suspendable(body: suspend BukkitCoroutine.() -> Unit): BukkitCoroutine {
 	val context = BukkitCoroutine(plugin)

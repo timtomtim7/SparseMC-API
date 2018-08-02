@@ -36,11 +36,21 @@ public class MavenArtifact {
 		if(name.length() < artifact.length() + 2)
 			throw new IllegalArgumentException("File name did not contain version.");
 		
-		String currentVersionString = name.substring(name.lastIndexOf('-') + 1);
+		if(!name.contains("$")) {
+			original.delete();
+			final File latestFile = new File(original.getParentFile(), getLatestFileName());
+			downloadLatest(latestFile);
+			return latestFile;
+		}
+		
+		String currentVersionString = name.substring(name.lastIndexOf('$') + 1);
 		currentVersionString = currentVersionString.substring(0, currentVersionString.lastIndexOf('.'));
+		final String latestVersionString = getLatestVersion();
+		
+		System.out.println(toString()+" (current "+currentVersionString+") (latest "+latestVersionString+")");
 		
 		Version currentVersion = Version.fromString(currentVersionString);
-		Version latestVersion = Version.fromString(getLatestVersion());
+		Version latestVersion = Version.fromString(latestVersionString);
 		
 		if(currentVersion.compareTo(latestVersion) >= 0)
 			return original;
@@ -56,7 +66,7 @@ public class MavenArtifact {
 	}
 	
 	public String getLatestFileName() throws IOException {
-		return group + '-' + artifact + '-' + getLatestVersion() + ".jar";
+		return group + '-' + artifact + '$' + getLatestVersion() + ".jar";
 	}
 	
 	public void downloadLatest(File target) throws IOException {

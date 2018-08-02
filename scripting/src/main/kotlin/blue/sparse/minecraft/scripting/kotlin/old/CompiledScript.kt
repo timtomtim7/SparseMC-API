@@ -1,4 +1,4 @@
-package blue.sparse.minecraft.scripting.kotlin
+package blue.sparse.minecraft.scripting.kotlin.old
 
 import java.lang.reflect.Constructor
 import kotlin.reflect.KClass

@@ -4,8 +4,7 @@ import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.scheduler.extensions.delayed
 import org.bukkit.event.*
 import org.bukkit.plugin.*
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlin.coroutines.*
 
 class BukkitCoroutine internal constructor(val plugin: Plugin) {
 
@@ -53,13 +52,15 @@ class BukkitCoroutine internal constructor(val plugin: Plugin) {
 			noinline filter: T.() -> Boolean = { true }
 	): T {
 		return listen(T::class.java, priority, ignoreCancelled, filter)
+//		return listen(T::class.java, priority, ignoreCancelled)
+//		return listen(T::class.java, priority, ignoreCancelled, filter)
 	}
 
 	suspend fun <T : Event> listen(
 			eventClass: Class<T>,
 			priority: EventPriority = EventPriority.NORMAL,
 			ignoreCancelled: Boolean = false,
-			filter: T.() -> Boolean = { true }
+			filter: T.() -> Boolean
 	): T {
 		sync()
 

@@ -1,5 +1,6 @@
-package blue.sparse.minecraft.scripting.kotlin
+package blue.sparse.minecraft.scripting.kotlin.old
 
+import blue.sparse.minecraft.scripting.kotlin.currentClasspath
 import org.jetbrains.kotlin.cli.common.repl.KotlinJsr223JvmScriptEngineFactoryBase
 import org.jetbrains.kotlin.com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer

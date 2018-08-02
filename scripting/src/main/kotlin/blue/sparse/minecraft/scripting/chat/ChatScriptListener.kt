@@ -4,7 +4,7 @@ import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.event.cancel
 import blue.sparse.minecraft.core.extensions.sendColoredMessage
 import blue.sparse.minecraft.core.extensions.server
-import blue.sparse.minecraft.scripting.kotlin.KotlinScriptManager
+import blue.sparse.minecraft.scripting.kotlin.old.KotlinScriptManager
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

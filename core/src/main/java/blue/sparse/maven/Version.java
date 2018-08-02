@@ -65,7 +65,7 @@ public final class Version implements Comparable<Version> {
 		else
 			trimmed = string.substring(0, dashIndex);
 		
-		System.out.println("Version.fromString(\""+trimmed+"\")");
+//		System.out.println("Version.fromString(\""+trimmed+"\")");
 		final String[] parts = trimmed.split("\\.");
 		if(parts.length == 2)
 			return new Version(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 0);

@@ -20,11 +20,15 @@ public final class SparseMCAPIPlugin extends JavaPlugin {
 	}
 	
 	public static File getDependenciesFolder() {
-		return new File(getPlugin().getDataFolder(), "dependencies");
+		return new File(dataFolder(), "dependencies");
 	}
 	
 	public static File getModulesFolder() {
-		return new File(getPlugin().getDataFolder(), "modules");
+		return new File(dataFolder(), "modules");
+	}
+	
+	public static File dataFolder() {
+		return getPlugin().getDataFolder();
 	}
 	
 	/**

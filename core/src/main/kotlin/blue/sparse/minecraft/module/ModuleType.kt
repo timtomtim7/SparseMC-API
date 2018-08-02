@@ -24,8 +24,9 @@ enum class ModuleType {
 	companion object {
 
 		fun downloadAndLoadAll() {
+			val toDownload = values().filter { it != CORE }.map { it.artifact }
 			val depend = DependencyManager.downloadDependencies(
-					values().map { it.artifact },
+					toDownload,
 					ModuleManager.modulesFolder
 			)
 

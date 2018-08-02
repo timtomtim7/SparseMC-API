@@ -1,4 +1,4 @@
-package blue.sparse.minecraft.scripting.kotlin
+package blue.sparse.minecraft.scripting.kotlin.old
 
 import jdk.internal.org.objectweb.asm.*
 import jdk.internal.org.objectweb.asm.commons.RemappingClassAdapter
@@ -21,6 +21,7 @@ class KotlinScriptClassLoader(parent: ClassLoader = KotlinScriptClassLoader::cla
 		if (metadata != null) {
 			//Maybe I *shouldn't* remove the metadata
 			node.visibleAnnotations.remove(metadata)
+
 //			val values = metadata.values
 //			val d2 = values[values.indexOf("d2") + 1] as List<String>
 //			println(d2.joinToString("\n") { "-> $it" })
@@ -33,7 +34,13 @@ class KotlinScriptClassLoader(parent: ClassLoader = KotlinScriptClassLoader::cla
 		return writer.toByteArray()
 	}
 
-	fun compiledScriptToClass(script: KotlinJsr223JvmScriptEngineBase.CompiledKotlinScript, className: String? = null, directory: File? = null): Class<*> {
+	fun compiledScriptToClass(
+			script: KotlinJsr223JvmScriptEngineBase.CompiledKotlinScript,
+			className: String? = null,
+			directory: File? = null
+	): Class<*> {
+		directory?.deleteRecursively()
+		directory?.mkdirs()
 		var mainClass: Class<*>? = null
 		val newMainClassName = className ?: generateNextClassName()
 		val oldMainClassName = script.compiledData.mainClassName
@@ -41,7 +48,7 @@ class KotlinScriptClassLoader(parent: ClassLoader = KotlinScriptClassLoader::cla
 		val nameMap = HashMap<String, String>()
 		script.compiledData.classes.filter { it.path.endsWith(".class") }.forEach {
 			val name = it.path.removeSuffix(".class")
-			nameMap.put(name, name.replace(oldMainClassName, newMainClassName))
+			nameMap[name] = name.replace(oldMainClassName, newMainClassName)
 		}
 
 		script.compiledData.classes.filter { it.path.endsWith(".class") }.forEach {
@@ -50,20 +57,34 @@ class KotlinScriptClassLoader(parent: ClassLoader = KotlinScriptClassLoader::cla
 			val newName = nameMap[name] ?: return@forEach
 			val newBytes = renameClass(it.bytes, nameMap)
 
-			if (directory != null)
-				File(directory, "$newName.class").writeBytes(newBytes)
-
 			val clazz = defineClass(newName.replace('/', '.'), newBytes, 0, newBytes.size)
 			resolveClass(clazz)
+
+			if (directory != null)
+				File(directory, "$newName.class").writeBytes(newBytes)
+//			cacheTo?.writeBytes(newBytes)
+
 			if (name == script.compiledData.mainClassName || name.endsWith("/${script.compiledData.mainClassName}"))
 				mainClass = clazz
 		}
 
-		return mainClass ?: throw IllegalArgumentException("Compiled script did not contain its main class (?!)")
+		val main = mainClass ?: throw IllegalArgumentException("Compiled script did not contain its main class (?!)")
+
+		if (directory != null)
+			File(directory, "main").writeText(main.name)
+
+		return main
 	}
 
-//	override fun loadClass(name: String?): Class<*>
-//	{
-//		return super.loadClass(name)
-//	}
+	fun loadCachedScript(folder: File): Class<*> {
+		val classes = folder.listFiles().mapNotNull { file ->
+			if (file.extension != "class")
+				return@mapNotNull  null
+			val bytes = file.readBytes()
+			defineClass(file.nameWithoutExtension, bytes, 0, bytes.size)
+		}
+
+		val main = File(folder, "main").readText()
+		return classes.first { it.name == main }
+	}
 }

@@ -1,4 +1,4 @@
-package blue.sparse.minecraft.scripting.kotlin
+package blue.sparse.minecraft.scripting.kotlin.old
 
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector

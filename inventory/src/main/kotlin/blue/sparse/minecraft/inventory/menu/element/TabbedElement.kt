@@ -17,7 +17,7 @@ class TabbedElement(
 	private val tabs = LinkedHashSet<Tab>()
 
 	var tabsSide = Side.TOP
-	var dividers: Array<out ItemStack>? = arrayOf(ItemStack(Material.GLASS_PANE))
+	var dividers: Array<out ItemStack>? = arrayOf(ItemStack(Material.GLASS))
 	var selectedDivider: ItemStack? = ItemStack(Material.GLASS)
 	val hasDividers get() = dividers != null
 
@@ -32,7 +32,7 @@ class TabbedElement(
 	}
 
 	inline fun divider(
-			base: ItemStack = ItemStack(Material.GLASS_PANE),
+			base: ItemStack = ItemStack(Material.GLASS),
 			body: ItemStack.() -> Unit = {}
 	) {
 		dividers = arrayOf(base.apply(body))
