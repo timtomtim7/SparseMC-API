@@ -6,4 +6,5 @@ group 'blue.sparse.minecraft'
 dependencies {
     compileOnly project(':core')
     compileOnly project(':nms')
+    compileOnly project(':persistent')
 }

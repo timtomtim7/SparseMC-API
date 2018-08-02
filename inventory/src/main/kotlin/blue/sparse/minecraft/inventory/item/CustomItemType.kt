@@ -5,6 +5,7 @@ import blue.sparse.minecraft.inventory.extensions.editMeta
 import blue.sparse.minecraft.inventory.extensions.notEmptyOrNull
 import blue.sparse.minecraft.nms.extensions.editNBT
 import blue.sparse.minecraft.nms.extensions.nbt
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.*
 import org.bukkit.event.entity.ItemSpawnEvent
@@ -16,107 +17,110 @@ import org.bukkit.material.MaterialData
 import java.util.concurrent.ThreadLocalRandom
 
 abstract class CustomItemType(
-		val id: String,
-		val defaultIcon: MaterialData,
-		val canStack: Boolean = true
+        val id: String,
+        val defaultIcon: MaterialData,
+        val canStack: Boolean = true
 ) {
 
-	protected fun create(vararg args: Any): ItemStack {
-		val item = defaultIcon.toItemStack(1)
+    constructor(id: String, material: Material, canStack: Boolean) : this(id, MaterialData(material), canStack)
 
-		item.editNBT {
-			compound("sparseCustomItem") {
-				string("id", id)
-				if (!canStack)
-					long("uid", ThreadLocalRandom.current().nextLong())
+    protected fun create(vararg args: Any): ItemStack {
+        val item = defaultIcon.toItemStack(1)
 
-				compound("data", newData(args))
-			}
-		}
-		item.editMeta { newMeta(args, this) }
+        item.editNBT {
+            compound("sparseCustomItem") {
+                string("id", id)
+                if (!canStack)
+                    long("uid", ThreadLocalRandom.current().nextLong())
 
-		return item
-	}
+                compound("data", newData(args))
+            }
+        }
+        item.editMeta { newMeta(args, this) }
 
-	fun isInstance(item: ItemStack): Boolean {
-		val nbt = item.nbt
-		if ("sparseCustomItem" !in nbt)
-			return false
+        return item
+    }
 
-		return nbt.compound("sparseCustomItem").string("id") == this.id
-	}
+    fun isInstance(item: ItemStack): Boolean {
+        val nbt = item.nbt
+        if ("sparseCustomItem" !in nbt)
+            return false
+
+        return nbt.compound("sparseCustomItem").string("id") == this.id
+    }
 
 
-	open fun onWorldRightClick(event: PlayerInteractEvent, player: Player, item: ItemStack, block: Block?, entity: Entity?) {}
-	open fun onWorldRightClickBlock(event: PlayerInteractEvent, player: Player, item: ItemStack, block: Block) {}
-	open fun onWorldRightClickEntity(event: PlayerInteractAtEntityEvent, player: Player, item: ItemStack, entity: Entity) {}
-	open fun onWorldRightClickNothing(event: PlayerInteractEvent, player: Player, item: ItemStack) {}
+    open fun onWorldRightClick(event: PlayerInteractEvent, player: Player, item: ItemStack, block: Block?, entity: Entity?) {}
+    open fun onWorldRightClickBlock(event: PlayerInteractEvent, player: Player, item: ItemStack, block: Block) {}
+    open fun onWorldRightClickEntity(event: PlayerInteractAtEntityEvent, player: Player, item: ItemStack, entity: Entity) {}
+    open fun onWorldRightClickNothing(event: PlayerInteractEvent, player: Player, item: ItemStack) {}
 
-	open fun onWorldLeftClick(event: PlayerInteractEvent, player: Player, item: ItemStack, block: Block?, entity: Entity?) {}
-	open fun onWorldLeftClickBlock(event: PlayerInteractEvent, player: Player, item: ItemStack, block: Block) {}
-	open fun onWorldLeftClickEntity(event: PlayerInteractAtEntityEvent, player: Player, item: ItemStack, entity: Entity) {}
-	open fun onWorldLeftClickNothing(event: PlayerInteractEvent, player: Player, item: ItemStack) {}
+    open fun onWorldLeftClick(event: PlayerInteractEvent, player: Player, item: ItemStack, block: Block?, entity: Entity?) {}
+    open fun onWorldLeftClickBlock(event: PlayerInteractEvent, player: Player, item: ItemStack, block: Block) {}
+    open fun onWorldLeftClickEntity(event: PlayerInteractAtEntityEvent, player: Player, item: ItemStack, entity: Entity) {}
+    open fun onWorldLeftClickNothing(event: PlayerInteractEvent, player: Player, item: ItemStack) {}
 
-	open fun onPlayerDrop(event: PlayerDropItemEvent, player: Player, item: ItemStack, entity: Item) {}
-	open fun onPlayerPickup(event: PlayerPickupItemEvent, player: Player, item: ItemStack, entity: Item) {}
-	open fun onDrop(event: ItemSpawnEvent, item: ItemStack, entity: Item) {}
+    open fun onPlayerDrop(event: PlayerDropItemEvent, player: Player, item: ItemStack, entity: Item) {}
+    open fun onPlayerPickup(event: PlayerPickupItemEvent, player: Player, item: ItemStack, entity: Item) {}
+    open fun onDrop(event: ItemSpawnEvent, item: ItemStack, entity: Item) {}
 
-	open fun onDisplay(player: Player, item: ItemStack): ItemStack? = null
+    open fun onDisplay(player: Player, item: ItemStack): ItemStack? = null
 
-	/**
-	 * Called when this item is attempted to be swapped or stacked with another in an inventory.
-	 */
-	open fun onInventoryClickOtherOnThis(event: InventoryClickEvent, player: Player, item: ItemStack, other: ItemStack) {}
-	open fun onInventoryClickThisOnOther(event: InventoryClickEvent, player: Player, item: ItemStack, other: ItemStack) {}
-	open fun onInventoryClickSplit(event: InventoryClickEvent, player: Player, item: ItemStack) {}
+    /**
+     * Called when this item is attempted to be swapped or stacked with another in an inventory.
+     */
+    open fun onInventoryClickOtherOnThis(event: InventoryClickEvent, player: Player, item: ItemStack, other: ItemStack) {}
 
-	open fun onTickDropped(item: Item) {}
-	open fun onTickPlayerInventory(player: Player, item: ItemStack, slot: Int) {}
+    open fun onInventoryClickThisOnOther(event: InventoryClickEvent, player: Player, item: ItemStack, other: ItemStack) {}
+    open fun onInventoryClickSplit(event: InventoryClickEvent, player: Player, item: ItemStack) {}
 
-	protected fun getData(item: ItemStack): Compound {
-		instanceCheck(item)
+    open fun onTickDropped(item: Item) {}
+    open fun onTickPlayerInventory(player: Player, item: ItemStack, slot: Int) {}
 
-		return item.nbt.compound("sparseCustomItem").compound("data")
-	}
+    protected fun getData(item: ItemStack): Compound {
+        instanceCheck(item)
 
-	protected open fun newData(args: Array<out Any>): Compound {
-		return Compound()
-	}
+        return item.nbt.compound("sparseCustomItem").compound("data")
+    }
 
-	protected open fun newMeta(args: Array<out Any>, meta: ItemMeta) {}
+    protected open fun newData(args: Array<out Any>): Compound {
+        return Compound()
+    }
 
-	protected fun instanceCheck(item: ItemStack) {
-		if (!isInstance(item))
-			throw IllegalArgumentException("Item is not an instance of this custom item type (${javaClass.name})")
-	}
+    protected open fun newMeta(args: Array<out Any>, meta: ItemMeta) {}
 
-	companion object {
+    protected fun instanceCheck(item: ItemStack) {
+        if (!isInstance(item))
+            throw IllegalArgumentException("Item is not an instance of this custom item type (${javaClass.name})")
+    }
 
-		private val registered = HashMap<String, CustomItemType>()
+    companion object {
 
-		fun register(type: CustomItemType): Boolean {
-			if(type.id in registered)
-				return false
+        private val registered = HashMap<String, CustomItemType>()
 
-			registered[type.id] = type
-			return true
-		}
+        fun register(type: CustomItemType): Boolean {
+            if (type.id in registered)
+                return false
 
-		operator fun get(id: String): CustomItemType? {
-			return registered[id]
-		}
+            registered[type.id] = type
+            return true
+        }
 
-		fun getType(item: ItemStack): CustomItemType? {
-			if(item.notEmptyOrNull() == null)
-				return null
+        operator fun get(id: String): CustomItemType? {
+            return registered[id]
+        }
 
-			val nbt = item.nbt
-			val custom = nbt.optionalCompound("sparseCustomItem") ?: return null
-			val id = custom.optionalString("id") ?: return null
+        fun getType(item: ItemStack): CustomItemType? {
+            if (item.notEmptyOrNull() == null)
+                return null
 
-			return get(id)
-		}
+            val nbt = item.nbt
+            val custom = nbt.optionalCompound("sparseCustomItem") ?: return null
+            val id = custom.optionalString("id") ?: return null
 
-	}
+            return get(id)
+        }
+
+    }
 
 }
