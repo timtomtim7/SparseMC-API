@@ -182,7 +182,7 @@ class BukkitCoroutine internal constructor(val plugin: Plugin) {
 			priority: EventPriority,
 			val ignoreCancelled: Boolean,
 			val filter: T.() -> Boolean,
-			val timeout: Long
+			/*val*/ timeout: Long
 	) : CoroutineState, Listener, EventExecutor {
 
 		private val handlerLists = getHandlerListNullable(eventClass)?.let(::listOf) ?: HandlerList.getHandlerLists()

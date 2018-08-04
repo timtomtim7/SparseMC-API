@@ -34,14 +34,16 @@ object ScriptingModule : Module {
 	object Config: FileConfig(File(plugin.dataFolder, "scripting.cfg")) {
 		val test by 5
 
+		val enableChatScripting by true
+		val chatScriptDefaultsToOperators by false
+
+		override fun asyncAfterReloadQueued() {
+			println("Reloading...")
+			reload()
+		}
+
 		override fun afterReload() {
 			println("test = $test")
 		}
-//		val enableChatScripting by true
-//		val chatScriptDefaultsToOperators by false
-
-//		override fun afterReload() {
-//			super.afterReload()
-//		}
 	}
 }

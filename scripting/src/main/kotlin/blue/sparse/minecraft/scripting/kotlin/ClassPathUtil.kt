@@ -17,9 +17,9 @@ private fun URL.toFile(): File? {
 }
 
 internal fun ClassLoader.classpath(): List<File> {
-	return generateSequence(this) { it.parent }.toList().flatMap {
-		(it as? URLClassLoader)?.urLs?.mapNotNull {
-			it.toFile()?.takeIf { file -> file.isDirectory || validClasspathFilesExtensions.any { file.extension == it } }
+	return generateSequence(this) { it.parent }.toList().flatMap { loader ->
+		(loader as? URLClassLoader)?.urLs?.mapNotNull { url ->
+			url.toFile()?.takeIf { file -> file.isDirectory || validClasspathFilesExtensions.any { file.extension == it } }
 		} ?: emptyList()
 	}
 }

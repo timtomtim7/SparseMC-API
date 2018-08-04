@@ -6,6 +6,7 @@ import org.bukkit.Bukkit
 enum class NMSVersion {
 
 	UNKNOWN,
+	v1_7_R4,
 	v1_8_R1,
 	v1_8_R2,
 	v1_8_R3,

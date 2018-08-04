@@ -18,6 +18,7 @@ dependencies {
     compileOnly name: "spigot-1.8.8"
     compileOnly name: "spigot-1.8.3"
     compileOnly name: "spigot-1.8"
+    compileOnly name: "spigot-1.7.10"
 
     testCompileOnly name: "spigot-1.12.2"
 }

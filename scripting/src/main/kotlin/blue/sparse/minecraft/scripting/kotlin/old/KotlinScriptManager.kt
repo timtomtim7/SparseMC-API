@@ -37,28 +37,28 @@ class KotlinScriptManager<T : Any>(
 
 	@Suppress("UNCHECKED_CAST")
 	fun compile(source: String, cache: Boolean = true, className: String? = null): CompiledScript<T> {
-		val cacheFolder = getCacheFolder(source)
-		if(cache) {
-			if(cacheFolder.exists()) {
-				try {
-					val clazz = classLoader.loadCachedScript(cacheFolder).kotlin
-					val script = CompiledScript(clazz as KClass<T>)
-					if (cache)
-						cache(CacheKey.Source(source), script)
-
-					return script
-				}catch(t: Throwable) {
-					cacheFolder.deleteRecursively()
-				}
-			}
-		}
+//		val cacheFolder = getCacheFolder(source)
+//		if(cache) {
+//			if(cacheFolder.exists()) {
+//				try {
+//					val clazz = classLoader.loadCachedScript(cacheFolder).kotlin
+//					val script = CompiledScript(clazz as KClass<T>)
+//					if (cache)
+//						cache(CacheKey.Source(source), script)
+//
+//					return script
+//				}catch(t: Throwable) {
+//					cacheFolder.deleteRecursively()
+//				}
+//			}
+//		}
 
 		engine.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE)
 
 		val compiled = classLoader.compiledScriptToClass(
 				engine.compile(source) as JBCompiledScript,
-				className,
-				cacheFolder
+				className/*,
+				cacheFolder*/
 		).kotlin
 
 		if (!template.isSuperclassOf(compiled))

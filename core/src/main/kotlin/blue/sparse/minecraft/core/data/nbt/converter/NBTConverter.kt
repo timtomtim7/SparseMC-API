@@ -58,7 +58,7 @@ interface NBTConverter<T : Any> {
 		}
 
 		fun <T : Any> convertFromNBT(value: Compound): T? {
-			val converterID = value.optionalString("__converter") ?: return null
+			val converterID = value.optionalString("^") ?: return null
 
 			val converter = registered
 					.find { it.id == converterID } ?: return null

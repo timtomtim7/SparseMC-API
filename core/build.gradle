@@ -6,7 +6,7 @@ group 'blue.sparse.minecraft'
 archivesBaseName = "SparseMC-API"
 
 dependencies {
-	compile "blue.sparse:sparse-data:1.0-SNAPSHOT"
+	compile "blue.sparse:sparse-data:1.1"
 	compile "blue.sparse:sparse-utils:1.0-SNAPSHOT"
 }
 

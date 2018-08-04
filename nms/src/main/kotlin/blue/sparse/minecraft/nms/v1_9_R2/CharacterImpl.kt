@@ -84,12 +84,12 @@ class CharacterImpl: CharacterNMS {
 			nms.profile.reflection["name"].declaredFieldValue = name
 			nms.displayName = name
 
-			skin?.let { skin ->
-				val properties = nms.profile.properties
-				properties.keySet().remove("textures")
-				properties.put("textures", Property("textures", skin.value, skin.signature))
-				println(properties["textures"].first().value)
-			}
+//			skin?.let { skin ->
+//				val properties = nms.profile.properties
+//				properties.keySet().remove("textures")
+//				properties.put("textures", Property("textures", skin.value, skin.signature))
+//				println(properties["textures"].first().value)
+//			}
 
 			player.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, nms))
 			player.sendPacket(PacketPlayOutNamedEntitySpawn(nms))
