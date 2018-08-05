@@ -2,27 +2,45 @@ package blue.sparse.minecraft.inventory.item
 
 import blue.sparse.minecraft.inventory.InventoryModule
 import blue.sparse.minecraft.persistent.extensions.persistent
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.InventoryHolder
 
 object CustomBlockListener : Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun onBlockBreak(event: BlockBreakEvent) {
         val type = CustomBlockType.getType(event.block) ?: return
+
         event.block.persistent(InventoryModule.plugin) {
             remove("SparseCustomBlock")
         }
+
+        val inventory = (event.block as? InventoryHolder)?.inventory
+
         type.onBlockBreak(event, event.block, event.player)
+
+        if (event.isCancelled)
+            return
+
+        event.isCancelled = true
+        event.block.type = Material.AIR
+        event.block.world.dropItem(event.block.location, type.item)
+
+        if (inventory != null) {
+            for (drop in inventory.contents)
+                event.block.world.dropItem(event.block.location, drop)
+        }
     }
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
         val itemType = CustomItemType.getType(event.itemInHand) ?: return
-
         event.block.persistent(InventoryModule.plugin) {
             compound("SparseCustomBlock") {
                 string("id", itemType.id)
@@ -52,7 +70,6 @@ object CustomBlockListener : Listener {
             val type = CustomBlockType.getType(block) ?: continue
             type.onBlockExplode(event, block)
         }
-
     }
 
     @EventHandler

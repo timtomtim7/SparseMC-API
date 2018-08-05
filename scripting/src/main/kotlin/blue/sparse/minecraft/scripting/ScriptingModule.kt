@@ -37,11 +37,6 @@ object ScriptingModule : Module {
 		val enableChatScripting by true
 		val chatScriptDefaultsToOperators by false
 
-		override fun asyncAfterReloadQueued() {
-			println("Reloading...")
-			reload()
-		}
-
 		override fun afterReload() {
 			println("test = $test")
 		}

@@ -23,6 +23,7 @@ abstract class CustomBlockType(
             canStack: Boolean
     ): this(id, MaterialData(defaultIcon), canStack)
 
+    val item get() = create()
 
     open fun onBlockPlace(event: BlockPlaceEvent, block: Block, item: ItemStack, player: Player) {}
     open fun onBlockBreak(event: BlockBreakEvent, block: Block, player: Player?) {}
@@ -31,6 +32,8 @@ abstract class CustomBlockType(
     open fun onBlockExplode(event: BlockExplodeEvent, block: Block) {}
     open fun onPistonMove(event: BlockPistonEvent, block: Block) {}
     open fun onBlockTick(block: Block) {}
+
+    fun isInstance(block: Block) = CustomBlockType.getType(block) == this
 
     companion object {
         fun getType(block: Block): CustomBlockType? {

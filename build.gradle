@@ -58,3 +58,36 @@ task copyToPlugins(type: Copy) {
 		from subprojects.findAll { it.name != "core" }.collect { it.tasks.withType(Jar) }
 	}
 }
+
+def testServersDir = file("E:/Spigot/Test Servers")
+
+
+for(file in testServersDir.listFiles()) {
+	def pluginsFolder = new File(file, "plugins")
+	def modulesFolder = new File(pluginsFolder, "SparseMC-API/modules")
+
+	task "delete${file.name}"(type: Delete) {
+		group = "versions"
+
+		delete modulesFolder.absolutePath
+	}
+
+	task "copyTo${file.name}"(type: Copy) {
+		group = "versions"
+
+		into(pluginsFolder.absolutePath)
+		from subprojects.find { it.name == "core" }.tasks.withType(Jar)
+
+		dependsOn "delete${file.name}"
+
+		into("SparseMC-API/modules") {
+			from subprojects.findAll { it.name != "core" }.collect { it.tasks.withType(Jar) }
+		}
+	}
+}
+
+task copyToTestServers() {
+	for(file in testServersDir.listFiles()) {
+		finalizedBy("copyTo${file.name}")
+	}
+}
