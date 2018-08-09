@@ -7,7 +7,7 @@ object CollectionConverter: NBTConverter.Class<Collection<*>>(Collection::class)
 	override fun toNBT(value: Collection<*>): Compound {
 		return Compound {
 			collection("value", value.mapNotNull {
-				NBTConverter.garunteePrimitive(it ?: return@mapNotNull null)
+				NBTConverter.guaranteePrimitive(it ?: return@mapNotNull null)
 			})
 		}
 	}

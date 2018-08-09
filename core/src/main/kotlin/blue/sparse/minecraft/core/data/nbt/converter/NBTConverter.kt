@@ -66,12 +66,12 @@ interface NBTConverter<T : Any> {
 			return converter.fromNBT(value) as T
 		}
 
-		fun garunteePrimitive(value: Any): Any? {
+		fun guaranteePrimitive(value: Any): Any? {
 			return NBTValue.toNBTValueOrNull(value) ?: convertToNBT(value)
 		}
 
 		fun setValue(target: Compound, key: String, value: Any): Boolean {
-			target[key] = garunteePrimitive(value) ?: return false
+			target[key] = guaranteePrimitive(value) ?: return false
 			return true
 		}
 

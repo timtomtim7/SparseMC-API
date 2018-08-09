@@ -13,13 +13,19 @@ object CommandReflectionLoader {
 			clazz: KClass<*>,
 			instance: Any? = clazz.objectInstance
 	): Set<BukkitCommand> {
+		generateIntermediateSingles(plugin, null, clazz)
 		return emptySet()
+	}
+
+	private fun groupOverloadedSingles(singles: Collection<IntermediateSingleCommand>): Collection<IntermediateCommandOverloads> {
+		return singles.groupBy { it.command.name }.map {
+			IntermediateCommandOverloads(it.key, it.value.toSet())
+		}
 	}
 
 	private fun generateIntermediateSingles(plugin: Plugin, parent: Any?, clazz: KClass<*>): Set<IntermediateSingleCommand> {
 		return clazz.declaredMemberExtensionFunctions.mapNotNullTo(HashSet()) {
 			generateIntermediate(plugin, parent, it) }
-
 	}
 
 	private fun generateIntermediate(plugin: Plugin, parent: Any?, function: KFunction<*>): IntermediateSingleCommand? {
@@ -64,9 +70,20 @@ object CommandReflectionLoader {
 			val name: String,
 			val commands: Set<IntermediateSingleCommand>
 	) {
-//		fun toBukkitCommand(): BukkitCommand {
-//			TODO()
-//		}
+		fun execute(sender: CommandSender, raw: String): ExecuteResult {
+			val parsed = commands
+					.map { it to it.signature.parse(raw) }
+
+			val matches = parsed
+					.filter { it.second is Signature.ParseResult.Success }
+					.map { it.first to (it.second as Signature.ParseResult.Success) }
+
+			if(matches.isEmpty())
+				return ExecuteResult.FailedNoMatch(parsed.map { it.second as Signature.ParseResult.Fail })
+
+			val (command, parseSuccess) = matches.minBy { it.second.extra.length }!!
+			return command.execute(sender, parseSuccess)
+		}
 	}
 
 	/**
@@ -103,16 +120,22 @@ object CommandReflectionLoader {
 				it to args.values[it.name]
 			}.filter { it.second != null }
 
-			function.callBy(params)
+			try {
+				function.callBy(params)
+			}catch(t: Throwable) {
+				return ExecuteResult.FailedError(t)
+			}
+
 			return ExecuteResult.Success(args.extra)
 		}
 
-		sealed class ExecuteResult {
-			data class FailedParse(val fail: Signature.ParseResult.Fail): ExecuteResult()
-			data class FailedError(val error: Throwable): ExecuteResult()
-			data class Success(val extra: String): ExecuteResult()
-		}
+	}
 
+	sealed class ExecuteResult {
+		data class FailedParse(val fail: Signature.ParseResult.Fail): ExecuteResult()
+		data class FailedError(val error: Throwable): ExecuteResult()
+		data class FailedNoMatch(val parseFails: Collection<Signature.ParseResult.Fail>): ExecuteResult()
+		data class Success(val extra: String): ExecuteResult()
 	}
 
 	data class Signature(val types: Map<String, KType>) {

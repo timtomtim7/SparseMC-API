@@ -1,6 +1,7 @@
 package blue.sparse.minecraft.core.data.nbt.converter
 
 import blue.sparse.minecraft.core.data.nbt.Compound
+import blue.sparse.minecraft.core.util.PluginClasses
 import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
@@ -42,7 +43,7 @@ object ReflectConverter : NBTConverter<Any> {
 
 	override fun fromNBT(value: Compound): Any {
 		val className = value.string("&")
-		val clazz = Class.forName(className).kotlin
+		val clazz = PluginClasses.forName(className).kotlin
 
 		val constructor = clazz.primaryConstructor
 				?: error("Class must have primary constructor")
