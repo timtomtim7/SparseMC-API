@@ -28,7 +28,7 @@ class WorldPersistent(
 
 		override fun get(value: World): Persistent<World> {
 			return worlds.getOrPut(value) {
-				val file = File(folder, "${value.uid}.dat")
+				val file = File(getFolder(value, plugin.plugin), "world.dat")
 				WorldPersistent(this, value, Compound.readOrCreate(file))
 			}
 		}

@@ -151,6 +151,8 @@ abstract class SparsePlugin : PluginBase(), PluginProvided<SparsePlugin> {
 		enabled = value
 	}
 
+	fun getDatabase(): Nothing = throw UnsupportedOperationException()
+
 	companion object {
 
 		fun getProvidingPlugin(clazz: Class<*>): SparsePlugin? {

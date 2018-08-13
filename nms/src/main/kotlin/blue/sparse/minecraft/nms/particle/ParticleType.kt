@@ -15,7 +15,9 @@ sealed class ParticleType<T : ParticleInfo.ParticleInfoPart>(
 	class MotionRGBParticle(override val info: ParticleInfo) : ParticleInfo.MotionInfo, ParticleInfo.ColorRGBInfo
 	class RGBParticle(override val info: ParticleInfo) : ParticleInfo.ColorRGBInfo
 	class HueParticle(override val info: ParticleInfo) : ParticleInfo.ColorHueInfo
-	class MotionMaterialParticle(override val info: ParticleInfo) : ParticleInfo.MotionInfo, ParticleInfo.MaterialDataInfo
+	class MotionMaterialParticle(override val info: ParticleInfo) : ParticleInfo.MotionInfo, ParticleInfo.MaterialDataInfo {
+		override val shiftData = true
+	}
 
 	object ExplosionNormal : ParticleType<MotionParticle>(0, "explode", ::MotionParticle)
 	object ExplosionLarge : ParticleType<CountOffsetParticle>(1, "largeexplode", ::CountOffsetParticle)

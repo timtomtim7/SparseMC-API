@@ -4,9 +4,7 @@ import blue.sparse.minecraft.inventory.InventoryModule
 import blue.sparse.minecraft.persistent.extensions.persistent
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
+import org.bukkit.event.*
 import org.bukkit.event.block.*
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.InventoryHolder
@@ -40,15 +38,18 @@ object CustomBlockListener : Listener {
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
-        val itemType = CustomItemType.getType(event.itemInHand) ?: return
+        val type = CustomItemType.getType(event.itemInHand) as? CustomBlockType ?: return
+        type.onBlockPlace(event, event.block, event.itemInHand, event.player)
+
+        if(event.isCancelled)
+            return
+
         event.block.persistent(InventoryModule.plugin) {
             compound("SparseCustomBlock") {
-                string("id", itemType.id)
+                string("id", type.id)
             }
         }
 
-        val type = CustomBlockType.getType(event.block) ?: return
-        type.onBlockPlace(event, event.block, event.itemInHand, event.player)
     }
 
     @EventHandler

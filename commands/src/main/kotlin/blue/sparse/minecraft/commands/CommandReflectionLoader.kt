@@ -11,21 +11,23 @@ object CommandReflectionLoader {
 	fun loadBukkitCommands(
 			plugin: Plugin,
 			clazz: KClass<*>,
-			instance: Any? = clazz.objectInstance
+			parent: Any? = clazz.objectInstance
 	): Set<BukkitCommand> {
-		generateIntermediateSingles(plugin, null, clazz)
+		generateIntermediateSingles(plugin, parent, clazz)
 		return emptySet()
 	}
 
 	private fun groupOverloadedSingles(singles: Collection<IntermediateSingleCommand>): Collection<IntermediateCommandOverloads> {
-		return singles.groupBy { it.command.name }.map {
-			IntermediateCommandOverloads(it.key, it.value.toSet())
+		val uniqueNames = singles.flatMapTo(HashSet()) { it.names }
+		return uniqueNames.map { name ->
+			IntermediateCommandOverloads(name, singles.filterTo(HashSet()) { name in it.names })
 		}
 	}
 
 	private fun generateIntermediateSingles(plugin: Plugin, parent: Any?, clazz: KClass<*>): Set<IntermediateSingleCommand> {
 		return clazz.declaredMemberExtensionFunctions.mapNotNullTo(HashSet()) {
-			generateIntermediate(plugin, parent, it) }
+			generateIntermediate(plugin, parent, it)
+		}
 	}
 
 	private fun generateIntermediate(plugin: Plugin, parent: Any?, function: KFunction<*>): IntermediateSingleCommand? {
@@ -52,6 +54,34 @@ object CommandReflectionLoader {
 		return Command(plugin, name, aliases, description, usage, permission)
 	}
 
+	data class IntermediateCommandGroup(
+			val command: Command,
+			val commands: Set<IntermediateCommand>,
+			val default: IntermediateCommand?
+	) : IntermediateCommand {
+
+		override val names: List<String>
+			get() = command.aliases + command.name
+
+		override fun execute(sender: CommandSender, raw: String): ExecuteResult {
+			val targetName = raw.takeWhile { it != ' ' }
+			val extra = raw.removePrefix(targetName).trim()
+
+			if (targetName.isBlank()) {
+				if (default != null) {
+					return default.execute(sender, extra)
+				} else {
+					//TODO: Send error about no matching subcommand?
+				}
+			} else {
+//				val target = commands.find {
+//
+//				}
+			}
+			TODO()
+		}
+	}
+
 	/**
 	 * This class represents multiple command functions
 	 * in the same scope with the same name but differing parameters and annotation data.
@@ -69,8 +99,11 @@ object CommandReflectionLoader {
 	data class IntermediateCommandOverloads(
 			val name: String,
 			val commands: Set<IntermediateSingleCommand>
-	) {
-		fun execute(sender: CommandSender, raw: String): ExecuteResult {
+	) : IntermediateCommand {
+
+		override val names = listOf(name)
+
+		override fun execute(sender: CommandSender, raw: String): ExecuteResult {
 			val parsed = commands
 					.map { it to it.signature.parse(raw) }
 
@@ -78,7 +111,7 @@ object CommandReflectionLoader {
 					.filter { it.second is Signature.ParseResult.Success }
 					.map { it.first to (it.second as Signature.ParseResult.Success) }
 
-			if(matches.isEmpty())
+			if (matches.isEmpty())
 				return ExecuteResult.FailedNoMatch(parsed.map { it.second as Signature.ParseResult.Fail })
 
 			val (command, parseSuccess) = matches.minBy { it.second.extra.length }!!
@@ -97,8 +130,12 @@ object CommandReflectionLoader {
 			val command: Command,
 			val signature: Signature,
 			val function: KFunction<*>
-	) {
-		fun execute(sender: CommandSender, raw: String): ExecuteResult {
+	) : IntermediateCommand {
+
+		override val names: List<String>
+			get() = command.aliases + command.name
+
+		override fun execute(sender: CommandSender, raw: String): ExecuteResult {
 			val args = signature.parse(raw)
 			return when (args) {
 				is Signature.ParseResult.Fail -> ExecuteResult.FailedParse(args)
@@ -107,7 +144,7 @@ object CommandReflectionLoader {
 		}
 
 		fun execute(sender: CommandSender, args: Signature.ParseResult.Success): ExecuteResult {
-			if(args.signature != signature)
+			if (args.signature != signature)
 				throw IllegalArgumentException("Command arguments provided with wrong signature")
 
 			val params = HashMap<KParameter, Any?>()
@@ -122,7 +159,7 @@ object CommandReflectionLoader {
 
 			try {
 				function.callBy(params)
-			}catch(t: Throwable) {
+			} catch (t: Throwable) {
 				return ExecuteResult.FailedError(t)
 			}
 
@@ -131,11 +168,17 @@ object CommandReflectionLoader {
 
 	}
 
+	interface IntermediateCommand {
+		val names: List<String>
+
+		fun execute(sender: CommandSender, raw: String): ExecuteResult
+	}
+
 	sealed class ExecuteResult {
-		data class FailedParse(val fail: Signature.ParseResult.Fail): ExecuteResult()
-		data class FailedError(val error: Throwable): ExecuteResult()
-		data class FailedNoMatch(val parseFails: Collection<Signature.ParseResult.Fail>): ExecuteResult()
-		data class Success(val extra: String): ExecuteResult()
+		data class FailedParse(val fail: Signature.ParseResult.Fail) : ExecuteResult()
+		data class FailedError(val error: Throwable) : ExecuteResult()
+		data class FailedNoMatch(val parseFails: Collection<Signature.ParseResult.Fail>) : ExecuteResult()
+		data class Success(val extra: String) : ExecuteResult()
 	}
 
 	data class Signature(val types: Map<String, KType>) {
@@ -150,13 +193,13 @@ object CommandReflectionLoader {
 					val raw: String,
 					val values: Map<String, Any?>,
 					val extra: String
-			): ParseResult(signature)
+			) : ParseResult(signature)
 
 			class Fail(
 					signature: Signature,
 					val failedAtName: String,
 					val failedAtIndex: Int
-			): ParseResult(signature)
+			) : ParseResult(signature)
 		}
 
 	}

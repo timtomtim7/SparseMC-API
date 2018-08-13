@@ -18,6 +18,9 @@ object PersistentModule : AbstractModule(ModuleType.PERSISTENT) {
 		persistent.values.forEach {
 			it.players.saveAll()
 			it.plugins.saveAll()
+			it.blocks.saveAll()
+			it.chunks.saveAll()
+			it.worlds.saveAll()
 		}
 	}
 
