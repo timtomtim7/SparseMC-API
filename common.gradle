@@ -1,20 +1,24 @@
 apply plugin: 'kotlin'
 apply plugin: 'idea'
 
-int getAndIncrementVersion() {
-	def file = new File(ideaModule.module.contentRoot, "ver.txt")
-	def value
-	try {
-		value = file.text.toInteger() + 1
-	}catch(Throwable ignored) {
-		file.text = "1"
-		return 1
-	}
-	file.text = value.toString()
-	return value
+//int getAndIncrementVersion() {
+//	def file = new File(ideaModule.module.contentRoot, "ver.txt")
+//	def value
+//	try {
+//		value = file.text.toInteger() + 1
+//	}catch(Throwable ignored) {
+//		file.text = "1"
+//		return 1
+//	}
+//	file.text = value.toString()
+//	return value
+//}
+
+static String getMinorVersion() {
+	return System.currentTimeMillis() - 1534134354769L
 }
 
-version = "${ext.baseVer}.${getAndIncrementVersion()}".toString()
+version = "${ext.baseVer}.${getMinorVersion()}".toString()
 
 repositories {
 	mavenLocal()

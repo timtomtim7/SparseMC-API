@@ -57,7 +57,7 @@ class Character(
 	}
 
 	fun lookAt(target: Vector) {
-		location.direction = location.toVector().add(Vector(0.0, handle.eyeHeight, 0.0)).subtract(target)
+		location.direction = target.clone().subtract(location.toVector().add(Vector(0.0, handle.eyeHeight, 0.0)))
 	}
 
 	fun dropBlockItems(hand: ItemStack, block: Block) {
@@ -93,10 +93,14 @@ class Character(
 			equipment.setAll()
 
 		if (lastLocation != location) {
-			if (lastLocation.distanceSquared(location) <= 8 * 8) {
-				handle.moveTo(location.x, location.y, location.z, location.yaw, location.pitch)
-			}else{
-				handle.teleport(location.x, location.y, location.z, location.yaw, location.pitch)
+			if(lastLocation.toVector() != location.toVector()) {
+				if (lastLocation.distanceSquared(location) <= 8 * 8) {
+					handle.moveTo(location.x, location.y, location.z, location.yaw, location.pitch)
+				}else{
+					handle.teleport(location.x, location.y, location.z, location.yaw, location.pitch)
+				}
+			}else if(lastLocation.direction != location.direction) {
+				handle.look(location.yaw, location.pitch)
 			}
 			lastLocation = location.clone()
 		}

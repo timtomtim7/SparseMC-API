@@ -92,9 +92,14 @@ class CharacterImpl: CharacterNMS {
 //				println(properties["textures"].first().value)
 //			}
 
-			player.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, nms))
+			val field = EntityHuman::class.java.getDeclaredField("bp")
+			field.isAccessible = true
+			@Suppress("UNCHECKED_CAST")
+			nms.dataWatcher.set(field.get(null) as DataWatcherObject<Byte>, 0xFF.toByte())
+
 			player.sendPacket(PacketPlayOutNamedEntitySpawn(nms))
-			player.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, nms))
+			player.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, nms))
+//			player.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, nms))
 		}
 
 		override fun setInvisible(player: Player) {
