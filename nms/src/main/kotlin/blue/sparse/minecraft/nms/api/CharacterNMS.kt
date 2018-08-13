@@ -4,6 +4,7 @@ import blue.sparse.minecraft.core.i18n.LocalizedString
 import blue.sparse.minecraft.nms.character.Skin
 import blue.sparse.minecraft.util.Either
 import org.bukkit.Location
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -54,7 +55,7 @@ interface CharacterNMS: NMSHandler {
 		fun setAnimationSneaking(value: Boolean)
 		fun setAnimationSprinting(value: Boolean)
 
-
+		fun breakBlock(hand: ItemStack, block: Block): Boolean
 	}
 
 }

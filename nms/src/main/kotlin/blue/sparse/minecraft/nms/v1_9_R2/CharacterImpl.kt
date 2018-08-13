@@ -9,6 +9,7 @@ import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import net.minecraft.server.v1_9_R2.*
 import org.bukkit.Location
+import org.bukkit.block.Block
 import org.bukkit.craftbukkit.v1_9_R2.CraftServer
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer
@@ -57,10 +58,10 @@ class CharacterImpl: CharacterNMS {
 			val nmsWorld = (location.world as CraftWorld).handle
 			val nmsServer = (server as CraftServer).server
 
-			val name = name.fold({it}, {it.default})
+			val name = name.fold({ it }, { it.default })
 			val profile = GameProfile(UUID.fromString("f01763ef-0925-4f3f-b3a4-9bef42068f5e"), name)
 			val skin = skin
-			if(skin != null)
+			if (skin != null)
 				profile.properties.put("textures", Property("textures", skin.value, skin.signature))
 
 			nms = EntityPlayer(nmsServer, nmsWorld, profile, PlayerInteractManager(nmsWorld))
@@ -181,6 +182,11 @@ class CharacterImpl: CharacterNMS {
 		override fun setAnimationSprinting(value: Boolean) {
 			nms.setFlag(2, value)
 		}
-	}
 
+		override fun breakBlock(hand: ItemStack, block: Block): Boolean {
+			if (block.world != world)
+				throw IllegalStateException("Attempt to break block in different world.")
+			return nms.playerInteractManager.breakBlock(BlockPosition(block.x, block.y, block.z))
+		}
+	}
 }

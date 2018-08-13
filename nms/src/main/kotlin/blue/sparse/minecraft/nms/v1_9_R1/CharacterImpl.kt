@@ -9,6 +9,7 @@ import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import net.minecraft.server.v1_9_R1.*
 import org.bukkit.Location
+import org.bukkit.block.Block
 import org.bukkit.craftbukkit.v1_9_R1.CraftServer
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer
@@ -180,6 +181,12 @@ class CharacterImpl: CharacterNMS {
 
 		override fun setAnimationSprinting(value: Boolean) {
 			nms.setFlag(2, value)
+		}
+
+		override fun breakBlock(hand: ItemStack, block: Block): Boolean {
+			if (block.world != world)
+				throw IllegalStateException("Attempt to break block in different world.")
+			return nms.playerInteractManager.breakBlock(BlockPosition(block.x, block.y, block.z))
 		}
 	}
 
