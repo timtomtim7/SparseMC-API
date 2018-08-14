@@ -2,6 +2,7 @@ package blue.sparse.minecraft.core
 
 import blue.sparse.minecraft.core.extensions.getPluginLocale
 import blue.sparse.minecraft.core.extensions.server
+import blue.sparse.minecraft.core.i18n.LocalizedString
 import blue.sparse.minecraft.core.i18n.PluginLocale
 import blue.sparse.minecraft.plugin.SparsePluginClassLoader
 import org.bukkit.entity.Player
@@ -26,4 +27,13 @@ interface PluginProvided<T : Plugin> {
 
 	val Player.pluginLocale: PluginLocale
 		get() = getPluginLocale(plugin)
+
+	fun localized(key: String, placeholders: Map<String, Any> = emptyMap()): LocalizedString {
+		return LocalizedString(plugin, key, placeholders)
+	}
+
+	fun localized(key: String, vararg placeholders: Pair<String, Any>): LocalizedString {
+		return localized(key, placeholders.toMap())
+	}
+
 }

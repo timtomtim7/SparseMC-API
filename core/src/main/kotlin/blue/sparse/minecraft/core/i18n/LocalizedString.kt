@@ -7,7 +7,7 @@ import org.bukkit.plugin.Plugin
 data class LocalizedString(
 		val plugin: Plugin,
 		val key: String,
-		val placeholders: Map<String, Any>
+		val placeholders: Map<String, Any> = emptyMap()
 ) {
 
 	val default: String?
