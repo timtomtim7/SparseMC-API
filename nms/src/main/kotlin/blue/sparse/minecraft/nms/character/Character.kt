@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import java.util.Objects
 
-class Character(
+open class Character(
 		name: Either<String, LocalizedString> = Left("Unnamed"),
 		var location: Location,
 		val skin: Skin? = null
@@ -73,7 +73,19 @@ class Character(
 		handle.animateSwing()
 	}
 
+	fun animateDamage() {
+		handle.animateDamage()
+	}
+
+	protected fun onAttacked(player: Player) {}
+
+	protected fun onRightClicked(player: Player) {}
+
+	protected fun onTick() {}
+
 	internal fun tick() {
+		onTick()
+
 		val newHash = dataHash
 		if (newHash != lastDataHash) {
 			println("Respawning:  $newHash != $lastDataHash")
@@ -133,10 +145,19 @@ class Character(
 
 		init {
 			server.scheduler.scheduleSyncRepeatingTask(NMSModule.plugin, ::tick, 1L, 1L)
+			NMSModule.characterNMS.setEntityUseCallback(::useCallback)
 		}
 
 		private fun tick() {
 			characters.iterator().forEach(Character::tick)
+		}
+
+		private fun useCallback(player: Player, id: Int, action: CharacterNMS.UseAction) {
+			val used = characters.find { it.handle.id == id } ?: return
+			when(action) {
+				CharacterNMS.UseAction.INTERACT -> used.onRightClicked(player)
+				CharacterNMS.UseAction.ATTACK -> used.onAttacked(player)
+			}
 		}
 
 	}

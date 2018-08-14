@@ -23,4 +23,8 @@ class CharacterImpl: CharacterNMS {
 		TODO("not implemented")
 	}
 
+	override fun setEntityUseCallback(body: (Player, Int, CharacterNMS.UseAction) -> Unit) {
+		TODO("not implemented")
+	}
+
 }

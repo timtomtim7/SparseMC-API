@@ -9,10 +9,11 @@ data class LocalizedString(
 		val key: String,
 		val placeholders: Map<String, Any>
 ) {
+
 	val default: String?
 		get() = PluginLocale.default(plugin)[key, placeholders]
 
-	fun get(player: Player): String? {
+	operator fun get(player: Player): String? {
 		return player.getPluginLocale(plugin)[key, placeholders]
 	}
 }

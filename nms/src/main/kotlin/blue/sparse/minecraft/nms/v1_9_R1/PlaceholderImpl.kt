@@ -2,6 +2,7 @@ package blue.sparse.minecraft.nms.v1_9_R1
 
 import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.server
+import blue.sparse.minecraft.nms.NMSModule
 import blue.sparse.minecraft.nms.api.PlaceholderNMS
 import blue.sparse.minecraft.nms.extensions.*
 import blue.sparse.minecraft.nms.placeholders.ItemReplacer
@@ -46,6 +47,8 @@ class PlaceholderImpl : PlaceholderNMS, Listener {
 
 //		PacketPlayInSetCreativeSlot
 //		PacketPlayInWindowClick
+
+//		PacketPlayInUseEntity
 	}
 
 	override fun onDisable() {
@@ -104,6 +107,10 @@ class PlaceholderImpl : PlaceholderNMS, Listener {
 					val reverted = revert(items)
 					setItems(packet, reverted)
 				}
+
+				//TODO: Maybe rename packet intercept or create new packet intercept for players
+				if(packet is PacketPlayInUseEntity)
+					(NMSModule.characterNMS as CharacterImpl).handleUseEntity(player, packet)
 			} catch (t: Throwable) {
 				t.printStackTrace()
 			}

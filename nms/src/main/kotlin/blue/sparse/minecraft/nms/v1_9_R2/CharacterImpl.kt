@@ -24,6 +24,8 @@ class CharacterImpl: CharacterNMS {
 	override val isAnimationSwimSupported = false
 	override val isAnimationElytraSupported = true
 
+	private var useCallback: ((Player, Int, CharacterNMS.UseAction) -> Unit)? = null
+
 	override fun spawn(name: Either<String, LocalizedString>, location: Location, skin: Skin?): CharacterNMS.CharacterHandle {
 		return CharacterHandleImpl(name, skin, location)
 	}
@@ -32,6 +34,21 @@ class CharacterImpl: CharacterNMS {
 		val profile = (player as CraftPlayer).handle.profile
 		val textures = profile.properties["textures"]?.firstOrNull() ?: return null
 		return Skin(textures.value, textures.signature)
+	}
+
+	override fun setEntityUseCallback(body: (Player, Int, CharacterNMS.UseAction) -> Unit) {
+		useCallback = body
+	}
+
+	internal fun handleUseEntity(player: Player, packet: PacketPlayInUseEntity) {
+		val entityID = packet.castDeclaredField<Int>("a")
+		val action = when(packet.a()) {
+			PacketPlayInUseEntity.EnumEntityUseAction.INTERACT -> CharacterNMS.UseAction.INTERACT
+			PacketPlayInUseEntity.EnumEntityUseAction.ATTACK -> CharacterNMS.UseAction.ATTACK
+			PacketPlayInUseEntity.EnumEntityUseAction.INTERACT_AT -> CharacterNMS.UseAction.INTERACT
+			else -> throw IllegalStateException()
+		}
+		useCallback?.invoke(player, entityID, action)
 	}
 
 	class CharacterHandleImpl(
@@ -53,6 +70,9 @@ class CharacterImpl: CharacterNMS {
 
 		override val eyeHeight: Double
 			get() = 1.62///nms.headHeight.toDouble()
+
+		override val id: Int
+			get() = nms.id
 
 		init {
 			val nmsWorld = (location.world as CraftWorld).handle

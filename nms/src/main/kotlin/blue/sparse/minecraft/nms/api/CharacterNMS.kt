@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
-interface CharacterNMS: NMSHandler {
+interface CharacterNMS : NMSHandler {
 
 	val isSecondaryHandSupported: Boolean
 	val isAnimationSwimSupported: Boolean
@@ -19,9 +19,17 @@ interface CharacterNMS: NMSHandler {
 
 	fun getSkin(player: Player): Skin?
 
+	fun setEntityUseCallback(body: (Player, Int, UseAction) -> Unit)
+
+	enum class UseAction {
+		INTERACT,
+		ATTACK
+	}
+
 	interface CharacterHandle {
 
 		var name: Either<String, LocalizedString>
+		val id: Int
 
 		val eyeHeight: Double
 
