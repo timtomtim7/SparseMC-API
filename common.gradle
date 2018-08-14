@@ -15,7 +15,7 @@ apply plugin: 'idea'
 //}
 
 static String getMinorVersion() {
-	return System.currentTimeMillis() - 1534134354769L
+	return ((System.currentTimeMillis() - 1534134354769L) / 1000L).toLong()
 }
 
 version = "${ext.baseVer}.${getMinorVersion()}".toString()
