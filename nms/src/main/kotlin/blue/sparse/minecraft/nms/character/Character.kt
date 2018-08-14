@@ -77,11 +77,11 @@ open class Character(
 		handle.animateDamage()
 	}
 
-	protected fun onAttacked(player: Player) {}
+	protected open fun onAttacked(player: Player) {}
 
-	protected fun onRightClicked(player: Player) {}
+	protected open fun onRightClicked(player: Player) {}
 
-	protected fun onTick() {}
+	protected open fun onTick() {}
 
 	internal fun tick() {
 		onTick()

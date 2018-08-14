@@ -85,6 +85,11 @@ class CharacterImpl: CharacterNMS {
 				profile.properties.put("textures", Property("textures", skin.value, skin.signature))
 
 			nms = EntityPlayer(nmsServer, nmsWorld, profile, PlayerInteractManager(nmsWorld))
+			nms.playerConnection = PlayerConnection(
+					nmsServer,
+					NetworkManager(EnumProtocolDirection.CLIENTBOUND),
+					nms
+			)
 			nms.setLocation(location.x, location.y, location.z, location.yaw, location.pitch)
 		}
 

@@ -25,6 +25,7 @@ data class Skin(
 	companion object {
 
 		private const val SKIN_DATA_DOWNLOAD_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false"
+		private val playerIDSkinCache = HashMap<UUID, Skin>()
 
 		fun fromFile(file: File) = file.readLines().let { Skin(it[0], it[1]) }
 
@@ -33,6 +34,7 @@ data class Skin(
 		fun fromOfflinePlayer(player: OfflinePlayer) = fromPlayerID(player.uniqueId)
 
 		fun fromPlayerID(playerID: UUID): Skin? {
+			playerIDSkinCache[playerID]?.let { return it }
 			server.getPlayer(playerID)?.let { return fromPlayer(it) }
 
 			val urlString = SKIN_DATA_DOWNLOAD_URL.format(playerID.toString().replace("-", ""))
@@ -49,7 +51,9 @@ data class Skin(
 			val properties = obj["properties"] as JSONArray
 			val prop = properties[0] as JSONObject
 
-			return Skin(prop["value"] as String, prop["signature"] as String)
+			val result = Skin(prop["value"] as String, prop["signature"] as String)
+			playerIDSkinCache[playerID] = result
+			return result
 		}
 
 	}

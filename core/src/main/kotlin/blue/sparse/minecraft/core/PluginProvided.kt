@@ -35,5 +35,4 @@ interface PluginProvided<T : Plugin> {
 	fun localized(key: String, vararg placeholders: Pair<String, Any>): LocalizedString {
 		return localized(key, placeholders.toMap())
 	}
-
 }
