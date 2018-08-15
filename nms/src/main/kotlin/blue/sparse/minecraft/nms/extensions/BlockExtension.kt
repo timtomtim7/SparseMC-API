@@ -32,3 +32,7 @@ val Block.snapshot: BlockSnapshot
 fun Block.getDropsWithEnchanted(item: ItemStack?): List<ItemStack>? {
 	return NMSModule.blockNMS.getDrops(this, item)
 }
+
+fun Block.crack(percent: Float) {
+	NMSModule.blockNMS.crack(this, percent)
+}

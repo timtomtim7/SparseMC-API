@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
 
-class EntityImpl: EntityNMS {
+class EntityImpl : EntityNMS {
 	override fun getNBT(entity: Entity): Compound {
 		val cEntity = entity as CraftEntity
 		val nmsCompound = NBTTagCompound()
@@ -25,25 +25,32 @@ class EntityImpl: EntityNMS {
 		cEntity.handle.f(base as NBTTagCompound)
 	}
 
+	@Suppress("UNCHECKED_CAST")
 	override fun getDrops(entity: Entity, item: ItemStack?, killer: LivingEntity?): List<ItemStack>? {
-		val nmsEntity = (entity as CraftEntity).handle ?: return null
-		val entityLiving = nmsEntity as? EntityLiving ?: return null
-		val entitySentient = nmsEntity as? EntityInsentient ?: return null
+		val entityLiving = (entity as CraftEntity).handle as? EntityLiving ?: return null
+		val lootingLevel = item?.getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS) ?: 0
 
 		val dropsField = EntityLiving::class.java.getDeclaredField("drops").apply { isAccessible = true }
-		dropsField.set(entityLiving, ArrayList<ItemStack>())
+		dropsField[entityLiving] = ArrayList<ItemStack>()
 
-		val dropDeathLootMethod = EntityInsentient::class.java.getDeclaredMethod("dropDeathLoot")
-				.apply { isAccessible = true }
+		for (methodName in listOf("dropDeathLoot", "dropEquipment")) {
 
-		val lootingLevel = item?.getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS) ?: 0
-		dropDeathLootMethod.invoke(entitySentient, false, lootingLevel)
+			val method = EntityLiving::class.java
+					.getDeclaredMethod(methodName, Boolean::class.java, Int::class.javaPrimitiveType)
+					.apply {
+						isAccessible = true
+					}
 
-		val drops = dropsField.get(entityLiving) as? ArrayList<ItemStack> ?: run {
-			println("couldn't cast the drops to an array list of items.")
-			return null
+			method(entityLiving, false, lootingLevel)
 		}
 
+		EntityLiving::class.java.getDeclaredMethod("getRareDrop")
+				.apply { isAccessible = true }
+				.invoke(entityLiving, false, lootingLevel)
+
+		val drops = dropsField[entityLiving] as? ArrayList<ItemStack> ?: return null
+
+		dropsField[entityLiving] = null
 		return drops
 	}
 }

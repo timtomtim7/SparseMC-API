@@ -1,5 +1,6 @@
 package blue.sparse.minecraft.nms.character
 
+import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.core.i18n.LocalizedString
 import blue.sparse.minecraft.nms.NMSModule
@@ -148,10 +149,12 @@ open class Character(
 		}
 
 		private fun useCallback(player: Player, id: Int, action: CharacterNMS.UseAction) {
-			val used = characters.find { it.handle.id == id } ?: return
-			when(action) {
-				CharacterNMS.UseAction.INTERACT -> used.onRightClicked(player)
-				CharacterNMS.UseAction.ATTACK -> used.onAttacked(player)
+			server.scheduler.scheduleSyncDelayedTask(SparseMCAPIPlugin.getPlugin()) {
+				val used = characters.find { it.handle.id == id } ?: return@scheduleSyncDelayedTask
+				when(action) {
+					CharacterNMS.UseAction.INTERACT -> used.onRightClicked(player)
+					CharacterNMS.UseAction.ATTACK -> used.onAttacked(player)
+				}
 			}
 		}
 

@@ -5,7 +5,7 @@ import blue.sparse.minecraft.nms.api.EntityNMS
 import net.minecraft.server.v1_12_R1.*
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftHumanEntity
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.*
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
@@ -24,34 +24,30 @@ class EntityImpl : EntityNMS {
 		cEntity.handle.f(base as NBTTagCompound)
 	}
 
+	@Suppress("UNCHECKED_CAST")
 	override fun getDrops(entity: Entity, item: ItemStack?, killer: LivingEntity?): List<ItemStack>? {
-		val nmsEntity = (entity as CraftEntity).handle as? EntityInsentient ?: return null
-		val insentientClass = EntityInsentient::class.java
+		val entityLiving = (entity as CraftEntity).handle as? EntityLiving ?: return null
+		val lootingLevel = item?.getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS) ?: 0
 
-		val bCField = insentientClass.getDeclaredField("bC")
-		bCField.isAccessible = true
+		entityLiving.killer = (killer as? CraftHumanEntity)?.handle
 
-		var key = bCField.get(nmsEntity) as MinecraftKey?
-//		var key = nmsEntity.castDeclaredField<MinecraftKey?>("bC")
-		if (key == null) {
-			val method = insentientClass.getDeclaredMethod("J")
-			method.isAccessible = true
-			key = method.invoke(nmsEntity) as MinecraftKey?
+		val dropsField = EntityLiving::class.java.getDeclaredField("drops").apply { isAccessible = true }
+		dropsField[entityLiving] = ArrayList<ItemStack>()
+
+		for (methodName in listOf("dropDeathLoot", "dropEquipment")) {
+
+			val method = EntityLiving::class.java
+					.getDeclaredMethod(methodName, Boolean::class.java, Int::class.javaPrimitiveType)
+					.apply {
+						isAccessible = true
+					}
+
+			method(entityLiving, false, lootingLevel)
 		}
 
-		if (key == null)
-			return null
+		val drops = dropsField[entityLiving] as? ArrayList<ItemStack> ?: return null
 
-		val lootTable = nmsEntity.world.lootTableRegistry.a(key)
-		var info = LootTableInfo.a(nmsEntity.world as WorldServer).a(nmsEntity)
-
-		if(killer != null && killer is HumanEntity) {
-			val nmsKiller = (killer as CraftHumanEntity).handle
-			info = info.a(nmsKiller).a(nmsKiller.du())
-		}
-
-		//TODO: Killed by player?
-
-		return lootTable.a(nmsEntity.world.random, info.a())?.map { CraftItemStack.asCraftMirror(it) }
+		dropsField[entityLiving] = null
+		return drops
 	}
 }
