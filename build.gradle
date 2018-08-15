@@ -59,7 +59,7 @@ task copyToPlugins(type: Copy) {
 	}
 }
 
-def testServersDir = file("E:/Spigot/Test Servers")
+def testServersDir = file("F:/Spigot/Test Servers")
 
 
 for(file in testServersDir.listFiles()) {

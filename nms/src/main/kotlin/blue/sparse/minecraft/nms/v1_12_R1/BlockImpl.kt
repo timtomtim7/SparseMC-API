@@ -5,6 +5,7 @@ import blue.sparse.minecraft.nms.api.BlockNMS
 import net.minecraft.server.v1_12_R1.*
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
@@ -70,5 +71,18 @@ class BlockImpl : BlockNMS {
 //			val i = EnchantmentManager.getEnchantmentLevel(Enchantments.LOOT_BONUS_BLOCKS, itemstack)
 //			this.b(world, blockposition, iblockdata, i)
 //		}
+	}
+
+	override fun crack(block: Block, percent: Float) {
+		val position = BlockPosition(block.x, block.y, block.z)
+		val packet = PacketPlayOutBlockBreakAnimation(
+				position.hashCode() * -13,
+				position,
+				if (percent !in 0f..1f) -1 else (percent * 7f).toInt()
+		)
+
+		block.world.getNearbyEntities(block.location, 20.0, 20.0, 20.0)
+				.filterIsInstance<CraftPlayer>()
+				.forEach { it.handle.playerConnection.sendPacket(packet) }
 	}
 }

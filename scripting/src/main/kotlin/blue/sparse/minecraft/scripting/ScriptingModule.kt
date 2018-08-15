@@ -27,18 +27,6 @@ object ScriptingModule : Module {
 				folder
 		)
 
-		Config.saveDefaults()
 		ChatScriptListener
-	}
-
-	object Config: FileConfig(File(plugin.dataFolder, "scripting.cfg")) {
-		val test by 5
-
-		val enableChatScripting by true
-		val chatScriptDefaultsToOperators by false
-
-		override fun afterReload() {
-			println("test = $test")
-		}
 	}
 }

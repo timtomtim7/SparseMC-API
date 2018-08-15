@@ -3,9 +3,11 @@ package blue.sparse.minecraft.nms.v1_7_R4
 import blue.sparse.minecraft.core.data.nbt.Compound
 import blue.sparse.minecraft.nms.api.BlockNMS
 import net.minecraft.server.v1_7_R4.NBTTagCompound
+import net.minecraft.server.v1_7_R4.PacketPlayOutBlockBreakAnimation
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld
 import org.bukkit.inventory.ItemStack
+import java.util.*
 
 class BlockImpl : BlockNMS {
 	override fun getNBT(block: Block): Compound? {
@@ -32,5 +34,17 @@ class BlockImpl : BlockNMS {
 
 	override fun getDrops(block: Block, item: ItemStack?): List<ItemStack>? {
 		TODO("not implemented")
+	}
+
+	override fun crack(block: Block, percent: Float) {
+		val packet = PacketPlayOutBlockBreakAnimation(
+				Objects.hash(block.x, block.y, block.z),
+				block.x,
+				block.y,
+				block.z,
+				if (percent !in 0f..1f) -1 else (percent * 7f).toInt()
+		)
+
+
 	}
 }

@@ -19,6 +19,8 @@ class PaginatedElement<T : PaginatedElement.PageItem>(
 		parent: ElementContainer
 ) : Element(position, size, parent) {
 
+	class InventoryAction internal constructor(val leftClick: Boolean, val rightClick: Boolean, val shiftClick: Boolean)
+
 	private val items = ArrayList<T>()
 
 	var nextPageIconPosition = Vector2i(size.x - 1, 0)
@@ -86,6 +88,7 @@ class PaginatedElement<T : PaginatedElement.PageItem>(
 		val index = (page * itemsPerPage) + sectionIndex
 		val item = items.getOrNull(index) ?: return
 		item.onClick(player)
+		item.onClick(player, InventoryAction(event.isLeftClick, event.isRightClick, event.isShiftClick))
 		section[position] = item.icon
 	}
 
@@ -113,5 +116,6 @@ class PaginatedElement<T : PaginatedElement.PageItem>(
 		val icon: ItemStack
 
 		fun onClick(player: Player) {}
+		fun onClick(player: Player, action: InventoryAction) {}
 	}
 }

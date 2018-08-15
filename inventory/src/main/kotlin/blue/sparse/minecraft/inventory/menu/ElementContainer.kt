@@ -69,15 +69,6 @@ abstract class ElementContainer(val contentSize: Vector2i, open val locale: Plug
 		}
 	}
 
-	fun test() {
-		val enabled = false
-		item(
-				0 x 0, Material.DIAMOND_AXE,
-				"menu.axe.name",
-				"menu.axe.lore"
-		)
-	}
-
 	inline fun item(
 			position: Vector2i,
 			icon: Material,
@@ -112,11 +103,4 @@ abstract class ElementContainer(val contentSize: Vector2i, open val locale: Plug
 	}
 
 	infix fun Int.x(y: Int) = Vector2i(this, y)
-
-//	open fun setup() {
-//		for (element in elements.values) {
-//			val subsection = section.subsection(element.position, element.contentSize)
-//			element.setup(subsection)
-//		}
-//	}
 }

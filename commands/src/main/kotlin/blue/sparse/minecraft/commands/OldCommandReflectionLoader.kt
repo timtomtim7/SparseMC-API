@@ -92,7 +92,6 @@ object OldCommandReflectionLoader {
 						if (t.targetException !is ContextEscape)
 							throw t
 					}
-
 				}
 
 				return true

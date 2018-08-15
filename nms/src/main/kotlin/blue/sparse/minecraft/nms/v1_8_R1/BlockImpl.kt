@@ -33,4 +33,8 @@ class BlockImpl : BlockNMS {
 	override fun getDrops(block: Block, item: ItemStack?): List<ItemStack>? {
 		TODO("not implemented")
 	}
+
+	override fun crack(block: Block, percent: Float) {
+
+	}
 }

@@ -13,6 +13,7 @@ object InventoryModule: Module {
 	override val type = ModuleType.INVENTORY
 	
 	override fun onEnable() {
+		println("INITIALIZING INVENTORY MODULE")
 		val pl = SparseMCAPIPlugin.getPlugin()
 		val pm = server.pluginManager
 //		pm.registerEvents(InventoryListener, pl)

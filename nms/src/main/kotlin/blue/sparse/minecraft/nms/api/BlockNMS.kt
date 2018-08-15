@@ -8,6 +8,6 @@ interface BlockNMS: NMSHandler {
 	fun getNBT(block: Block): Compound?
 	fun setNBT(block: Block, compound: Compound): Boolean
 	fun hasNBT(block: Block): Boolean
-
+	fun crack(block: Block, percent: Float)
 	fun getDrops(block: Block, item: ItemStack?): List<ItemStack>?
 }
