@@ -4,6 +4,7 @@ import blue.sparse.minecraft.core.data.nbt.Compound
 import blue.sparse.minecraft.nms.NMSModule
 import blue.sparse.minecraft.nms.block.BlockSnapshot
 import org.bukkit.block.Block
+import org.bukkit.inventory.ItemStack
 
 //TODO: potentially a `toNBT`
 
@@ -27,3 +28,7 @@ val Block.snapshot: BlockSnapshot
 			return BlockSnapshot(type, nbt)
 		return BlockSnapshot(type)
 	}
+
+fun Block.getDropsWithEnchanted(item: ItemStack?): List<ItemStack>? {
+	return NMSModule.blockNMS.getDrops(this, item)
+}

@@ -2,9 +2,12 @@ package blue.sparse.minecraft.nms.v1_12_R1
 
 import blue.sparse.minecraft.core.data.nbt.Compound
 import blue.sparse.minecraft.nms.api.BlockNMS
-import net.minecraft.server.v1_12_R1.NBTTagCompound
+import net.minecraft.server.v1_12_R1.*
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers
+import org.bukkit.inventory.ItemStack
 
 class BlockImpl : BlockNMS {
 	override fun getNBT(block: Block): Compound? {
@@ -27,5 +30,45 @@ class BlockImpl : BlockNMS {
 
 	override fun hasNBT(block: Block): Boolean {
 		return (block.world as CraftWorld).getTileEntityAt(block.x, block.y, block.z) != null
+	}
+
+	override fun getDrops(block: Block, item: ItemStack?): List<ItemStack>? {
+		val nmsBlock = CraftMagicNumbers.getBlock(block)
+		val nmsItem = CraftItemStack.asNMSCopy(item)
+		val nmsWorld = (block.world as CraftWorld).handle
+		val nmsPosition = BlockPosition(block.x, block.y, block.z)
+		val nmsData = nmsWorld.getType(nmsPosition)
+
+		val nmsBlockClass = net.minecraft.server.v1_12_R1.Block::class.java
+		val silkDropsMethod = nmsBlockClass.getDeclaredMethod("n")
+		silkDropsMethod.isAccessible = true
+		val silkDrops = silkDropsMethod.invoke(nmsBlock) as Boolean
+
+		val nmsResult = if(silkDrops && EnchantmentManager.getEnchantmentLevel(Enchantments.SILK_TOUCH, nmsItem) > 0) {
+//			val method = nmsBlock.reflection["u"].method(IBlockData::class.java)!!
+			val method = nmsBlockClass.getDeclaredMethod("u", IBlockData::class.java)
+			method.isAccessible = true
+			method.invoke(nmsBlock, nmsData) as net.minecraft.server.v1_12_R1.ItemStack
+
+		} else {
+			val i = EnchantmentManager.getEnchantmentLevel(Enchantments.LOOT_BONUS_BLOCKS, nmsItem)
+			val type = nmsBlock.getDropType(nmsData, nmsWorld.random, i)
+			if(type === Items.a)
+				return emptyList()
+
+			val count = nmsBlock.getDropCount(i, nmsWorld.random)
+
+			net.minecraft.server.v1_12_R1.ItemStack(type, count)
+		}
+
+		return listOf(CraftItemStack.asCraftMirror(nmsResult))
+
+//		if (this.n() && EnchantmentManager.getEnchantmentLevel(Enchantments.SILK_TOUCH, itemstack) > 0) {
+//			val itemstack1 = this.u(iblockdata)
+//			a(world, blockposition, itemstack1)
+//		} else {
+//			val i = EnchantmentManager.getEnchantmentLevel(Enchantments.LOOT_BONUS_BLOCKS, itemstack)
+//			this.b(world, blockposition, iblockdata, i)
+//		}
 	}
 }

@@ -5,6 +5,7 @@ import blue.sparse.minecraft.nms.api.BlockNMS
 import net.minecraft.server.v1_11_R1.NBTTagCompound
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.v1_11_R1.CraftWorld
+import org.bukkit.inventory.ItemStack
 
 class BlockImpl : BlockNMS {
 	override fun getNBT(block: Block): Compound? {
@@ -27,5 +28,9 @@ class BlockImpl : BlockNMS {
 
 	override fun hasNBT(block: Block): Boolean {
 		return (block.world as CraftWorld).getTileEntityAt(block.x, block.y, block.z) != null
+	}
+
+	override fun getDrops(block: Block, item: ItemStack?): List<ItemStack>? {
+		TODO("not implemented")
 	}
 }

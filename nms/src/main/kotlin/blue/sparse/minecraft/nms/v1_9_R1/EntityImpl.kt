@@ -5,6 +5,8 @@ import blue.sparse.minecraft.nms.api.EntityNMS
 import net.minecraft.server.v1_9_R1.NBTTagCompound
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftEntity
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.inventory.ItemStack
 
 class EntityImpl: EntityNMS {
 	override fun getNBT(entity: Entity): Compound {
@@ -18,5 +20,9 @@ class EntityImpl: EntityNMS {
 		val cEntity = entity as CraftEntity
 		val base = NBTUtil.valueToNBTBase(compound)
 		cEntity.handle.f(base as NBTTagCompound)
+	}
+
+	override fun getDrops(entity: Entity, item: ItemStack?, killer: LivingEntity?): List<ItemStack>? {
+		TODO("not implemented")
 	}
 }
