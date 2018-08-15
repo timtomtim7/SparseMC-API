@@ -6,7 +6,6 @@ import blue.sparse.minecraft.nms.NMSModule
 import blue.sparse.minecraft.nms.api.CharacterNMS
 import blue.sparse.minecraft.util.*
 import org.bukkit.Location
-import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -60,10 +59,6 @@ open class Character(
 		location.direction = target.clone().subtract(location.toVector().add(Vector(0.0, handle.eyeHeight, 0.0)))
 	}
 
-	fun dropBlockItems(hand: ItemStack, block: Block) {
-		handle.breakBlock(hand, block)
-	}
-
 	fun remove() {
 		despawn()
 		characters.remove(this)
@@ -88,7 +83,7 @@ open class Character(
 
 		val newHash = dataHash
 		if (newHash != lastDataHash) {
-			println("Respawning:  $newHash != $lastDataHash")
+//			println("Respawning:  $newHash != $lastDataHash")
 			lastDataHash = newHash
 			respawn()
 		}

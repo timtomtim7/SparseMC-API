@@ -2,13 +2,10 @@ package blue.sparse.minecraft.nms.v1_9_R2
 
 import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.server
-import blue.sparse.minecraft.nms.NMSModule
 import blue.sparse.minecraft.nms.api.PlaceholderNMS
 import blue.sparse.minecraft.nms.extensions.*
 import blue.sparse.minecraft.nms.placeholders.ItemReplacer
-import blue.sparse.minecraft.nms.v1_9_R1.CharacterImpl
 import io.netty.channel.*
-import net.minecraft.server.v1_9_R1.PacketPlayInUseEntity
 import net.minecraft.server.v1_9_R2.*
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack
@@ -107,10 +104,6 @@ class PlaceholderImpl : PlaceholderNMS, Listener {
 					val reverted = revert(items)
 					setItems(packet, reverted)
 				}
-
-				//TODO: Maybe rename packet intercept or create new packet intercept for players
-				if(packet is PacketPlayInUseEntity)
-					(NMSModule.characterNMS as CharacterImpl).handleUseEntity(player, packet)
 			} catch (t: Throwable) {
 				t.printStackTrace()
 			}
@@ -186,7 +179,7 @@ class PlaceholderImpl : PlaceholderNMS, Listener {
 					}
 				}
 
-				if(Array<out ItemStack?>::class.java.isAssignableFrom(it.type)) {
+				if (Array<out ItemStack?>::class.java.isAssignableFrom(it.type)) {
 					it.isAccessible = true
 					return@mapNotNull it.name to (it.get(value) as Array<out ItemStack?>).toList()
 				}
@@ -214,7 +207,7 @@ class PlaceholderImpl : PlaceholderNMS, Listener {
 					continue
 				}
 
-				if(Array<out ItemStack?>::class.java.isAssignableFrom(field.type)) {
+				if (Array<out ItemStack?>::class.java.isAssignableFrom(field.type)) {
 					field.isAccessible = true
 					field.set(value, items.toTypedArray())
 					continue
