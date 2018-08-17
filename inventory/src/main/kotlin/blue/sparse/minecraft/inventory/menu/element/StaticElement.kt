@@ -11,18 +11,22 @@ import org.bukkit.inventory.ItemStack
 class StaticElement(position: Vector2i, size: Vector2i, parent: ElementContainer) : Element(position, size, parent) {
 
 	var icon = ItemStack(Material.STONE)
-	var clickCallback: (position: Vector2i) -> Unit = {}
+	var clickCallback: (position: Vector2i, event: InventoryClickEvent) -> Unit = { _, _ -> }
 
 	inline fun icon(base: ItemStack = icon, body: ItemStack.() -> Unit) {
 		icon = base.apply(body)
 	}
 
 	fun onClick(clickCallback: (position: Vector2i) -> Unit) {
+		this.clickCallback = { it, _ -> clickCallback(it) }
+	}
+
+	fun onAdvancedClick(clickCallback: (position: Vector2i, event: InventoryClickEvent) -> Unit) {
 		this.clickCallback = clickCallback
 	}
 
 	override fun onClick(event: InventoryClickEvent, player: Player, position: Vector2i) {
-		clickCallback(position)
+		clickCallback(position, event)
 		event.cancel()
 	}
 
