@@ -35,6 +35,12 @@ dependencies {
 	compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
 	compileOnly 'org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT'
 	testCompileOnly 'org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT'
+
+//	project.parent.subprojects.each {
+//		if(it != project)
+//			compileOnly it
+//	}
+//	project.parent.subprojects.each { compile it }
 }
 
 jar {

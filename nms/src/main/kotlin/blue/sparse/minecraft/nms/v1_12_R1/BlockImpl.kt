@@ -9,6 +9,7 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
+import org.bukkit.material.MaterialData
 
 class BlockImpl : BlockNMS {
 	override fun getNBT(block: Block): Compound? {
@@ -71,6 +72,16 @@ class BlockImpl : BlockNMS {
 //			val i = EnchantmentManager.getEnchantmentLevel(Enchantments.LOOT_BONUS_BLOCKS, itemstack)
 //			this.b(world, blockposition, iblockdata, i)
 //		}
+	}
+
+	override fun displayBreakParticles(block: Block, particle: MaterialData) {
+		val id = (particle.data.toInt() shl 12) or particle.itemType.id
+		val position = BlockPosition(block.x, block.y, block.z)
+
+		val packet = PacketPlayOutWorldEvent(2001, position, id, false)
+		block.world.getNearbyEntities(block.location, 20.0, 20.0, 20.0)
+				.filterIsInstance<CraftPlayer>()
+				.forEach { it.handle.playerConnection.sendPacket(packet) }
 	}
 
 	override fun crack(block: Block, percent: Float) {

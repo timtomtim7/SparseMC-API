@@ -5,6 +5,7 @@ import blue.sparse.minecraft.nms.NMSModule
 import blue.sparse.minecraft.nms.block.BlockSnapshot
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import org.bukkit.material.MaterialData
 
 //TODO: potentially a `toNBT`
 
@@ -35,4 +36,8 @@ fun Block.getDropsWithEnchanted(item: ItemStack?): List<ItemStack>? {
 
 fun Block.crack(percent: Float) {
 	NMSModule.blockNMS.crack(this, percent)
+}
+
+fun Block.displayBreakParticles(particle: MaterialData = MaterialData(type, data)) {
+	NMSModule.blockNMS.displayBreakParticles(this, particle)
 }

@@ -42,8 +42,8 @@ val locationConverter = NBTConverter.of(
 					it.double("x"),
 					it.double("y"),
 					it.double("z"),
-					it.float("pitch"),
-					it.float("yaw")
+					it.float("yaw"),
+					it.float("pitch")
 			)
 		}
 )
