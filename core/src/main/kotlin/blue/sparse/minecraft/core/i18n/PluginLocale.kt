@@ -1,5 +1,6 @@
 package blue.sparse.minecraft.core.i18n
 
+import blue.sparse.minecraft.core.extensions.color
 import blue.sparse.minecraft.core.extensions.colored
 import org.bukkit.ChatColor
 import org.bukkit.plugin.Plugin

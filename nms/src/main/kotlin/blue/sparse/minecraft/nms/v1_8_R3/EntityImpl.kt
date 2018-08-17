@@ -46,7 +46,7 @@ class EntityImpl : EntityNMS {
 
 		EntityLiving::class.java.getDeclaredMethod("getRareDrop")
 				.apply { isAccessible = true }
-				.invoke(entityLiving, false, lootingLevel)
+				.invoke(entityLiving)
 
 		val drops = dropsField[entityLiving] as? ArrayList<ItemStack> ?: return null
 

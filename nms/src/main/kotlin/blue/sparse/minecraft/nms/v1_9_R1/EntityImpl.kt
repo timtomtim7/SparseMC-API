@@ -2,6 +2,7 @@ package blue.sparse.minecraft.nms.v1_9_R1
 
 import blue.sparse.minecraft.core.data.nbt.Compound
 import blue.sparse.minecraft.nms.api.EntityNMS
+import net.minecraft.server.v1_9_R1.DamageSource
 import net.minecraft.server.v1_9_R1.EntityHuman
 import net.minecraft.server.v1_9_R1.EntityLiving
 import net.minecraft.server.v1_9_R1.NBTTagCompound
@@ -31,24 +32,24 @@ class EntityImpl: EntityNMS {
 	override fun getDrops(entity: Entity, item: ItemStack?, killer: LivingEntity?): List<ItemStack>? {
 		val entityLiving = (entity as CraftEntity).handle as? EntityLiving ?: return null
 		val lootingLevel = item?.getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS) ?: 0
+		val entityLivingClazz = EntityLiving::class.java
 
-		entityLiving.killer = (killer as? CraftHumanEntity)?.handle
+		val damageSource =
+				if (killer != null && killer is CraftHumanEntity)
+					DamageSource.playerAttack(killer.handle)
+				else
+					DamageSource.GENERIC
 
-		val dropsField = EntityLiving::class.java.getDeclaredField("drops").apply { isAccessible = true }
+		val dropsField = entityLivingClazz.getDeclaredField("drops").apply { isAccessible = true }
 		dropsField[entityLiving] = ArrayList<ItemStack>()
 
-		for (methodName in listOf("dropDeathLoot", "dropEquipment")) {
-			val method = EntityLiving::class.java
-					.getDeclaredMethod(methodName, Boolean::class.java, Int::class.javaPrimitiveType)
-					.apply {
-						isAccessible = true
-					}
-
-			method(entityLiving, false, lootingLevel)
-		}
+		val aMethod = entityLivingClazz.getDeclaredMethod("a",
+				Boolean::class.java,
+				Int::class.java,
+				DamageSource::class.java).apply { isAccessible = true }
+		aMethod(entityLiving, false, lootingLevel, damageSource)
 
 		val drops = dropsField[entityLiving] as? ArrayList<ItemStack> ?: return null
-
 		dropsField[entityLiving] = null
 		return drops
 	}

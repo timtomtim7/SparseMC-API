@@ -7,4 +7,5 @@ dependencies {
     compileOnly project(':core')
     compileOnly project(':nms')
     compileOnly project(':persistent')
+    compileOnly project(':scheduler')
 }

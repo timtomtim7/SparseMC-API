@@ -28,25 +28,25 @@ class EntityImpl : EntityNMS {
 	override fun getDrops(entity: Entity, item: ItemStack?, killer: LivingEntity?): List<ItemStack>? {
 		val entityLiving = (entity as CraftEntity).handle as? EntityLiving ?: return null
 		val lootingLevel = item?.getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS) ?: 0
+		val entityLivingClazz = EntityLiving::class.java
 
-		entityLiving.killer = (killer as? CraftHumanEntity)?.handle
+		val damageSource =
+				if (killer != null && killer is CraftHumanEntity)
+					DamageSource.playerAttack(killer.handle)
+				else
+					DamageSource.GENERIC
 
-		val dropsField = EntityLiving::class.java.getDeclaredField("drops").apply { isAccessible = true }
+		val dropsField = entityLivingClazz.getDeclaredField("drops").apply { isAccessible = true }
 		dropsField[entityLiving] = ArrayList<ItemStack>()
 
-		for (methodName in listOf("dropDeathLoot", "dropEquipment")) {
+		val aMethod = entityLivingClazz.getDeclaredMethod("a",
+				Boolean::class.java,
+				Int::class.java,
+				DamageSource::class.java).apply { isAccessible = true }
 
-			val method = EntityLiving::class.java
-					.getDeclaredMethod(methodName, Boolean::class.java, Int::class.javaPrimitiveType)
-					.apply {
-						isAccessible = true
-					}
-
-			method(entityLiving, false, lootingLevel)
-		}
+		aMethod(entityLiving, false, lootingLevel, damageSource)
 
 		val drops = dropsField[entityLiving] as? ArrayList<ItemStack> ?: return null
-
 		dropsField[entityLiving] = null
 		return drops
 	}
