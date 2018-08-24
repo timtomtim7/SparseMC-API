@@ -16,7 +16,7 @@ fun ItemMeta.displayName(vararg parts: Any?) {
 }
 
 fun ItemMeta.appendLore(vararg parts: Any?) {
-	val newLore = (lore as? MutableList<String> ?: lore?.toMutableList() ?: ArrayList<String>())
+	val newLore = (lore as? MutableList<String> ?: lore?.toMutableList() ?: ArrayList())
 	newLore.addAll(parts.joinToString("").split("\n"))
 	lore = newLore
 }

@@ -29,4 +29,9 @@ object ScriptingModule : Module {
 
 		ChatScriptListener
 	}
+
+	object Config: FileConfig(File(plugin.dataFolder, "scripting.cfg")) {
+		val enableChatScripting by true
+		val chatScriptDefaultsToOperators by false
+	}
 }

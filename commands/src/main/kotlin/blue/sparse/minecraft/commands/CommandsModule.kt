@@ -72,6 +72,9 @@ object CommandsModule : Module, Listener {
 	}
 
 	fun registerCommands(plugin: Plugin, clazz: KClass<*>) {
+//		CommandReflectionLoader.loadBukkitCommands(plugin, clazz).forEach {
+//			registerCommand(plugin, it)
+//		}
 		OldCommandReflectionLoader.scan(plugin, clazz).forEach {
 			registerCommand(plugin, it)
 		}

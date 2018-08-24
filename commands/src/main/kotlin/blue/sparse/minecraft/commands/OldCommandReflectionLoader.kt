@@ -61,11 +61,11 @@ object OldCommandReflectionLoader {
 		return object : org.bukkit.command.Command(
 				data.name,
 				data.description,
-				data.usage,
+				"/${data.name} [args]",
 				data.aliases
 		) {
 			override fun execute(sender: CommandSender, commandLabel: String, args: Array<out String>): Boolean {
-				val context = Execute(data, sender, args)
+				val context = Execute(data.name, data.plugin, sender, args)
 
 				val permission = data.permission
 				if(permission != null && !sender.hasPermission(permission)) {
@@ -100,7 +100,7 @@ object OldCommandReflectionLoader {
 			override fun tabComplete(sender: CommandSender, alias: String, args: Array<out String>): MutableList<String> {
 				if (tab == null)
 					return ArrayList()
-				val context = TabComplete(data, sender, args)
+				val context = TabComplete(data.name, data.plugin, sender, args)
 				//TODO: Make more efficient?
 				return (tab.call(holder, context) as Collection<*>).mapTo(ArrayList(), Any?::toString)
 			}
@@ -125,7 +125,7 @@ object OldCommandReflectionLoader {
 	}
 
 	private fun sendErrorMessage(context: Execute, params: List<KParameter>, failedAt: KParameter) {
-		val message = context.locale["error.command.${context.command.name}.${failedAt.name}", emptyMap()]
+		val message = context.locale["error.command.${context.commandName}.${failedAt.name}", emptyMap()]
 		if (message != null) {
 			context.replyRaw(message)
 			return
@@ -150,7 +150,7 @@ object OldCommandReflectionLoader {
 			args.append(' ')
 		}
 
-		context.replyRaw(ChatColor.GRAY, ChatColor.BOLD, "Usage: ", ChatColor.LIGHT_PURPLE, '/', context.command.name, ' ', args)
+		context.replyRaw(ChatColor.GRAY, ChatColor.BOLD, "Usage: ", ChatColor.LIGHT_PURPLE, '/', context.commandName, ' ', args)
 		context.replyRaw(ChatColor.GRAY, ChatColor.BOLD, "Expected: ", ChatColor.RED, failedAt.name!!)
 	}
 
@@ -201,17 +201,14 @@ object OldCommandReflectionLoader {
 	}
 
 	private fun getAnnotationData(plugin: Plugin, originalName: String, element: KAnnotatedElement): Command {
-
 		val name = element.findAnnotation<Command.Name>()?.name ?: originalName
 		val aliases = element.findAnnotation<Command.Aliases>()?.aliases?.toList() ?: emptyList()
 		val description = element.findAnnotation<Command.Description>()?.description ?: ""
-		val usage = element.findAnnotation<Command.Usage>()?.usage ?: "/$name"
 		val permission = element.findAnnotation<Command.Permission>()?.permission
 
 		val default = element.findAnnotation<Command.Default>() != null
 
-		return Command(plugin, name, aliases, description, usage, permission)
-
+		return Command(plugin, name, aliases, description, permission, default)
 	}
 
 }

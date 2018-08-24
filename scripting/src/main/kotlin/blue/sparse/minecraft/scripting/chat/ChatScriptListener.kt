@@ -4,6 +4,7 @@ import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.event.cancel
 import blue.sparse.minecraft.core.extensions.sendColoredMessage
 import blue.sparse.minecraft.core.extensions.server
+import blue.sparse.minecraft.scripting.ScriptingModule
 import blue.sparse.minecraft.scripting.kotlin.old.KotlinScriptManager
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
@@ -11,12 +12,14 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionDefault
+import java.io.File
 
 object ChatScriptListener : Listener {
 
 	val permission = Permission(
 			"sparsemc.api.scripting",
-			PermissionDefault.FALSE
+			if (ScriptingModule.Config.chatScriptDefaultsToOperators) PermissionDefault.OP
+			else PermissionDefault.FALSE
 	)
 
 	private val pluginJars = SparseMCAPIPlugin.getPlugin()
@@ -36,8 +39,8 @@ object ChatScriptListener : Listener {
 
 	@EventHandler
 	fun onPlayerChat(e: AsyncPlayerChatEvent) {
-//		if (!ScriptingModule.Config.enableChatScripting)
-//			return
+		if (!ScriptingModule.Config.enableChatScripting)
+			return
 
 		val message = e.message
 		if (!message.startsWith("$"))
@@ -48,11 +51,16 @@ object ChatScriptListener : Listener {
 
 		e.cancel()
 		val code = message.removePrefix("$")
+		val file = File("scripts/$code").takeIf { it.exists() }
 		val scheduler = Bukkit.getScheduler()
 		val plugin = SparseMCAPIPlugin.getPlugin()
 		scheduler.runTaskAsynchronously(plugin) {
 			val compiled = try {
-				manager.getOrCompile(code)
+				if(file != null) {
+					manager.getOrCompile(file)
+				}else{
+					manager.getOrCompile(code)
+				}
 			} catch (t: Throwable) {
 				System.err.println("Error compiling chat script:")
 				t.printStackTrace()

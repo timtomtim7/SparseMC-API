@@ -8,20 +8,16 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 
 sealed class CommandContext(
-		val command: Command,
+		val commandName: String,
+		val plugin: Plugin,
 		val sender: CommandSender,
 		val rawArgs: Array<out String>
 ) {
-
-	val plugin: Plugin
-		get() = command.plugin
-
 	val locale: PluginLocale
 		get() = (sender as? Player)?.getPluginLocale(plugin) ?: PluginLocale.default(plugin)
-
 }
 
-class Execute(command: Command, sender: CommandSender, rawArgs: Array<out String>) : CommandContext(command, sender, rawArgs) {
+class Execute(commandName: String, plugin: Plugin, sender: CommandSender, rawArgs: Array<out String>) : CommandContext(commandName, plugin, sender, rawArgs) {
 
 	fun error(): Nothing = throw ContextEscape()
 
@@ -54,6 +50,6 @@ class Execute(command: Command, sender: CommandSender, rawArgs: Array<out String
 	}
 }
 
-class TabComplete(command: Command, sender: CommandSender, rawArgs: Array<out String>) : CommandContext(command, sender, rawArgs)
+class TabComplete(commandName: String, plugin: Plugin, sender: CommandSender, rawArgs: Array<out String>) : CommandContext(commandName, plugin, sender, rawArgs)
 
 internal class ContextEscape: Throwable()

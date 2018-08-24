@@ -1,11 +1,29 @@
 package blue.sparse.minecraft.commands.test
 
-import blue.sparse.minecraft.commands.Execute
-import blue.sparse.minecraft.core.extensions.server
-import blue.sparse.minecraft.plugin.*
-import org.bukkit.ChatColor
+import blue.sparse.minecraft.commands.*
 
 object TestCommands {
+
+	fun Execute.test(number: Int) {
+		replyRaw("2 * $number = ${2 * number}")
+	}
+
+	fun Execute.test(hello: String) {
+		replyRaw("Hello: $hello!")
+	}
+
+	object GroupTest: CommandGroup {
+		@Command.Default
+		fun Execute.a() = replyRaw("This is A!")
+
+		fun Execute.b() = replyRaw("This is B!")
+		fun Execute.c() = replyRaw("This is C!")
+
+		object Hello: CommandGroup {
+			fun Execute.world() = replyRaw("Hello, world!")
+			fun Execute.me() = replyRaw("Hello, ${sender.name}!")
+		}
+	}
 
 //	fun Execute.sparseReload(pluginName: String) {
 //		if (!sender.hasPermission("sparsemcapi.reload.plugin"))
