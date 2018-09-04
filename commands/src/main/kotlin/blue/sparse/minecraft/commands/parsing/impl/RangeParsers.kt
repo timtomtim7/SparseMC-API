@@ -13,13 +13,13 @@ class RangeParser<V: Comparable<V>, R: ClosedRange<V>>(
 	@Suppress("UNCHECKED_CAST")
 	override fun parse(target: KClass<*>, iterator: CharIterator): Any {
 		val a = Parser.parse(rangeType, iterator)
-		println(a)
+//		println(a)
 
 		if(!iterator.hasNext() || iterator.next() != ':')
 			throw ParseFailException()
 
 		val b = Parser.parse(rangeType, iterator)
-		println(b)
+//		println(b)
 
 		if(a == null/* || !rangeType.isInstance(a)*/)
 			throw ParseFailException()
