@@ -1,6 +1,5 @@
 package blue.sparse.minecraft.core.i18n
 
-import blue.sparse.minecraft.core.extensions.color
 import blue.sparse.minecraft.core.extensions.colored
 import org.bukkit.ChatColor
 import org.bukkit.plugin.Plugin
@@ -43,6 +42,56 @@ class PluginLocale private constructor(
 	}
 
 	operator fun get(key: String, placeholders: Map<String, Any>): String? {
+		val splits = key.split(".")
+
+		val original = getNoWildcard(key, placeholders)
+		if(original != null)
+			return original
+
+		for(i in splits.indices) {
+			val builder = StringBuilder()
+
+			for(j in splits.indices) {
+				if(builder.isNotEmpty())
+					builder.append('.')
+				if(j == i)
+					builder.append('*')
+				else
+					builder.append(splits[j])
+			}
+
+			val result = getNoWildcard(builder.toString(), placeholders)
+			if(result != null)
+				return result
+		}
+
+//		server.logger.warning("${plugin.name} missing locale entry \"$key\" for language $code.")
+
+//		for(i in splits.size - 1 downTo 0) {
+//			val builder = StringBuilder()
+//
+//			for(j in 0..i) {
+//				builder.append(splits[j])
+//				if(builder.isNotEmpty())
+//					builder.append('.')
+//			}
+//
+//			if(i < splits.size - 1)
+//				builder.append(".*")
+//
+//			val result = getNoWildcard(key, placeholders)
+//			if(result != null)
+//				return result
+//		}
+
+		return null
+	}
+
+	operator fun get(key: String, vararg placeholders: Pair<String, Any>): String? {
+		return get(key, placeholders.toMap())
+	}
+
+	fun getNoWildcard(key: String, placeholders: Map<String, Any>): String? {
 		val localized = storage[key] as? String ?: return null//"MISSING_LOCALE_KEY[$key]"
 
 		val result = StringBuilder()
@@ -67,10 +116,6 @@ class PluginLocale private constructor(
 
 		//TODO: Should this stay `colored`?
 		return result.toString().colored
-	}
-
-	operator fun get(key: String, vararg placeholders: Pair<String, Any>): String? {
-		return get(key, placeholders.toMap())
 	}
 
 	private fun getPlaceholderValue(key: String, placeholders: Map<String, Any>): String {

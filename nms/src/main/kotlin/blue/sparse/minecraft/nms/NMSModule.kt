@@ -3,7 +3,6 @@ package blue.sparse.minecraft.nms
 import blue.sparse.minecraft.core.data.nbt.converter.NBTConverter
 import blue.sparse.minecraft.module.*
 import blue.sparse.minecraft.nms.api.*
-import blue.sparse.minecraft.nms.extensions.getDrops
 import blue.sparse.minecraft.nms.extensions.nbt
 import blue.sparse.minecraft.nms.util.ItemStackConverter
 import org.bukkit.Material
@@ -24,6 +23,7 @@ object NMSModule : Module, Listener {
 	val blockNMS = create("BlockImpl") as BlockNMS
 	val entityNMS = create("EntityImpl") as EntityNMS
 	val characterNMS = create("CharacterImpl") as CharacterNMS
+	val chatNMS = create("ChatImpl") as ChatNMS
 
 	override fun onEnable() {
 		println("NMSModule enabled with ${nmsHandlers.size} NMS handlers.")

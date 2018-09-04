@@ -7,6 +7,8 @@ import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 
 class ItemStackImpl : ItemStackNMS {
+	private val nbtLorePrefix = "\u1710"
+
 	private val craftMetaItemClass by lazy { Class.forName("org.bukkit.craftbukkit.v1_7_R4.inventory.CraftMetaItem") }
 
 	override fun getNBT(item: ItemStack): Compound {
@@ -21,8 +23,27 @@ class ItemStackImpl : ItemStackNMS {
 
 	override fun setNBT(item: ItemStack, compound: Compound) {
 		val nmsItem = CraftItemStack.asNMSCopy(item)
-		nmsItem.tag = NBTUtil.valueToNBTBase(compound) as NBTTagCompound
+		val nmsTag = NBTUtil.valueToNBTBase(compound) as NBTTagCompound
+		nmsItem.tag = nmsTag
 		item.itemMeta = CraftItemStack.getItemMeta(nmsItem)
+//		val meta = CraftItemStack.getItemMeta(nmsItem)
+//
+//		val newLore: MutableList<String>
+//
+//		val existingLore = meta.lore
+//		if(existingLore != null) {
+//			newLore = existingLore.toMutableList()
+//			newLore.removeAll { it.startsWith(nbtLorePrefix) }
+//		}else{
+//			newLore = ArrayList()
+//		}
+//
+//		val bytes = NBTCompressedStreamTools.a(nmsTag)
+//		val string = Base64.getEncoder().encodeToString(bytes)
+//		newLore.add("$nbtLorePrefix$string")
+//
+//		meta.lore = newLore
+//		item.itemMeta = meta
 	}
 
 	override fun toNBT(item: ItemStack): Compound {

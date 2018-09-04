@@ -22,12 +22,20 @@ class PluginPersistent(
 
 		private val plugins = WeakHashMap<Plugin, PluginPersistent>()
 
+		// Plugin persistent was in the wrong folder, so this...
+		private val oldFolder: File
+			get() = File(super.folder, "players")
+
 		override val folder: File
-			get() = File(super.folder, "players").apply { mkdirs() }
+			get() = super.folder.apply { mkdirs() }
 
 		override fun get(value: Plugin): Persistent<Plugin> {
 			return plugins.getOrPut(value) {
-				val file = File(folder, "${value.name}.dat")
+				val fileName = "${value.name}.dat"
+				val oldFile = File(oldFolder, fileName)
+				val file = File(folder, fileName)
+				if(oldFile.exists())
+					oldFile.renameTo(file)
 				PluginPersistent(this, value, Compound.readOrCreate(file))
 			}
 		}

@@ -8,18 +8,20 @@ object TestCommands {
 		replyRaw("2 * $number = ${2 * number}")
 	}
 
-	fun Execute.test(hello: String) {
-		replyRaw("Hello: $hello!")
-	}
+//	fun Execute.test() {
+//		val player = sender as Player
+//
+//		replyRaw("Hello: $hello!")
+//	}
 
-	object GroupTest: CommandGroup {
+	object GroupTest : CommandGroup {
 		@Command.Default
 		fun Execute.a() = replyRaw("This is A!")
 
 		fun Execute.b() = replyRaw("This is B!")
 		fun Execute.c() = replyRaw("This is C!")
 
-		object Hello: CommandGroup {
+		object Hello : CommandGroup {
 			fun Execute.world() = replyRaw("Hello, world!")
 			fun Execute.me() = replyRaw("Hello, ${sender.name}!")
 		}

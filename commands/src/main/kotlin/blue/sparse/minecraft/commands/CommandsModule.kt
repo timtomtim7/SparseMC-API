@@ -3,7 +3,6 @@ package blue.sparse.minecraft.commands
 import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.commands.parsing.Parser
 import blue.sparse.minecraft.commands.parsing.impl.*
-import blue.sparse.minecraft.commands.test.TestCommands
 import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.module.*
 import blue.sparse.minecraft.util.castDeclaredField
@@ -28,7 +27,7 @@ object CommandsModule : Module, Listener {
 	override fun onEnable() {
 		server.pluginManager.registerEvents(this, SparseMCAPIPlugin.getPlugin())
 		registerDefaultParsers()
-		registerCommands(SparseMCAPIPlugin.getPlugin(), TestCommands)
+//		registerCommands(SparseMCAPIPlugin.getPlugin(), TestCommands)
 	}
 
 	override fun onDisable() {
@@ -57,7 +56,8 @@ object CommandsModule : Module, Listener {
 				QuotedStringParser,
 				EitherParser,
 				playerParser,
-				worldParser
+				worldParser,
+				intRangeParser
 //				offlinePlayerParser
 		)
 	}
@@ -72,12 +72,12 @@ object CommandsModule : Module, Listener {
 	}
 
 	fun registerCommands(plugin: Plugin, clazz: KClass<*>) {
-//		CommandReflectionLoader.loadBukkitCommands(plugin, clazz).forEach {
-//			registerCommand(plugin, it)
-//		}
-		OldCommandReflectionLoader.scan(plugin, clazz).forEach {
+		CommandReflectionLoader.loadBukkitCommands(plugin, clazz).forEach {
 			registerCommand(plugin, it)
 		}
+//		OldCommandReflectionLoader.scan(plugin, clazz).forEach {
+//			registerCommand(plugin, it)
+//		}
 	}
 
 	private fun registerCommand(plugin: Plugin, command: Command) {

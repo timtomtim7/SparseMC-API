@@ -2,10 +2,15 @@ package blue.sparse.minecraft.commands
 
 import blue.sparse.minecraft.commands.parsing.CharIterator
 import blue.sparse.minecraft.commands.parsing.Parser
+import blue.sparse.minecraft.core.extensions.getPluginLocale
 import blue.sparse.minecraft.core.extensions.sendMessage
+import blue.sparse.minecraft.core.i18n.PluginLocale
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
+import org.bukkit.permissions.Permissible
 import org.bukkit.plugin.Plugin
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.jvmErasure
@@ -17,12 +22,11 @@ object CommandReflectionLoader {
 			clazz: KClass<*>,
 			parent: Any? = clazz.objectInstance
 	): Collection<BukkitCommand> {
-
-		return (generateIntermediates(plugin, parent, clazz)).map(this::createBukkitCommand)
+		return (generateIntermediates(null, plugin, parent, clazz)).map { createBukkitCommand(plugin, it) }
 	}
 
-	private fun createBukkitCommand(command: IntermediateCommand): BukkitCommand {
-		return object: BukkitCommand(
+	private fun createBukkitCommand(plugin: Plugin, command: IntermediateCommand): BukkitCommand {
+		return object : BukkitCommand(
 				command.primaryName,
 				"",
 				"",
@@ -30,27 +34,53 @@ object CommandReflectionLoader {
 		) {
 			override fun execute(sender: CommandSender, alias: String?, args: Array<out String>): Boolean {
 				val result = command.execute(sender, args.joinToString(" "))
+				val locale = (sender as? Player)?.getPluginLocale(plugin) ?: PluginLocale.default(plugin)
+
 				when (result) {
 					is ExecuteResult.Success -> return true
 					is ExecuteResult.FailedError -> {
-						sender.sendMessage(ChatColor.RED, "An internal error occurred while attempting to execute this command.")
+						val message = locale["error.command.${command.primaryName}.internalError"]
+							?: "${ChatColor.RED}An internal error occurred while attempting to execute this command."
+						sender.sendMessage(message)
+						result.error.printStackTrace()
 					}
 					is ExecuteResult.FailedNoMatch -> {
-						if(result.parseFails.size == 1) {
-							sender.sendMessage(ChatColor.RED, "Invalid usage.")
-						}else{
-							sender.sendMessage(ChatColor.RED, "Invalid usage (overloads).")
-						}
-						for(error in result.parseFails) {
-							sender.sendMessage(error.signature)
+						for ((overload, error) in result.parseFails) {
+							val message = locale["error.command.${command.primaryName}.${error.failedAtName}"]
+							if(message != null) {
+								sender.sendMessage(message)
+							}else{
+								val usage = error.signature.errorString(error.failedAtName)
+								sender.sendMessage(
+										ChatColor.DARK_RED, ChatColor.BOLD, "Usage: ",
+										ChatColor.GREEN, '/', overload.fullName, ' ', usage
+								)
+							}
 						}
 					}
 					is ExecuteResult.FailedParse -> {
-						sender.sendMessage(ChatColor.RED, "Invalid usage.")
-						sender.sendMessage(result.fail.signature)
+						val message = locale["error.command.${command.primaryName}.${result.fail.failedAtName}"]
+						if(message != null) {
+							sender.sendMessage(message)
+						}else{
+							val usage = result.fail.signature.errorString(result.fail.failedAtName)
+							sender.sendMessage(
+									ChatColor.DARK_RED, ChatColor.BOLD, "Usage: ",
+									ChatColor.GREEN, '/', command.fullName, ' ', usage
+							)
+						}
 					}
 					is ExecuteResult.FailedNoSubcommand -> {
-						sender.sendMessage(ChatColor.RED, "Use a subcommand.")
+						val group = result.group
+						sender.sendMessage(ChatColor.DARK_RED, ChatColor.BOLD, "Commands:")
+						for (subcommand in group.commands) {
+							sender.sendMessage(ChatColor.RED, '/', subcommand.fullName)
+						}
+					}
+					is ExecuteResult.FailedNoPermission -> {
+						val message = locale["error.command.${command.primaryName}.internalError"]
+								?: "${ChatColor.RED}You do not have permission to run that command."
+						sender.sendMessage(message)
 					}
 				}
 
@@ -63,20 +93,20 @@ object CommandReflectionLoader {
 		}
 	}
 
-	private fun generateIntermediates(plugin: Plugin, parent: Any?, clazz: KClass<*>): List<IntermediateCommand> {
-		val overloads = groupOverloadedSingles(generateIntermediateSingles(plugin, parent, clazz))
-		val groups = generateIntermediateGroups(plugin, parent, clazz)
+	private fun generateIntermediates(parentCommand: IntermediateCommandGroup?, plugin: Plugin, parent: Any?, clazz: KClass<*>): List<IntermediateCommand> {
+		val overloads = groupOverloadedSingles(parentCommand, generateIntermediateSingles(parentCommand, plugin, parent, clazz))
+		val groups = generateIntermediateGroups(parentCommand, plugin, parent, clazz)
 
 		return overloads + groups
 	}
 
-	private fun generateIntermediateGroups(plugin: Plugin, parent: Any?, clazz: KClass<*>): List<IntermediateCommandGroup> {
+	private fun generateIntermediateGroups(parentCommand: IntermediateCommandGroup?, plugin: Plugin, parent: Any?, clazz: KClass<*>): List<IntermediateCommandGroup> {
 		val groupParents = clazz.nestedClasses.filter {
 			it.isSubclassOf(CommandGroup::class)
 		}.map {
 			it.objectInstance
 			val obj = it.objectInstance
-			if(obj != null) {
+			if (obj != null) {
 				obj
 			} else {
 				val constructor = it.constructors.first()
@@ -87,36 +117,46 @@ object CommandReflectionLoader {
 			}
 		}
 
-		return groupParents.map {
-			val data = getAnnotationData(plugin, it.javaClass.simpleName, it.javaClass.kotlin)
-			val intermediates = generateIntermediates(plugin, it, it::class)
-			IntermediateCommandGroup(data, intermediates, null)
+		return groupParents.map { groupParent ->
+			val data = getAnnotationData(plugin, groupParent.javaClass.simpleName, groupParent.javaClass.kotlin)
+			val intermediates = ArrayList<IntermediateCommand>()
+			val group = IntermediateCommandGroup(parent, data, intermediates, null, parentCommand)
+
+			intermediates.addAll(generateIntermediates(group, plugin, groupParent, groupParent::class))
+			val default: IntermediateCommand? = intermediates
+					.asSequence()
+					.filterIsInstance<IntermediateCommandGroup>()
+					.find { it.command.isDefaultOfGroup }
+					?: intermediates
+							.filterIsInstance<IntermediateCommandOverloads>()
+							.flatMap { it.commands }
+							.find { it.command.isDefaultOfGroup }
+			group.default = default
+
+			group
 		}
 	}
 
-	private fun groupOverloadedSingles(singles: Collection<IntermediateSingleCommand>): Collection<IntermediateCommandOverloads> {
+	private fun groupOverloadedSingles(parentCommand: IntermediateCommandGroup?, singles: Collection<IntermediateSingleCommand>): Collection<IntermediateCommandOverloads> {
 		val uniqueNames = singles.flatMap { it.names }
 		return uniqueNames.map { name ->
-			IntermediateCommandOverloads(name, singles.filter { name in it.names })
+			IntermediateCommandOverloads(name, singles.filter { name in it.names }, parentCommand)
 		}
 	}
 
-	private fun generateIntermediateSingles(plugin: Plugin, parent: Any?, clazz: KClass<*>): Collection<IntermediateSingleCommand> {
+	private fun generateIntermediateSingles(parentCommand: IntermediateCommandGroup?, plugin: Plugin, parent: Any?, clazz: KClass<*>): Collection<IntermediateSingleCommand> {
 		return clazz.declaredMemberExtensionFunctions.mapNotNull {
-			generateIntermediate(plugin, parent, it)
+			generateIntermediate(parentCommand, plugin, parent, it)
 		}
 	}
 
-	private fun generateIntermediate(plugin: Plugin, parent: Any?, function: KFunction<*>): IntermediateSingleCommand? {
+	private fun generateIntermediate(parentCommand: IntermediateCommandGroup?, plugin: Plugin, parent: Any?, function: KFunction<*>): IntermediateSingleCommand? {
 		if (function.extensionReceiverParameter?.type?.jvmErasure != Execute::class)
 			return null
 
 		val data = getAnnotationData(plugin, function.name, function)
-//		val types = function.valueParameters.map {
-//			it.name!! to it.type
-//		}.toMap()
 
-		return IntermediateSingleCommand(parent, data, Signature(function.valueParameters), function)
+		return IntermediateSingleCommand(parent, data, Signature(function.valueParameters), function, parentCommand)
 	}
 
 	private fun getAnnotationData(plugin: Plugin, originalName: String, element: KAnnotatedElement): Command {
@@ -131,25 +171,34 @@ object CommandReflectionLoader {
 	}
 
 	data class IntermediateCommandGroup(
+			val parent: Any?,
 			val command: Command,
 			val commands: Collection<IntermediateCommand>,
-			val default: IntermediateCommand?
+			var default: IntermediateCommand?,
+			override var parentCommand: IntermediateCommandGroup?
 	) : IntermediateCommand {
 
 		override val names: List<String>
-			get() = command.aliases + command.name
+			get() = mutableListOf(command.name).apply { addAll(command.aliases) }
+
+		fun hasPermission(sender: Permissible): Boolean {
+			return command.permission == null || sender.hasPermission(command.permission)
+		}
 
 		override fun execute(sender: CommandSender, raw: String): ExecuteResult {
+			if(!hasPermission(sender))
+				return ExecuteResult.FailedNoPermission(command.permission!!)
+
 			val targetName = raw.takeWhile { it != ' ' }
 			val extra = raw.removePrefix(targetName).trim()
 
 			return if (targetName.isBlank()) {
-				default?.execute(sender, extra) ?: ExecuteResult.FailedNoSubcommand
+				default?.execute(sender, extra) ?: ExecuteResult.FailedNoSubcommand(this)
 			} else {
 				val target = commands.find {
-					it.names.any { name -> targetName.equals(name, true)}
+					it.names.any { name -> targetName.equals(name, true) }
 				}
-				target?.execute(sender, extra) ?: ExecuteResult.FailedNoSubcommand
+				target?.execute(sender, extra) ?: ExecuteResult.FailedNoSubcommand(this)
 			}
 		}
 	}
@@ -170,7 +219,8 @@ object CommandReflectionLoader {
 	 */
 	data class IntermediateCommandOverloads(
 			val name: String,
-			val commands: Collection<IntermediateSingleCommand>
+			val commands: Collection<IntermediateSingleCommand>,
+			override var parentCommand: IntermediateCommandGroup?
 	) : IntermediateCommand {
 
 		override val names = listOf(name)
@@ -180,11 +230,14 @@ object CommandReflectionLoader {
 					.map { it to it.signature.parse(raw) }
 
 			val matches = parsed
+					.asSequence()
 					.filter { it.second is Signature.ParseResult.Success }
+					.filter { it.first.hasPermission(sender) }
 					.map { it.first to (it.second as Signature.ParseResult.Success) }
+					.toList()
 
 			if (matches.isEmpty())
-				return ExecuteResult.FailedNoMatch(parsed.map { it.second as Signature.ParseResult.Fail })
+				return ExecuteResult.FailedNoMatch(parsed.map { it.first to it.second as Signature.ParseResult.Fail }.toMap())
 
 			val (command, parseSuccess) = matches.minBy { it.second.extra.length }!!
 			return command.execute(sender, parseSuccess)
@@ -201,11 +254,12 @@ object CommandReflectionLoader {
 			val parent: Any?,
 			val command: Command,
 			val signature: Signature,
-			val function: KFunction<*>
+			val function: KFunction<*>,
+			override var parentCommand: IntermediateCommandGroup?
 	) : IntermediateCommand {
 
 		override val names: List<String>
-			get() = command.aliases + command.name
+			get() = mutableListOf(command.name).apply { addAll(command.aliases) }
 
 		override fun execute(sender: CommandSender, raw: String): ExecuteResult {
 			val args = signature.parse(raw)
@@ -215,9 +269,16 @@ object CommandReflectionLoader {
 			}
 		}
 
+		fun hasPermission(sender: Permissible): Boolean {
+			return command.permission == null || sender.hasPermission(command.permission)
+		}
+
 		fun execute(sender: CommandSender, args: Signature.ParseResult.Success): ExecuteResult {
 			if (args.signature != signature)
 				throw IllegalArgumentException("Command arguments provided with wrong signature")
+
+			if(!hasPermission(sender))
+				return ExecuteResult.FailedNoPermission(command.permission!!)
 
 			val params = HashMap<KParameter, Any?>()
 			function.instanceParameter?.let { params[it] = parent }
@@ -226,14 +287,14 @@ object CommandReflectionLoader {
 			params[function.extensionReceiverParameter!!] = context
 
 			params += args.values
-//			params += function.parameters.map {
-//				it to args.values[it.name]
-//			}.filter { it.second != null }
-
 			try {
 				function.callBy(params)
 			} catch (t: Throwable) {
-				return ExecuteResult.FailedError(t)
+				return if (t is ContextEscape || (t is InvocationTargetException && t.targetException is ContextEscape)) {
+					ExecuteResult.Success(args.extra)
+				} else {
+					ExecuteResult.FailedError(t)
+				}
 			}
 
 			return ExecuteResult.Success(args.extra)
@@ -246,14 +307,29 @@ object CommandReflectionLoader {
 		val aliases get() = names - primaryName
 		val names: List<String>
 
+		var parentCommand: IntermediateCommandGroup?
+
+		val fullName: String
+			get() {
+				return buildString {
+					val parent = parentCommand
+					if (parent != null) {
+						append(parent.fullName)
+						append(' ')
+					}
+					append(primaryName)
+				}
+			}
+
 		fun execute(sender: CommandSender, raw: String): ExecuteResult
 	}
 
 	sealed class ExecuteResult {
 		data class FailedParse(val fail: Signature.ParseResult.Fail) : ExecuteResult()
 		data class FailedError(val error: Throwable) : ExecuteResult()
-		data class FailedNoMatch(val parseFails: Collection<Signature.ParseResult.Fail>) : ExecuteResult()
-		object FailedNoSubcommand : ExecuteResult()
+		data class FailedNoMatch(val parseFails: Map<IntermediateCommand, Signature.ParseResult.Fail>) : ExecuteResult()
+		data class FailedNoSubcommand(val group: IntermediateCommandGroup) : ExecuteResult()
+		data class FailedNoPermission(val permission: String): ExecuteResult()
 		data class Success(val extra: String) : ExecuteResult()
 	}
 
@@ -281,7 +357,6 @@ object CommandReflectionLoader {
 					}
 
 					result[param] = array
-//				result[param] = vararg.toArray()
 				} else {
 					val parsed = Parser.parse(param.type, iterator)
 					if (parsed == null) {
@@ -289,7 +364,6 @@ object CommandReflectionLoader {
 							continue
 						if (!param.type.isMarkedNullable)
 							return ParseResult.Fail(this, param.name!!)
-//							return Right(param)
 					}
 
 					result[param] = parsed
@@ -298,23 +372,12 @@ object CommandReflectionLoader {
 				iterator.takeWhile(Char::isWhitespace)
 			}
 			return ParseResult.Success(this, raw, result, iterator.takeWhile { true })
-
-//			val result = LinkedHashMap<String, Any?>()
-//			for((name, type) in types) {
-//
-//			}
-//			return ParseResult.Success(this, raw, emptyMap(), raw) //TODO
 		}
 
 		override fun toString(): String {
 			val args = StringBuilder()
 
 			for (param in params) {
-//				if (param == failedAt) {
-//					args.append(ChatColor.RED.toString())
-//				} else {
-//					args.append(ChatColor.LIGHT_PURPLE.toString())
-//				}
 
 				val optional = param.isOptional || param.type.isMarkedNullable || param.isVararg
 				if (optional) args.append('[') else args.append('<')
@@ -327,13 +390,35 @@ object CommandReflectionLoader {
 			}
 
 			return args.toString()
-
-//			context.replyRaw(ChatColor.GRAY, ChatColor.BOLD, "Usage: ", ChatColor.LIGHT_PURPLE, '/', context.commandName, ' ', args)
-//			context.replyRaw(ChatColor.GRAY, ChatColor.BOLD, "Expected: ", ChatColor.RED, failedAt.name!!)
 		}
 
 		fun errorString(failedAt: String): String {
-			return toString()
+			val args = StringBuilder()
+
+			var foundFail = false
+			for (param in params) {
+				when {
+					param.name == failedAt -> {
+						foundFail = true
+						args.append(ChatColor.RED.toString())
+						args.append(ChatColor.BOLD.toString())
+					}
+					foundFail -> args.append(ChatColor.RED.toString())
+					else -> args.append(ChatColor.GREEN.toString())
+				}
+
+				val optional = param.isOptional || param.type.isMarkedNullable || param.isVararg
+				if (optional) args.append('[') else args.append('<')
+				args.append(param.name)
+				if (param.isVararg)
+					args.append("...")
+				if (optional) args.append(']') else args.append('>')
+
+				args.append(ChatColor.RED.toString())
+				args.append(' ')
+			}
+
+			return args.toString()
 		}
 
 		sealed class ParseResult(val signature: Signature) {

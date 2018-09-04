@@ -28,12 +28,11 @@ interface NBTConverter<T : Any> {
 		private val registered = LinkedHashSet<NBTConverter<*>>()
 
 		init {
+			register(ReflectConverter)
 			register(uuidConverter)
 			register(offlinePlayerConverter)
 			register(worldConverter)
 			register(locationConverter)
-			
-			register(ReflectConverter)
 		}
 
 		fun register(converter: NBTConverter<*>): Boolean {
@@ -41,7 +40,7 @@ interface NBTConverter<T : Any> {
 		}
 
 		fun <T : Any> getConverter(clazz: KClass<T>): NBTConverter<T>? {
-			return registered.firstOrNull {
+			return registered.lastOrNull {
 				it.canConvert(clazz)
 			} as NBTConverter<T>
 		}

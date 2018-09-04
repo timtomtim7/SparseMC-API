@@ -2,6 +2,7 @@ package blue.sparse.minecraft.nms.particle
 
 import blue.sparse.minecraft.nms.NMSModule
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import kotlin.reflect.full.isSubclassOf
 
 sealed class ParticleType<T : ParticleInfo.ParticleInfoPart>(
@@ -69,11 +70,7 @@ sealed class ParticleType<T : ParticleInfo.ParticleInfoPart>(
 	object Totem : ParticleType<CountOffsetParticle>(47, "totem", ::CountOffsetParticle)
 	object Spit : ParticleType<CountOffsetParticle>(48, "spit", ::CountOffsetParticle)
 
-	fun byName(name: String): ParticleType<*>? {
-		return this::class.nestedClasses
-				.filter { it.isSubclassOf(ParticleType::class) }
-				.first { it.simpleName == name } as? ParticleType<*>
-	}
+	val isAvailable: Boolean get() = NMSModule.particleNMS.isAvailable(this)
 
 	fun spawn(location: Location, data: ParticleData = ParticleData()): Boolean {
 		val nms = NMSModule.particleNMS
@@ -86,5 +83,26 @@ sealed class ParticleType<T : ParticleInfo.ParticleInfoPart>(
 
 	inline fun spawn(location: Location, body: T.() -> Unit): Boolean {
 		return spawn(location, createParts(ParticleInfo()).apply(body).info.toParticleData())
+	}
+
+	fun spawn(player: Player, location: Location, data: ParticleData = ParticleData()): Boolean {
+		val nms = NMSModule.particleNMS
+		if (!nms.isAvailable(this))
+			return false
+
+		nms.spawn(this, player, location.toVector(), data)
+		return true
+	}
+
+	inline fun spawn(player: Player, location: Location, body: T.() -> Unit): Boolean {
+		return spawn(player, location, createParts(ParticleInfo()).apply(body).info.toParticleData())
+	}
+
+	companion object {
+		fun byName(name: String): ParticleType<*>? {
+			return this::class.nestedClasses
+					.filter { it.isSubclassOf(ParticleType::class) }
+					.first { it.simpleName == name } as? ParticleType<*>
+		}
 	}
 }
