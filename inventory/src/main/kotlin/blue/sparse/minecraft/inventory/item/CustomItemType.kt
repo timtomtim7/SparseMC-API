@@ -106,9 +106,9 @@ abstract class CustomItemType(
             return true
         }
 
-        operator fun get(id: String): CustomItemType? {
-            return registered[id]
-        }
+        fun unregister(type: CustomItemType) = registered.remove(type.id) != null
+
+        operator fun get(id: String) = registered[id]
 
         fun getType(item: ItemStack): CustomItemType? {
             if (item.notEmptyOrNull() == null)

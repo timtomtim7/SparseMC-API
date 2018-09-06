@@ -24,6 +24,6 @@ internal fun ClassLoader.classpath(): List<File> {
 	}
 }
 
-internal fun currentClasspath() = Thread.currentThread().contextClassLoader.classpath()
+fun currentClasspath() = Thread.currentThread().contextClassLoader.classpath()
 
 internal typealias JBCompiledScript = KotlinJsr223JvmScriptEngineBase.CompiledKotlinScript

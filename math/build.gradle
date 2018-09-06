@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
 	compileOnly project(':core')
-	compile "blue.sparse:sparse-math:+"
+	compile "blue.sparse:sparse-math:0.5"
 }
 
 jar {

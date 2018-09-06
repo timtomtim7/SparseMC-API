@@ -61,7 +61,6 @@ task copyToPlugins(type: Copy) {
 
 def testServersDir = file("F:/Spigot/Test Servers")
 
-
 for(file in testServersDir.listFiles()) {
 	def pluginsFolder = new File(file, "plugins")
 	def modulesFolder = new File(pluginsFolder, "SparseMC-API/modules")

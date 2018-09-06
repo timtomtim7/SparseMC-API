@@ -36,7 +36,9 @@ open class Character(
 		}
 
 	val nearbyPlayers: List<Player>
-		get() = location.world.getNearbyEntities(location, 50.0, 50.0, 50.0).filterIsInstance<Player>()
+		get() = location.world.entities
+				.filterIsInstance<Player>()
+				.filter { location.distanceSquared(it.location) <= 50*50 }
 
 	val equipment = Equipment()
 
