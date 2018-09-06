@@ -11,3 +11,9 @@ fun Player.menu(plugin: Plugin, rows: Int = 3, setup: Menu.() -> Unit): Menu {
 	player.openInventory(menu.inventory)
 	return menu
 }
+
+fun Player.menu(plugin: Plugin, rows: Int = 3, titleLocale: String, setup: Menu.() -> Unit): Menu {
+	val menu = Menu(plugin, this, rows).apply(setup).apply { title(titleLocale) }
+	player.openInventory(menu.inventory)
+	return menu
+}

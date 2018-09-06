@@ -1,9 +1,14 @@
 package blue.sparse.minecraft.inventory.extensions
 
+import blue.sparse.minecraft.core.extensions.getPluginLocale
+import blue.sparse.minecraft.core.i18n.PluginLocale
 import blue.sparse.minecraft.inventory.item.CustomItemType
+import blue.sparse.minecraft.plugin.SparsePlugin
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
+import org.bukkit.plugin.Plugin
 
 val ItemStack.customItemType: CustomItemType?
 	get() = CustomItemType.getType(this)
@@ -34,4 +39,37 @@ inline fun item(
 		body: ItemStack.() -> Unit = {}
 ): ItemStack {
 	return ItemStack(type, amount, damage).apply(body)
+}
+
+fun ItemStack.localize(
+		plugin: Plugin,
+		player: Player,
+		localizedName: String,
+		localizedNameReplacements: Map<String, Any>,
+		localizedLore: String,
+		localizedLoreReplacements: Map<String, Any>
+): ItemStack {
+	val locale = player.getPluginLocale(plugin)
+	return apply {
+		editMeta {
+			displayName = locale[localizedName, localizedNameReplacements]
+			lore = locale[localizedLore, localizedLoreReplacements]?.lines()
+		}
+	}
+}
+
+fun ItemStack.localize(
+		plugin: Plugin,
+		localizedName: String,
+		localizedNameReplacements: Map<String, Any>,
+		localizedLore: String,
+		localizedLoreReplacements: Map<String, Any>
+): ItemStack {
+	val locale = PluginLocale.default(plugin)
+	return apply {
+		editMeta {
+			displayName = locale[localizedName, localizedNameReplacements]
+			lore = locale[localizedLore, localizedLoreReplacements]?.lines()
+		}
+	}
 }
