@@ -2,6 +2,7 @@ package blue.sparse.minecraft.core.data.nbt.converter
 
 import blue.sparse.minecraft.core.data.nbt.Compound
 import blue.sparse.minecraft.core.data.nbt.NBTValue
+import blue.sparse.minecraft.core.data.nbt.converter.collection.CollectionConverter
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubclassOf
@@ -33,6 +34,8 @@ interface NBTConverter<T : Any> {
 			register(offlinePlayerConverter)
 			register(worldConverter)
 			register(locationConverter)
+			register(EnumConverter)
+			register(CollectionConverter)
 		}
 
 		fun register(converter: NBTConverter<*>): Boolean {

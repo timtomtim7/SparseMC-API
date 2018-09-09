@@ -26,8 +26,8 @@ val Block.hasNBT get() = NMSModule.blockNMS.hasNBT(this)
 val Block.snapshot: BlockSnapshot
 	get() {
 		if (hasNBT)
-			return BlockSnapshot(type, nbt)
-		return BlockSnapshot(type)
+			return BlockSnapshot(type, data, nbt)
+		return BlockSnapshot(type, data)
 	}
 
 fun Block.getDropsWithEnchanted(item: ItemStack?): List<ItemStack>? {
