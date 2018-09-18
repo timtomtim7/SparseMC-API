@@ -145,6 +145,8 @@ abstract class SparsePlugin : PluginBase(), PluginProvided<SparsePlugin> {
 		_pluginLoader = pluginLoader
 		this.classLoader = classLoader
 		_server = server
+
+
 	}
 
 	internal fun setEnabled(value: Boolean) {

@@ -45,6 +45,8 @@ internal sealed class NBTValue<T: Any>(val id: Int) {
 					val first = nonNull.first().javaClass
 					if(nonNull.any { it.javaClass != first })
 						return null
+					if(nonNull.any { toNBTValueOrNull(it) == null })
+						return null
 					//TODO: I think there is a bug here (if the list contains non-NBT primitive types)
 
 					NBTList(nonNull)

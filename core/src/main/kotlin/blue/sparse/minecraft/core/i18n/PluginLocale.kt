@@ -12,9 +12,13 @@ class PluginLocale private constructor(
 		override val region: String
 ): Locale {
 
-	private val storage: Properties
+	private var storage: Properties
 
 	init {
+		this.storage = load()
+	}
+
+	private fun load(): Properties {
 		val resourcePath = "lang/$code.lang"
 		val file = File(plugin.dataFolder, resourcePath)
 		val default = plugin.getResource(resourcePath)
@@ -38,7 +42,11 @@ class PluginLocale private constructor(
 
 		sources.forEach(Closeable::close)
 
-		this.storage = storage
+		return storage
+	}
+
+	fun reload() {
+		this.storage = load()
 	}
 
 	operator fun get(key: String, placeholders: Map<String, Any>): String? {
