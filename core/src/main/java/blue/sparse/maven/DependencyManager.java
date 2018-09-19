@@ -12,7 +12,38 @@ public final class DependencyManager {
 	
 	private DependencyManager() {}
 	
-	public static Map<MavenArtifact, File> downloadDependencies(Collection<MavenArtifact> projects, File folder) {
+	public static void updateAndLoadDependencies(Collection<MavenArtifact> projects, File folder) {
+		updateAndLoadDependencies(projects, new HashMap<>(), folder, getHighestClassLoader());
+	}
+	
+	public static void updateAndLoadDependencies(Collection<MavenArtifact> projects, Map<MavenArtifact, String> forceVersion, File folder, URLClassLoader classLoader) {
+		final Collection<File> dependencies = downloadDependencies(projects, forceVersion, folder).values();
+		for(File dependency : dependencies) {
+			try {
+				load(classLoader, dependency);
+			}catch(MalformedURLException | ReflectiveOperationException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static URLClassLoader getHighestClassLoader() {
+		final ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+		if(systemClassLoader instanceof URLClassLoader)
+			return (URLClassLoader) systemClassLoader;
+		
+		final ClassLoader classLoader = DependencyManager.class.getClassLoader();
+		final ClassLoader parent = classLoader.getParent();
+		if(parent instanceof URLClassLoader)
+			return (URLClassLoader) parent;
+		
+		if(classLoader instanceof URLClassLoader)
+			return (URLClassLoader) classLoader;
+		
+		return null;
+	}
+	
+	public static Map<MavenArtifact, File> downloadDependencies(Collection<MavenArtifact> projects, Map<MavenArtifact, String> forceVersion, File folder) {
 		folder.mkdirs();
 		
 		final Map<MavenArtifact, File> result = new HashMap<>();
@@ -33,12 +64,19 @@ public final class DependencyManager {
 			final Optional<File> closest = Arrays.stream(files).min(Comparator.comparingInt(v -> v.getName().compareTo(project.toString())));
 			
 			try {
+				final String forced = forceVersion.get(project);
 				if(closest.isPresent()) {
-					final File file = project.updateIfNeeded(closest.get());
+					final File file = project.updateIfNeeded(closest.get(), forced);
 					result.put(project, file);
 				}else {
-					final File file = new File(folder, project.getLatestFileName());
-					project.downloadLatest(file);
+					File file;
+					if(forced != null) {
+						file = new File(folder, project.getFileName(forced));
+						project.download(file, forced);
+					}else {
+						file = new File(folder, project.getLatestFileName());
+						project.downloadLatest(file);
+					}
 					result.put(project, file);
 				}
 			}catch(IOException e) {
@@ -47,25 +85,6 @@ public final class DependencyManager {
 		}
 		
 		return result;
-	}
-	
-	public static void updateAndLoadDependencies(Collection<MavenArtifact> projects, File folder) {
-		updateAndLoadDependencies(projects, folder, getClassLoader());
-	}
-	
-	public static void updateAndLoadDependencies(Collection<MavenArtifact> projects, File folder, URLClassLoader classLoader) {
-		final Collection<File> dependencies = downloadDependencies(projects, folder).values();
-		for(File dependency : dependencies) {
-			try {
-				load(classLoader, dependency);
-			}catch(MalformedURLException | ReflectiveOperationException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public static void load(File jar) throws MalformedURLException, ReflectiveOperationException {
-		load(getClassLoader(), jar);
 	}
 	
 	public static void load(URLClassLoader classLoader, File jar) throws MalformedURLException, ReflectiveOperationException {
@@ -78,19 +97,7 @@ public final class DependencyManager {
 		addURL.invoke(loader, url);
 	}
 	
-	private static URLClassLoader getClassLoader() {
-		final ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
-		if(systemClassLoader instanceof URLClassLoader)
-			return (URLClassLoader) systemClassLoader;
-		
-		final ClassLoader classLoader = DependencyManager.class.getClassLoader();
-		final ClassLoader parent = classLoader.getParent();
-		if(parent instanceof URLClassLoader)
-			return (URLClassLoader) parent;
-		
-		if(classLoader instanceof URLClassLoader)
-			return (URLClassLoader) classLoader;
-		
-		return null;
+	public static void load(File jar) throws MalformedURLException, ReflectiveOperationException {
+		load(getHighestClassLoader(), jar);
 	}
 }

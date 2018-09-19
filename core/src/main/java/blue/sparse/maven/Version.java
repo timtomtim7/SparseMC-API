@@ -58,7 +58,7 @@ public final class Version implements Comparable<Version> {
 	}
 	
 	public static Version fromString(@NotNull String string) {
-		int dashIndex = string.lastIndexOf('-');
+		int dashIndex = string.indexOf('-');
 		final String trimmed;
 		if(dashIndex == -1)
 			trimmed = string;

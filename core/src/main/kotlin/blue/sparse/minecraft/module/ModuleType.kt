@@ -27,6 +27,7 @@ enum class ModuleType {
 			val toDownload = values().filter { it != CORE }.map { it.artifact }
 			val depend = DependencyManager.downloadDependencies(
 					toDownload,
+					emptyMap(),
 					ModuleManager.modulesFolder
 			)
 

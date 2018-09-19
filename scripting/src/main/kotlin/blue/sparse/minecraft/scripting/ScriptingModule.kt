@@ -24,7 +24,12 @@ object ScriptingModule : Module {
 		val folder = SparseMCAPIPlugin.getDependenciesFolder()
 		DependencyManager.updateAndLoadDependencies(
 				listOf(scriptRuntime, compilerEmbeddable),
-				folder
+				mapOf(
+						compilerEmbeddable to "1.3-M2",
+						scriptRuntime to "1.3-M2"
+				),
+				folder,
+				DependencyManager.getHighestClassLoader()
 		)
 
 		ChatScriptListener

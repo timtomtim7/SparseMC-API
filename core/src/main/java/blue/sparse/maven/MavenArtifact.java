@@ -29,10 +29,8 @@ public class MavenArtifact {
 		return artifact;
 	}
 	
-	public File updateIfNeeded(File original) throws IOException {
+	public File updateIfNeeded(File original, String forceVersion) throws IOException {
 		final String name = original.getName();
-//		if(!name.startsWith(toString()))
-//			throw new IllegalArgumentException("Tried to update with file with different artifact.");
 		if(name.length() < artifact.length() + 2)
 			throw new IllegalArgumentException("File name did not contain version.");
 		
@@ -52,26 +50,37 @@ public class MavenArtifact {
 		Version currentVersion = Version.fromString(currentVersionString);
 		Version latestVersion = Version.fromString(latestVersionString);
 		
-		if(currentVersion.compareTo(latestVersion) >= 0)
+		if(forceVersion == null && currentVersion.compareTo(latestVersion) >= 0)
 			return original;
 		
-//		final String latestFileName = getLatestFileName();
-//		if(name.equals(latestFileName))
-//			return original;
-		
 		original.delete();
-		final File latestFile = new File(original.getParentFile(), getLatestFileName());
-		downloadLatest(latestFile);
-		return latestFile;
+		if(forceVersion != null) {
+			final File file = new File(original.getParentFile(), getFileName(forceVersion));
+			download(file, forceVersion);
+			return file;
+		}else{
+			final File latestFile = new File(original.getParentFile(), getLatestFileName());
+			downloadLatest(latestFile);
+			return latestFile;
+		}
 	}
 	
 	public String getLatestFileName() throws IOException {
-		return group + '-' + artifact + '$' + getLatestVersion() + ".jar";
+		return getFileName(getLatestVersion());
+	}
+	
+	public String getFileName(String version) {
+		return group + '-' + artifact + '$' + version + ".jar";
 	}
 	
 	public void downloadLatest(File target) throws IOException {
 		SparseMCAPIPlugin.getPlugin().getLogger().info("Downloading dependency -> "+group+":"+artifact);
 		MavenDownloader.downloadLatestJar(repo, group, artifact, target);
+	}
+	
+	public void download(File target, String version) throws IOException {
+		SparseMCAPIPlugin.getPlugin().getLogger().info("Downloading dependency -> "+group+":"+artifact);
+		MavenDownloader.downloadJar(repo, group, artifact, version, target);
 	}
 	
 	public String getLatestVersion() throws IOException {
