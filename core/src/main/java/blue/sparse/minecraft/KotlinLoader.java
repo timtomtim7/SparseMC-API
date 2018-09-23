@@ -42,10 +42,10 @@ public final class KotlinLoader {
 	static void load(File folder) {
 		final HashMap<MavenArtifact, String> forceVersions = new HashMap<>();
 		forceVersions.put(KOTLINX_COROUTINES_CORE, "0.26.0-eap13");
-		forceVersions.put(KOTLIN_STDLIB, "1.3-M2");
-		forceVersions.put(KOTLIN_STDLIB_JDK8, "1.3-M2");
-		forceVersions.put(KOTLIN_STDLIB_JDK7, "1.3-M2");
-		forceVersions.put(KOTLIN_REFLECT, "1.3-M2");
+		forceVersions.put(KOTLIN_STDLIB, "1.3-M1");
+		forceVersions.put(KOTLIN_STDLIB_JDK8, "1.3-M1");
+		forceVersions.put(KOTLIN_STDLIB_JDK7, "1.3-M1");
+		forceVersions.put(KOTLIN_REFLECT, "1.3-M1");
 		DependencyManager.updateAndLoadDependencies(dependencies, forceVersions, folder, DependencyManager.getHighestClassLoader());
 	}
 }

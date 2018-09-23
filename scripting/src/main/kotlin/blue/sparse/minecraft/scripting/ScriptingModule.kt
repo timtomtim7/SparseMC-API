@@ -22,17 +22,27 @@ object ScriptingModule : Module {
 		val scriptRuntime = MavenArtifact(KotlinLoader.KOTLIN_EAP_REPO, "org.jetbrains.kotlin", "kotlin-script-runtime")
 
 		val folder = SparseMCAPIPlugin.getDependenciesFolder()
-		DependencyManager.updateAndLoadDependencies(
-				listOf(scriptRuntime, compilerEmbeddable),
-				mapOf(
-						compilerEmbeddable to "1.3-M2",
-						scriptRuntime to "1.3-M2"
-				),
-				folder,
-				DependencyManager.getHighestClassLoader()
-		)
+		try {
+			DependencyManager.updateAndLoadDependencies(
+					listOf(scriptRuntime, compilerEmbeddable),
+					mapOf(
+							compilerEmbeddable to "1.3-M1",
+							scriptRuntime to "1.3-M1"
+					),
+					folder,
+					DependencyManager.getHighestClassLoader()
+			)
+		} catch (t: Throwable) {
+			DependencyManager.updateAndLoadDependencies(
+					listOf(scriptRuntime, compilerEmbeddable),
+					folder
+			)
+		}
 
 		ChatScriptListener
+//		server.scheduler.scheduleSyncDelayedTask(plugin) {
+//			ServerScriptManager.loadAllScripts()
+//		}
 	}
 
 	object Config: FileConfig(File(plugin.dataFolder, "scripting.cfg")) {

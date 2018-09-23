@@ -1,4 +1,4 @@
-ext.baseVer = '0.1'
+ext.baseVer = '0.2'
 apply from: "../common.gradle"
 
 group 'blue.sparse.minecraft'
@@ -6,7 +6,7 @@ group 'blue.sparse.minecraft'
 archivesBaseName = "SparseMC-API"
 
 dependencies {
-	compile "blue.sparse:sparse-data:1.1"
+	compile "blue.sparse:sparse-data:1.2"
 	compile "blue.sparse:sparse-utils:1.0-SNAPSHOT"
 }
 
