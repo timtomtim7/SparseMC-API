@@ -53,12 +53,15 @@ public class MavenArtifact {
 		if(forceVersion == null && currentVersion.compareTo(latestVersion) >= 0)
 			return original;
 		
-		original.delete();
 		if(forceVersion != null) {
+			if(forceVersion.equals(currentVersionString))
+				return original;
+			original.delete();
 			final File file = new File(original.getParentFile(), getFileName(forceVersion));
 			download(file, forceVersion);
 			return file;
 		}else{
+			original.delete();
 			final File latestFile = new File(original.getParentFile(), getLatestFileName());
 			downloadLatest(latestFile);
 			return latestFile;

@@ -4,21 +4,13 @@ import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.scripting.kotlin.KotlinCompilerManager
 import java.io.File
+import java.net.URLClassLoader
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.full.staticFunctions
 
 object ServerScriptManager {
 
-	private val pluginJars = SparseMCAPIPlugin.getPlugin()
-			.dataFolder.parentFile.listFiles().filter { it.extension == "jar" }
-
-	private val moduleJars = SparseMCAPIPlugin.getModulesFolder()
-			.listFiles().filter { it.extension == "jar" }
-
-	private val dependencyJars = SparseMCAPIPlugin.getDependenciesFolder()
-			.listFiles().filter { it.extension == "jar" }
-
-	val manager = KotlinCompilerManager.withMinecraftDependencies(ClassLoader.getSystemClassLoader())
+	val manager = KotlinCompilerManager.withMinecraftDependencies(URLClassLoader(emptyArray(), javaClass.classLoader))
 
 //	val manager = KotlinCompilerManager(
 //			pluginJars + moduleJars + dependencyJars,
@@ -49,7 +41,7 @@ object ServerScriptManager {
 				clazz.staticFunctions.find { it.name == "start" }?.call()
 			}
 			file.extension == "kts" -> {
-				val clazz = manager.compileScript(file)
+				val clazz = manager.compileScript(file, ServerScriptTemplate::class)
 				clazz.primaryConstructor?.call(server, SparseMCAPIPlugin.getPlugin())
 			}
 		}

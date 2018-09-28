@@ -91,7 +91,9 @@ open class Character(
 			respawn()
 		}
 
-		val notVisible = visibleTo.filterNot(Player::isOnline)
+		val notVisible = visibleTo.filter {
+			!it.isOnline || it.location.distanceSquared(location) >= 55.0 * 55.0
+		}
 		notVisible.forEach(handle::setInvisible)
 		visibleTo.removeAll(notVisible)
 

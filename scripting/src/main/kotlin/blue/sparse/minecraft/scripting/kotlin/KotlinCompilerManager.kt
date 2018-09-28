@@ -76,7 +76,7 @@ class KotlinCompilerManager(
 		val configuration = CompilerConfiguration()
 		configuration.addKotlinSourceRoot(file.absolutePath)
 		configuration.addJvmClasspathRoots(currentClasspath())
-		configuration.addJvmClasspathRoots(classPath)
+		configuration.addJvmClasspathRoots(classPath.map { it.absoluteFile })
 
 		configuration.put(JVMConfigurationKeys.JVM_TARGET, JvmTarget.JVM_1_8)
 		configuration.put(JVMConfigurationKeys.RETAIN_OUTPUT_IN_MEMORY, false)
@@ -92,7 +92,7 @@ class KotlinCompilerManager(
 		val configuration = CompilerConfiguration()
 		configuration.addKotlinSourceRoot(file.absolutePath)
 		configuration.addJvmClasspathRoots(currentClasspath())
-		configuration.addJvmClasspathRoots(classPath)
+		configuration.addJvmClasspathRoots(classPath.map { it.absoluteFile })
 
 		configuration.put(JVMConfigurationKeys.JVM_TARGET, JvmTarget.JVM_1_8)
 		configuration.put(JVMConfigurationKeys.RETAIN_OUTPUT_IN_MEMORY, false)

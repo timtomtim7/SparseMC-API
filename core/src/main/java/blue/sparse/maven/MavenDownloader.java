@@ -24,7 +24,7 @@ public final class MavenDownloader {
 	
 	public static void downloadJar(String repo, String group, String artifact, String version, File target) throws IOException {
 		final String url = buildMavenCentralURL(repo, group, artifact) + version + '/' + artifact + '-' + version + ".jar";
-		
+
 		download(url, target);
 	}
 	
