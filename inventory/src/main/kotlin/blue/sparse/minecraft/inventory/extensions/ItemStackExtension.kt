@@ -17,14 +17,17 @@ fun ItemStack?.notEmptyOrNull(): ItemStack? {
 	return if (this == null || this.type == Material.AIR) null else this
 }
 
-inline fun <R> ItemStack.editMeta(body: ItemMeta.() -> R): R {
-	val meta = itemMeta
-	val result = meta.run(body)
-	itemMeta = meta
+//inline fun <R> ItemStack.editMeta(body: ItemMeta.() -> R): R {
+//	val meta = itemMeta
+//	val result = meta.run(body)
+//	itemMeta = meta
+//
+//	return result
+//}
 
-	return result
+inline fun ItemStack.editMeta(body: ItemMeta.() -> Unit) {
+	itemMeta = itemMeta.apply(body)
 }
-
 inline fun <reified M : ItemMeta> ItemStack.editMetaTyped(body: M.() -> Unit) {
 	val meta = itemMeta as M
 	val result = meta.run(body)

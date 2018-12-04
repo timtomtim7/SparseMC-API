@@ -205,10 +205,10 @@ object OldCommandReflectionLoader {
 		val aliases = element.findAnnotation<Command.Aliases>()?.aliases?.toList() ?: emptyList()
 		val description = element.findAnnotation<Command.Description>()?.description ?: ""
 		val permission = element.findAnnotation<Command.Permission>()?.permission
-
+		val overwrite = element.findAnnotation<Command.Addon>() != null
 		val default = element.findAnnotation<Command.Default>() != null
 
-		return Command(plugin, name, aliases, description, permission, default)
+		return Command(plugin, name, aliases, description, permission, default, overwrite)
 	}
 
 }

@@ -8,4 +8,8 @@ class ChatImpl: ChatNMS {
 	override fun send(player: Player, text: Text) {
 		TODO("not implemented")
 	}
+
+	override fun sendTitle(player: Player, title: String, subtitle: String, fadein: Int, stay: Int, fadeout: Int) {
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
 }

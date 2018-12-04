@@ -8,7 +8,8 @@ data class Command(
 		val aliases: List<String>,
 		val description: String,
 		val permission: String?,
-		val isDefaultOfGroup: Boolean
+		val isDefaultOfGroup: Boolean,
+		val addon: Boolean
 ) {
 	@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 	annotation class Name(val name: String)
@@ -21,6 +22,14 @@ data class Command(
 
 	@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 	annotation class Permission(val permission: String)
+
+	/**
+	 * Used to forcefully add to commands that are already registered
+	 * by listening to the CommandPreProcessEvent instead of putting it in
+	 * the command map.
+	 */
+	@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+	annotation class Addon
 
 	/**
 	 * Used to indicate the default function for a subcommand group

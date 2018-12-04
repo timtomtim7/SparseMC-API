@@ -40,16 +40,16 @@ object CommandReflectionLoader {
 					is ExecuteResult.Success -> return true
 					is ExecuteResult.FailedError -> {
 						val message = locale["error.command.${command.primaryName}.internalError"]
-							?: "${ChatColor.RED}An internal error occurred while attempting to execute this command."
+								?: "${ChatColor.RED}An internal error occurred while attempting to execute this command."
 						sender.sendMessage(message)
 						result.error.printStackTrace()
 					}
 					is ExecuteResult.FailedNoMatch -> {
 						for ((overload, error) in result.parseFails) {
 							val message = locale["error.command.${command.primaryName}.${error.failedAtName}"]
-							if(message != null) {
+							if (message != null) {
 								sender.sendMessage(message)
-							}else{
+							} else {
 								val usage = error.signature.errorString(error.failedAtName)
 								sender.sendMessage(
 										ChatColor.DARK_RED, ChatColor.BOLD, "Usage: ",
@@ -60,9 +60,9 @@ object CommandReflectionLoader {
 					}
 					is ExecuteResult.FailedParse -> {
 						val message = locale["error.command.${command.primaryName}.${result.fail.failedAtName}"]
-						if(message != null) {
+						if (message != null) {
 							sender.sendMessage(message)
-						}else{
+						} else {
 							val usage = result.fail.signature.errorString(result.fail.failedAtName)
 							sender.sendMessage(
 									ChatColor.DARK_RED, ChatColor.BOLD, "Usage: ",
@@ -164,10 +164,10 @@ object CommandReflectionLoader {
 		val aliases = element.findAnnotation<Command.Aliases>()?.aliases?.toList() ?: emptyList()
 		val description = element.findAnnotation<Command.Description>()?.description ?: ""
 		val permission = element.findAnnotation<Command.Permission>()?.permission
-
+		val overwrite = element.findAnnotation<Command.Addon>() != null
 		val default = element.findAnnotation<Command.Default>() != null
 
-		return Command(plugin, name, aliases, description, permission, default)
+		return Command(plugin, name, aliases, description, permission, default, overwrite)
 	}
 
 	data class IntermediateCommandGroup(
@@ -186,7 +186,7 @@ object CommandReflectionLoader {
 		}
 
 		override fun execute(sender: CommandSender, raw: String): ExecuteResult {
-			if(!hasPermission(sender))
+			if (!hasPermission(sender))
 				return ExecuteResult.FailedNoPermission(command.permission!!)
 
 			val targetName = raw.takeWhile { it != ' ' }
@@ -277,7 +277,7 @@ object CommandReflectionLoader {
 			if (args.signature != signature)
 				throw IllegalArgumentException("Command arguments provided with wrong signature")
 
-			if(!hasPermission(sender))
+			if (!hasPermission(sender))
 				return ExecuteResult.FailedNoPermission(command.permission!!)
 
 			val params = HashMap<KParameter, Any?>()
@@ -329,7 +329,7 @@ object CommandReflectionLoader {
 		data class FailedError(val error: Throwable) : ExecuteResult()
 		data class FailedNoMatch(val parseFails: Map<IntermediateCommand, Signature.ParseResult.Fail>) : ExecuteResult()
 		data class FailedNoSubcommand(val group: IntermediateCommandGroup) : ExecuteResult()
-		data class FailedNoPermission(val permission: String): ExecuteResult()
+		data class FailedNoPermission(val permission: String) : ExecuteResult()
 		data class Success(val extra: String) : ExecuteResult()
 	}
 
