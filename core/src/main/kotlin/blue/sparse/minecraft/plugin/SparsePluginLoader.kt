@@ -3,7 +3,8 @@ package blue.sparse.minecraft.plugin
 import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.util.castDeclaredField
 import org.bukkit.Server
-import org.bukkit.event.*
+import org.bukkit.event.Event
+import org.bukkit.event.Listener
 import org.bukkit.plugin.*
 import java.io.File
 import java.util.regex.Pattern
@@ -47,6 +48,7 @@ class SparsePluginLoader(val server: Server) : PluginLoader {
 		server.pluginManager.castDeclaredField<MutableList<Plugin>>("plugins").remove(plugin)
 		server.pluginManager.castDeclaredField<MutableMap<String, Plugin>>("lookupNames").values.remove(plugin)
 		loadedPlugins.values.remove(plugin)
+		(plugin.javaClass.classLoader as SparsePluginClassLoader).close()
 	}
 
 	fun unloadAll() {

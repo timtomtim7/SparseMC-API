@@ -72,9 +72,15 @@ object CommandReflectionLoader {
 					}
 					is ExecuteResult.FailedNoSubcommand -> {
 						val group = result.group
-						sender.sendMessage(ChatColor.DARK_RED, ChatColor.BOLD, "Commands:")
-						for (subcommand in group.commands) {
-							sender.sendMessage(ChatColor.RED, '/', subcommand.fullName)
+						val message = locale["error.command.${command.primaryName}.help"]
+						if(message != null) {
+							sender.sendMessage(message)
+						}else {
+							sender.sendMessage(ChatColor.DARK_RED, ChatColor.BOLD, "Commands:")
+
+							for (subcommand in group.commands) {
+								sender.sendMessage(ChatColor.RED, '/', subcommand.fullName)
+							}
 						}
 					}
 					is ExecuteResult.FailedNoPermission -> {
@@ -137,7 +143,7 @@ object CommandReflectionLoader {
 		}
 	}
 
-	private fun groupOverloadedSingles(parentCommand: IntermediateCommandGroup?, singles: Collection<IntermediateSingleCommand>): Collection<IntermediateCommandOverloads> {
+	private fun groupOverloadedSingles(parentCommand: IntermediateCommandGroup?, singles: Collection<IntermediateSingleCommand>): Collection<IntermediateCommand> {
 		val uniqueNames = singles.flatMap { it.names }
 		return uniqueNames.map { name ->
 			IntermediateCommandOverloads(name, singles.filter { name in it.names }, parentCommand)

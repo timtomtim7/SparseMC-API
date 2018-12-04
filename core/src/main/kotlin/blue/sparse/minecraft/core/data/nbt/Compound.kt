@@ -222,6 +222,10 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 		}
 	}
 
+	fun write(output: OutputStream) {
+		NBTSerializer.writeNamed("", NBTValue.NBTCompound(this), output)
+	}
+
 	override fun toString(): String {
 		return backingMap.toString()
 	}
@@ -233,6 +237,12 @@ class Compound/*: AbstractMutableMap<String, Any>*/ {
 				it.read(ByteArray(3))
 				(NBTSerializer.read(DataInputStream(it), 10) as NBTValue.NBTCompound).value
 			}
+		}
+
+		fun read(input: InputStream): Compound {
+			input.read(ByteArray(3))
+			val data = input as? DataInputStream ?: DataInputStream(input)
+			return (NBTSerializer.read(data, 10) as NBTValue.NBTCompound).value
 		}
 
 		fun readOrCreate(file: File): Compound {

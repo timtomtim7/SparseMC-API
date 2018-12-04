@@ -1,6 +1,7 @@
 package blue.sparse.minecraft.core.data.nbt.converter
 
 import blue.sparse.minecraft.core.data.nbt.Compound
+import blue.sparse.minecraft.core.util.PluginClasses
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
@@ -18,7 +19,7 @@ object EnumConverter: NBTConverter<Enum<*>> {
 
 	@Suppress("UNCHECKED_CAST")
 	override fun fromNBT(value: Compound): Enum<*> {
-		val clazz = Class.forName(value.string("enumClass"))
+		val clazz = PluginClasses.forName(value.string("enumClass"))
 		val valueName = value.string("enumValue")
 		return clazz.enumConstants.first {
 			(it as Enum<*>).name == valueName

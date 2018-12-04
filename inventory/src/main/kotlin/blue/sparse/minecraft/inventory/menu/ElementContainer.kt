@@ -3,6 +3,7 @@ package blue.sparse.minecraft.inventory.menu
 import blue.sparse.minecraft.core.extensions.event.cancel
 import blue.sparse.minecraft.core.i18n.PluginLocale
 import blue.sparse.minecraft.inventory.extensions.editMeta
+import blue.sparse.minecraft.inventory.extensions.prependLore
 import blue.sparse.minecraft.inventory.menu.element.Element
 import blue.sparse.minecraft.inventory.menu.element.StaticElement
 import org.bukkit.Material
@@ -60,8 +61,13 @@ abstract class ElementContainer(val contentSize: Vector2i, open val locale: Plug
 				icon.editMeta {
 					if(localeName != null)
 						displayName = locale.get(localeName, *placeholders) ?: displayName
-					if(localeLore != null)
-						lore = locale.get(localeLore, *placeholders)?.lines() ?: lore
+					if(localeLore != null) {
+						val lore = locale.get(localeLore, *placeholders)
+						if(lore != null) {
+							prependLore(lore)
+						}
+//						lore = locale.get(localeLore, *placeholders)?.lines() ?: lore
+					}
 				}
 			}
 			this.icon = icon

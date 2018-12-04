@@ -107,6 +107,7 @@ class CharacterImpl : CharacterNMS {
 		}
 
 		override fun setVisible(player: Player) {
+			setInvisible(player)
 			val name = name.fold({ it }, { it[player] ?: it.key })
 			nms.profile.reflection["name"].declaredFieldValue = name
 			nms.displayName = name

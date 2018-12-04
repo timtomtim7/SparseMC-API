@@ -17,7 +17,17 @@ fun ItemMeta.displayName(vararg parts: Any?) {
 
 fun ItemMeta.appendLore(vararg parts: Any?) {
 	val newLore = (lore as? MutableList<String> ?: lore?.toMutableList() ?: ArrayList())
-	newLore.addAll(parts.joinToString("").split("\n"))
+	newLore.addAll(parts.filterNotNull().joinToString("").split("\n"))
+	lore = newLore
+}
+
+fun ItemMeta.prependLore(vararg parts: Any?) {
+	val newLore = (lore as? MutableList<String> ?: lore?.toMutableList() ?: ArrayList())
+	val lines = parts.filterNotNull().joinToString("").split("\n")
+	if (newLore.isEmpty())
+		newLore.addAll(lines)
+	else
+		newLore.addAll(0, lines)
 	lore = newLore
 }
 
@@ -26,7 +36,7 @@ fun ItemMeta.appendLore(plugin: Plugin, player: Player, key: String, vararg plac
 }
 
 fun ItemMeta.enchantedEffect() {
-	if(hasEnchants())
+	if (hasEnchants())
 		return
 
 	addEnchant(Enchantment.LURE, 1, true)

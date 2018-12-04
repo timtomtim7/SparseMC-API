@@ -1,12 +1,15 @@
 package blue.sparse.minecraft.commands.test
 
-import blue.sparse.minecraft.commands.*
+import blue.sparse.minecraft.commands.Execute
+import blue.sparse.minecraft.core.extensions.server
+import blue.sparse.minecraft.plugin.*
+import org.bukkit.ChatColor
 
 object TestCommands {
 
-	fun Execute.test(number: Int) {
-		replyRaw("2 * $number = ${2 * number}")
-	}
+//	fun Execute.test(number: Int) {
+//		replyRaw("2 * $number = ${2 * number}")
+//	}
 
 //	fun Execute.test() {
 //		val player = sender as Player
@@ -14,39 +17,39 @@ object TestCommands {
 //		replyRaw("Hello: $hello!")
 //	}
 
-	object GroupTest : CommandGroup {
-		@Command.Default
-		fun Execute.a() = replyRaw("This is A!")
-
-		fun Execute.b() = replyRaw("This is B!")
-		fun Execute.c() = replyRaw("This is C!")
-
-		object Hello : CommandGroup {
-			fun Execute.world() = replyRaw("Hello, world!")
-			fun Execute.me() = replyRaw("Hello, ${sender.name}!")
-		}
-	}
-
-//	fun Execute.sparseReload(pluginName: String) {
-//		if (!sender.hasPermission("sparsemcapi.reload.plugin"))
-//			errorRaw(ChatColor.RED, "No permission to reload.")
+//	object GroupTest : CommandGroup {
+//		@Command.Default
+//		fun Execute.a() = replyRaw("This is A!")
 //
-//		val pluginManager = server.pluginManager
-//		var plugin: SparsePlugin = (pluginManager.getPlugin(pluginName)
-//				?: errorRaw(ChatColor.RED, "Plugin either doesn't exist or isn't loaded")) as? SparsePlugin
-//				?: errorRaw(ChatColor.RED, "That plugin was not loaded by SparseMC-API")
+//		fun Execute.b() = replyRaw("This is B!")
+//		fun Execute.c() = replyRaw("This is C!")
 //
-//		val file = (plugin.javaClass.classLoader as SparsePluginClassLoader).file
-//
-//		val loader = SparsePluginLoader.instance!!
-//		loader.disablePlugin(plugin)
-//		loader.unloadPlugin(plugin)
-//
-//		plugin = pluginManager.loadPlugin(file) as SparsePlugin
-//		pluginManager.enablePlugin(plugin)
-//
-//		replyRaw(ChatColor.GRAY, "Plugin ", ChatColor.GREEN, plugin.name, ChatColor.GRAY, " reloaded.")
+//		object Hello : CommandGroup {
+//			fun Execute.world() = replyRaw("Hello, world!")
+//			fun Execute.me() = replyRaw("Hello, ${sender.name}!")
+//		}
 //	}
+
+	fun Execute.sparseReload(pluginName: String) {
+		if (!sender.hasPermission("sparsemcapi.reload.plugin"))
+			errorRaw(ChatColor.RED, "No permission to reload.")
+
+		val pluginManager = server.pluginManager
+		var plugin: SparsePlugin = (pluginManager.getPlugin(pluginName)
+				?: errorRaw(ChatColor.RED, "Plugin either doesn't exist or isn't loaded")) as? SparsePlugin
+				?: errorRaw(ChatColor.RED, "That plugin was not loaded by SparseMC-API")
+
+		val file = (plugin.javaClass.classLoader as SparsePluginClassLoader).file
+
+		val loader = SparsePluginLoader.instance!!
+		loader.disablePlugin(plugin)
+		loader.unloadPlugin(plugin)
+
+		plugin = pluginManager.loadPlugin(file) as SparsePlugin
+		pluginManager.enablePlugin(plugin)
+
+		replyRaw(ChatColor.GRAY, "Plugin ", ChatColor.GREEN, plugin.name, ChatColor.GRAY, " reloaded.")
+	}
 
 //	@Command.Description("Message another player or players.")
 //	fun Execute.msg(target: Either<Player, List<Player>>, message: SpacedString) {

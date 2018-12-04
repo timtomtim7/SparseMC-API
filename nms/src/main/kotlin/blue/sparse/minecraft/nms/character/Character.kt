@@ -91,11 +91,12 @@ open class Character(
 			respawn()
 		}
 
-		val notVisible = visibleTo.filter {
-			!it.isOnline || it.location.distanceSquared(location) >= 55.0 * 55.0
+		val notVisible = visibleTo.filterTo(ArrayList()) {
+			!it.isOnline || it.world != location.world || it.location.distanceSquared(location) >= 55.0 * 55.0
 		}
-		notVisible.forEach(handle::setInvisible)
 		visibleTo.removeAll(notVisible)
+		notVisible.removeAll { !it.isOnline }
+		notVisible.forEach(handle::setInvisible)
 
 		val newVisible = nearbyPlayers - visibleTo
 		newVisible.forEach(handle::setVisible)
