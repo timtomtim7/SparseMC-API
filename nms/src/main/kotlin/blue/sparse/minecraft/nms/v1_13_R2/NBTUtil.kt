@@ -6,19 +6,26 @@ import net.minecraft.server.v1_13_R2.*
 internal object NBTUtil {
 
 	internal fun nbtBaseValue(base: NBTBase): Any = when (base) {
-		is NBTTagByte -> base.g()
-		is NBTTagShort -> base.f()
-		is NBTTagInt -> base.e()
-		is NBTTagLong -> base.d()
-		is NBTTagFloat -> base.i()
+		is NBTTagByte -> getData(base) as Byte
+		is NBTTagShort -> getData(base) as Short
+		is NBTTagInt -> getData(base) as Int
+		is NBTTagLong -> getData(base) as Long
+		is NBTTagFloat -> getData(base) as Float
 		is NBTTagDouble -> base.asDouble()
-		is NBTTagByteArray -> base.c()
-		is NBTTagString -> base.b_()
+		is NBTTagByteArray -> getData(base) as ByteArray
+		is NBTTagString -> getData(base) as String
 		is NBTTagList -> (0 until base.size).mapNotNull { nbtBaseValue(base[it]) }
 		is NBTTagCompound -> Compound(base.keys.mapNotNull m@{ Pair(it ?: return@m null, nbtBaseValue(base[it])) })
-		is NBTTagIntArray -> base.d()
-		is NBTTagLongArray -> base.d()
+		is NBTTagIntArray -> getData(base) as IntArray
+		is NBTTagLongArray -> getData(base, "d") as String
 		else -> throw IllegalArgumentException("Invalid NBTBase object ${base.javaClass.name}")
+	}
+
+	private fun getData(base: NBTBase, fieldName: String = "data"): Any? {
+		return base.javaClass.getDeclaredField(fieldName).run {
+			isAccessible = true
+			get(base)
+		}
 	}
 
 	internal fun valueToNBTBase(value: Any): NBTBase {

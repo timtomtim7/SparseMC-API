@@ -4,13 +4,11 @@ apply from: "../common.gradle"
 group 'blue.sparse.minecraft'
 
 repositories {
-//    maven { url 'https://jitpack.io' }
     flatDir { dirs "plugins" }
 }
 
 dependencies {
     compile project(':core')
-//    implementation 'com.github.drtshock:FactionsUUID:-SNAPSHOT'
     file("plugins").listFiles().each {
         compileOnly name: it.name.replace(".jar", "")
     }

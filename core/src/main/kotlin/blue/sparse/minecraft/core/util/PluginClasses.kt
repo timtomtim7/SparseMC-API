@@ -6,12 +6,12 @@ object PluginClasses {
 	fun forName(name: String): Class<*> {
 		try {
 			return Class.forName(name)
-		}catch(ignored: ClassNotFoundException) { }
+		}catch(ignored: Throwable) { }
 
 		return server.pluginManager.plugins.mapNotNull {
 			try {
 				Class.forName(name, true, it.javaClass.classLoader)
-			}catch(ignored: ClassNotFoundException) {
+			}catch(ignored: Throwable) {
 				null
 			}
 		}.firstOrNull() ?: throw ClassNotFoundException(name)

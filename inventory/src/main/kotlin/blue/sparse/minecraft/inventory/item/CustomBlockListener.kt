@@ -36,7 +36,7 @@ object CustomBlockListener : Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun onBlockPlace(event: BlockPlaceEvent) {
         val type = CustomItemType.getType(event.itemInHand) as? CustomBlockType ?: return
         type.onBlockPlace(event, event.block, event.itemInHand, event.player)
