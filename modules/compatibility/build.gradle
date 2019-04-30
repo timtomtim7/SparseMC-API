@@ -1,0 +1,10 @@
+repositories {
+    flatDir { dirs "plugins" }
+}
+
+dependencies {
+    compileOnly project(':core')
+    file("plugins").listFiles().each {
+        compileOnly name: it.name.replace(".jar", "")
+    }
+}

@@ -1,92 +1,48 @@
-buildscript {
-    ext.kotlin_version = '1.3-M1'
-	ext.coroutines_version = '0.24.0-eap13'
-
-    repositories {
-		maven { url = "http://dl.bintray.com/kotlin/kotlin-eap/" }
-		mavenCentral()
-		jcenter()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+plugins {
+	id 'org.jetbrains.kotlin.jvm' version '1.3.31' apply false
 }
 
-group 'blue.sparse.minecraft'
+group 'blue.sparse.sparse-mc'
 version '1.0-SNAPSHOT'
 
 allprojects {
 	apply plugin: 'maven-publish'
 }
 
-subprojects { p ->
-	configure(p) {
-		publishing {
-			publications {
-				mavenJava(MavenPublication) {
-					groupId project.group
-					artifactId project.name
-					version project.version
-					from components.java
-				}
+subprojects {
+	apply from: "../../common.gradle"
 
-//				mavenJava(MavenPublication) {
-//					artifact tasks.getByName("jar")
-//				}
+	group 'blue.sparse.sparse-mc'
+
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+				groupId project.group
+				artifactId project.name
+				version project.version
+				from components.java
 			}
-			repositories {
-				maven {
-					name = "sparse"
-					url "F:\\maven"
-				}
+		}
+		repositories {
+			maven {
+				name = "sparse"
+				url "F:\\maven"
 			}
 		}
 	}
 }
 
-task copyJars(type: Copy) {
-	from subprojects.collect { it.tasks.withType(Jar) }
-	into "$buildDir/allJars"
+task fullJar(type: Jar, dependsOn: subprojects.collect { it.tasks["jar"] }) {
+	group "minecraft"
+	archiveName = "$buildDir/libs/SparseMC-API.jar"
+	from subprojects.collect { zipTree((it.tasks["jar"] as Jar).archivePath) }
+//	from subprojects.collect { it.sourceSets.main.output }
+//	from subprojects.collect { it.configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+//	from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
 task copyToPlugins(type: Copy) {
+	group "minecraft"
 	into("testServer/plugins")
-	from subprojects.find { it.name == "core" }.tasks.withType(Jar)
-
-	file("testServer/plugins/SparseMC-API/modules").deleteDir()
-	into("SparseMC-API/modules/") {
-		from subprojects.findAll { it.name != "core" }.collect { it.tasks.withType(Jar) }
-	}
-}
-
-def testServersDir = file("F:/Spigot/Test Servers")
-
-for(file in testServersDir.listFiles()) {
-	def pluginsFolder = new File(file, "plugins")
-	def modulesFolder = new File(pluginsFolder, "SparseMC-API/modules")
-
-	task "delete${file.name}"(type: Delete) {
-		group = "versions"
-
-		delete modulesFolder.absolutePath
-	}
-
-	task "copyTo${file.name}"(type: Copy) {
-		group = "versions"
-
-		into(pluginsFolder.absolutePath)
-		from subprojects.find { it.name == "core" }.tasks.withType(Jar)
-
-		dependsOn "delete${file.name}"
-
-		into("SparseMC-API/modules") {
-			from subprojects.findAll { it.name != "core" }.collect { it.tasks.withType(Jar) }
-		}
-	}
-}
-
-task copyToTestServers() {
-	for(file in testServersDir.listFiles()) {
-		finalizedBy("copyTo${file.name}")
-	}
+	from fullJar
 }

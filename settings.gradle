@@ -1,11 +1,6 @@
-rootProject.name = 'sparse-mc-api'
-include 'core'
-include 'math'
-include 'compatibility'
-include 'commands'
-include 'inventory'
-include 'persistent'
-include 'scripting'
-include 'scheduler'
-include 'nms'
+rootProject.name = 'sparse-mc-api-new'
 
+['core', 'math', 'compatibility', 'commands', 'inventory', 'persistent', 'scripting', 'scheduler', 'nms'].each {
+	include "modules/$it"
+	findProject(":modules/$it").name = it
+}
