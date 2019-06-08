@@ -128,7 +128,7 @@ class CharacterImpl : CharacterNMS {
 			player.sendPacket(PacketPlayOutNamedEntitySpawn(nms))
 			server.scheduler.scheduleSyncDelayedTask(SparseMCAPIPlugin.getPlugin(), {
 				player.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, nms))
-			}, 20L)
+			}, 40L)
 
 			createLookPackets().forEach { player.sendPacket(it) }
 		}

@@ -14,6 +14,8 @@ object ModuleManager {
 		for (value in ModuleType.values()) {
 			if(value == ModuleType.CORE)
 				continue
+			if(value == ModuleType.SCRIPTING)
+				continue
 			val module = value.clazz.objectInstance!!
 			modules.add(module)
 			module.onEnable()
