@@ -5,10 +5,15 @@ import blue.sparse.minecraft.nms.chat.Text
 import net.minecraft.server.v1_8_R1.*
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
+import org.bukkit.plugin.Plugin
 
 class ChatImpl: ChatNMS {
 	override fun send(player: Player, text: Text) {
 		TODO("not implemented")
+	}
+
+	override fun send(player: Player, plugin: Plugin, key: String) {
+
 	}
 
 	override fun sendTitle(player: Player, title: String, subtitle: String, fadein: Int, stay: Int, fadeout: Int) {

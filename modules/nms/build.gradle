@@ -5,7 +5,7 @@ repositories {
 dependencies {
     compileOnly project(':core')
     compileOnly name: "spigot-1.13.2"
-    compileOnly name: "spigot-1.13.1"
+//    compileOnly name: "spigot-1.13.1"
     compileOnly name: "spigot-1.13"
     compileOnly name: "spigot-1.12.2"
     compileOnly name: "spigot-1.11.2"

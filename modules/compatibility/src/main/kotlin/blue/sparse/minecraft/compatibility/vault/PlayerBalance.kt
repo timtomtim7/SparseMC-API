@@ -3,7 +3,7 @@ package blue.sparse.minecraft.compatibility.vault
 import org.bukkit.OfflinePlayer
 
 data class PlayerBalance(val player: OfflinePlayer) : Number() {
-	private var money
+	private var money: Double
 		get() = VaultCompat.economy.getBalance(player)
 		set(value) {
 			val difference = value - money
@@ -21,7 +21,7 @@ data class PlayerBalance(val player: OfflinePlayer) : Number() {
 	override fun toLong() = money.toLong()
 	override fun toShort() = money.toShort()
 
-	operator fun contains(amount: Number) = money >= amount.toDouble()
+	operator fun contains(amount: Number): Boolean = money >= amount.toDouble()
 	operator fun minusAssign(amount: Number) {
 		money -= amount.toDouble()
 	}

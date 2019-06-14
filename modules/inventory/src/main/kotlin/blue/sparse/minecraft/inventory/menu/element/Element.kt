@@ -25,11 +25,7 @@ abstract class Element(
 				&& point.y < max.y
 	}
 
-	abstract fun onClick(
-			event: InventoryClickEvent,
-			player: Player,
-			position: Vector2i
-	)
+	abstract fun onClick(event: InventoryClickEvent, player: Player, position: Vector2i)
 
 	abstract fun setup()
 
