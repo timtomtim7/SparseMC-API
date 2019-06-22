@@ -6,8 +6,13 @@ import net.minecraft.server.v1_9_R1.IChatBaseComponent
 import net.minecraft.server.v1_9_R1.PacketPlayOutTitle
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
+import org.bukkit.plugin.Plugin
 
 class ChatImpl: ChatNMS {
+	override fun send(player: Player, plugin: Plugin, key: String) {
+		TODO("not implemented")
+	}
+
 	override fun send(player: Player, text: Text) {
 		TODO("not implemented")
 	}

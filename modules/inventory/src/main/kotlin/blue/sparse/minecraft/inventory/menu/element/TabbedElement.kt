@@ -134,6 +134,10 @@ class TabbedElement(
 			section.clear()
 		}
 
+		override fun isVisible(element: Element): Boolean {
+			return currentTab == this && super.isVisible(element)
+		}
+
 		fun onSelected(selectedCallback: () -> Unit) {
 			this.selectedCallback = selectedCallback
 		}

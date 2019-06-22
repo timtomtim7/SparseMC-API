@@ -1,7 +1,6 @@
 package blue.sparse.minecraft.inventory.menu.element
 
-import blue.sparse.minecraft.inventory.menu.ElementContainer
-import blue.sparse.minecraft.inventory.menu.Vector2i
+import blue.sparse.minecraft.inventory.menu.*
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 
@@ -28,6 +27,10 @@ abstract class Element(
 	abstract fun onClick(event: InventoryClickEvent, player: Player, position: Vector2i)
 
 	abstract fun setup()
+
+	open fun onTick(menu: Menu): Boolean {
+		return false
+	}
 
 	interface Type<E : Element> {
 		fun create(position: Vector2i, size: Vector2i, parent: ElementContainer): E

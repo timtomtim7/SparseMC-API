@@ -4,13 +4,14 @@ import blue.sparse.minecraft.core.extensions.colored
 import org.bukkit.ChatColor
 import org.bukkit.plugin.Plugin
 import java.io.*
+import java.lang.Math.pow
 import java.util.Properties
 
 class PluginLocale private constructor(
 		val plugin: Plugin,
 		override val lang: String,
 		override val region: String
-): Locale {
+) : Locale {
 
 	private var storage: Properties
 
@@ -50,26 +51,40 @@ class PluginLocale private constructor(
 	}
 
 	operator fun get(key: String, placeholders: Map<String, Any>): String? {
-		val splits = key.split(".")
-
 		val original = getNoWildcard(key, placeholders)
-		if(original != null)
+		if (original != null)
 			return original
 
-		for(i in splits.indices) {
-			val builder = StringBuilder()
+		/*
+			a.b.c.d
+			*.b.c.d
+			a.*.c.d
+			a.b.*.d
+			a.b.c.*
+		 */
 
-			for(j in splits.indices) {
-				if(builder.isNotEmpty())
+		val splits = key.split(".")
+		val combinationCount = pow(2.0, splits.size.toDouble()).toInt()
+		val combinations = (0 until combinationCount)
+				.map {
+					it.toString(2)
+							.padStart(splits.size, '0')
+							.map { c -> c == '1' }
+				}
+				.sortedBy { it.count { b -> b } }
+
+		for (combo in combinations) {
+			val builder = StringBuilder()
+			for (i in splits.indices) {
+				if (builder.isNotEmpty())
 					builder.append('.')
-				if(j == i)
+				if (combo[i])
 					builder.append('*')
 				else
-					builder.append(splits[j])
+					builder.append(splits[i])
 			}
-
 			val result = getNoWildcard(builder.toString(), placeholders)
-			if(result != null)
+			if (result != null)
 				return result
 		}
 

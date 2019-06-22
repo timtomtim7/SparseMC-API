@@ -21,6 +21,8 @@ object ModuleManager {
 			module.onEnable()
 			SparseMCAPIPlugin.getPlugin().logger.info("Enabled module ${module.name}")
 		}
+
+		CoreModule.loadAndEnablePlugins()
 	}
 
 	@JvmName("onPluginDisable")

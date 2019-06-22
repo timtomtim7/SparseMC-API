@@ -31,7 +31,7 @@ abstract class ElementContainer(val contentSize: Vector2i, open val locale: Plug
 		return elements.remove(element)
 	}
 
-	fun isVisible(element: Element): Boolean {
+	open fun isVisible(element: Element): Boolean {
 		return element in elements
 	}
 
@@ -106,6 +106,20 @@ abstract class ElementContainer(val contentSize: Vector2i, open val locale: Plug
 
 	private fun setup(element: Element) {
 		element.setup()
+	}
+
+	internal fun tick(menu: Menu): Boolean {
+		var updated = false
+
+		elements.forEach {
+			if(isVisible(it)) {
+				updated = it.onTick(menu) || updated
+				if(it is ElementContainer)
+					updated = it.tick(menu) || updated
+			}
+		}
+
+		return updated
 	}
 
 	infix fun Int.x(y: Int) = Vector2i(this, y)

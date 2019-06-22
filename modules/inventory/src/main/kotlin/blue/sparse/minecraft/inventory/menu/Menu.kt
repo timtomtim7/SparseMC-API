@@ -5,6 +5,7 @@ import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.core.i18n.LocalizedString
 import blue.sparse.minecraft.core.i18n.PluginLocale
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.plugin.Plugin
@@ -12,7 +13,8 @@ import org.bukkit.plugin.Plugin
 class Menu(val plugin: Plugin, val player: Player, rows: Int)
 	: ElementContainer(Vector2i(9, rows), PluginLocale.default(plugin)), InventoryHolder {
 	private var _inventory = createInventory()
-	private var closeCallback: () -> Unit = {}
+	internal var closeCallback: () -> Unit = {}
+	internal var clickPlayerInventoryCallback: InventoryClickEvent.() -> Unit = {}
 
 	override val section: InventorySection
 		get() = InventorySection(_inventory, Vector2i(0, 0), contentSize)
@@ -46,5 +48,13 @@ class Menu(val plugin: Plugin, val player: Player, rows: Int)
 		closeCallback = body
 	}
 
+	fun onClickPlayerInventory(callback: InventoryClickEvent.() -> Unit) {
+		this.clickPlayerInventoryCallback = callback
+	}
+
 	override fun getInventory() = _inventory
+
+	internal fun closed() {
+		closeCallback()
+	}
 }

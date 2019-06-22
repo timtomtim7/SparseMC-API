@@ -3,8 +3,7 @@ package blue.sparse.minecraft.inventory.menu.element
 import blue.sparse.minecraft.core.extensions.event.cancel
 import blue.sparse.minecraft.inventory.extensions.displayName
 import blue.sparse.minecraft.inventory.extensions.editMeta
-import blue.sparse.minecraft.inventory.menu.ElementContainer
-import blue.sparse.minecraft.inventory.menu.Vector2i
+import blue.sparse.minecraft.inventory.menu.*
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -52,7 +51,24 @@ class PaginatedElement<T : PaginatedElement.PageItem>(
 		get() = page < pageCount - 1
 
 	override fun setup() {
-		setupPage(0)
+		setupPage(page)
+	}
+
+	override fun onTick(menu: Menu): Boolean {
+		var updated = false
+
+		var index = page * itemsPerPage
+		for (pos in section) {
+			if ((hasNextPage && pos == nextPageIconPosition) || (hasPrevPage && pos == prevPageIconPosition))
+				continue
+			val item = items.getOrNull(index++) ?: break
+			if (item.onTick(menu)) {
+				section[pos] = item.icon
+				updated = true
+			}
+		}
+
+		return updated
 	}
 
 	private fun setupPage(page: Int) {
@@ -89,6 +105,7 @@ class PaginatedElement<T : PaginatedElement.PageItem>(
 		val item = items.getOrNull(index) ?: return
 		item.onClick(player)
 		item.onClick(player, InventoryAction(event.isLeftClick, event.isRightClick, event.isShiftClick))
+		item.onClick(player, event)
 		section[position] = item.icon
 	}
 
@@ -115,7 +132,12 @@ class PaginatedElement<T : PaginatedElement.PageItem>(
 	interface PageItem {
 		val icon: ItemStack
 
+		fun onTick(menu: Menu): Boolean {
+			return false
+		}
+
 		fun onClick(player: Player) {}
 		fun onClick(player: Player, action: InventoryAction) {}
+		fun onClick(player: Player, event: InventoryClickEvent) {}
 	}
 }

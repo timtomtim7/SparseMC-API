@@ -242,8 +242,13 @@ object CommandReflectionLoader {
 					.map { it.first to (it.second as Signature.ParseResult.Success) }
 					.toList()
 
-			if (matches.isEmpty())
+			if (matches.isEmpty()) {
+				val perm = parsed.find { it.second !is Signature.ParseResult.Fail && it.first.command.permission != null }
+				if(perm != null) {
+					return CommandReflectionLoader.ExecuteResult.FailedNoPermission(perm.first.command.permission!!)
+				}
 				return ExecuteResult.FailedNoMatch(parsed.map { it.first to it.second as Signature.ParseResult.Fail }.toMap())
+			}
 
 			val (command, parseSuccess) = matches.minBy { it.second.extra.length }!!
 			return command.execute(sender, parseSuccess)

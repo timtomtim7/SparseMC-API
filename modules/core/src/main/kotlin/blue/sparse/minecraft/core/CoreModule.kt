@@ -1,11 +1,11 @@
 package blue.sparse.minecraft.core
 
+import blue.sparse.minecraft.SparseMCAPIPlugin
 import blue.sparse.minecraft.core.extensions.server
 import blue.sparse.minecraft.module.Module
 import blue.sparse.minecraft.module.ModuleType
 import blue.sparse.minecraft.plugin.SparsePluginLoader
 import blue.sparse.minecraft.util.reflection
-import java.io.File
 
 object CoreModule : Module {
 
@@ -13,13 +13,13 @@ object CoreModule : Module {
 
 	override fun onEnable() {
 		registerPluginLoader()
-		loadAndEnablePlugins()
 	}
 
 	override fun onDisable() {
 		disableAndUnloadPlugins()
 		unregisterPluginLoader()
 	}
+
 
 	private fun registerPluginLoader() {
 		server.pluginManager.registerInterface(SparsePluginLoader::class.java)
@@ -31,8 +31,9 @@ object CoreModule : Module {
 		fileAssoc.values.removeAll { it?.javaClass == SparsePluginLoader::class.java }
 	}
 
-	private fun loadAndEnablePlugins() {
-		val pluginsFolder = File("plugins")
+	internal fun loadAndEnablePlugins() {
+//		val pluginsFolder = File("plugins")
+		val pluginsFolder = SparseMCAPIPlugin.dataFolder().parentFile
 		if (pluginsFolder.exists()) {
 			val files = pluginsFolder.listFiles { f -> f.extension == "spl" }
 			val plugins = files.mapNotNull {

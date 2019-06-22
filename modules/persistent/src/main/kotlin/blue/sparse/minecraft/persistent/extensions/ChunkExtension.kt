@@ -1,5 +1,6 @@
 package blue.sparse.minecraft.persistent.extensions
 
+import blue.sparse.minecraft.core.PluginProvided
 import blue.sparse.minecraft.core.data.nbt.Compound
 import blue.sparse.minecraft.persistent.PersistentModule
 import org.bukkit.Chunk
@@ -19,4 +20,16 @@ inline fun Chunk.persistent(
 		if(save)
 			save()
 	}
+}
+
+fun Chunk.persistentProvided(plugin: PluginProvided<*>): Compound {
+	return PersistentModule[plugin.plugin].chunks[this].compound
+}
+
+inline fun Chunk.persistentProvided(
+		plugin: PluginProvided<*>,
+		save: Boolean = true,
+		body: Compound.() -> Unit
+) {
+	persistent(plugin.plugin, save, body)
 }
