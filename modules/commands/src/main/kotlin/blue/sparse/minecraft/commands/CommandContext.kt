@@ -42,7 +42,11 @@ class Execute(commandName: String, plugin: Plugin, sender: CommandSender, rawArg
 	}
 
 	fun reply(key: String, placeholders: Map<String, Any>, default: String = "MISSING_LOCALE_KEY[$key]") {
-		sender.sendMessage(locale[key, placeholders] ?: default)
+		val localizedMessage = locale[key, placeholders] ?: default
+
+		for (line in localizedMessage.lines()) {
+			sender.sendMessage(localizedMessage)
+		}
 	}
 
 	fun reply(key: String, vararg placeholders: Pair<String, Any>) {
